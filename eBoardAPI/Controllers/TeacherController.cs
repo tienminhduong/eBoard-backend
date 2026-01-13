@@ -8,7 +8,7 @@ namespace eBoardAPI.Controllers;
 public class TeacherController : ControllerBase
 {
     // authorize parent and teacher role
-    [HttpGet("/info/{id}")]
+    [HttpGet("info/{id}")]
     public async Task<ActionResult<TeacherInfoDto>> GetTeacherInfo([FromRoute] int id)
     {
         return Ok(new TeacherInfoDto
@@ -22,7 +22,7 @@ public class TeacherController : ControllerBase
     }
 
     // authorize teacher role
-    [HttpPut("/info/{id}")]
+    [HttpPut("info/{id}")]
     public async Task<ActionResult> UpdateTeacherInfo([FromRoute] int id, [FromBody] UpdateTeacherInfoDto updateTeacherInfoDto)
     {
         return Ok();
