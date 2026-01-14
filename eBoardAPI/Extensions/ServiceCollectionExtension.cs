@@ -7,6 +7,7 @@ using eBoardAPI.Models.Class;
 using eBoardAPI.Repositories;
 using eBoardAPI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 
 namespace eBoardAPI.Extensions;
 
@@ -20,7 +21,7 @@ public static class ServiceCollectionExtension
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new() { Title = "eBoard API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "eBoard API", Version = "v1" });
             });
             return services;
         }

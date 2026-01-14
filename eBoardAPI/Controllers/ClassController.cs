@@ -11,12 +11,7 @@ public class ClassController(IClassService classService) : ControllerBase
     [HttpGet("/api/grades")]
     public async Task<ActionResult> GetAllGrades()
     {
-        var grades = new[]
-        {
-            new { Id = Guid.NewGuid(), Name = "Grade 1" },
-            new { Id = Guid.NewGuid(), Name = "Grade 2" },
-            new { Id = Guid.NewGuid(), Name = "Grade 3" },
-        };
+        var grades = await classService.GetAllGradesAsync();
         return Ok(grades);
     }
     
@@ -24,29 +19,22 @@ public class ClassController(IClassService classService) : ControllerBase
     [HttpGet]
     public async Task<ActionResult> GetAllClassesByTeacher(Guid teacherId)
     {
-        var classDtos = await classService.GetAllTeachingClassesByTeacher(teacherId);
+        var classDtos = await classService.GetAllTeachingClassesByTeacherAsync(teacherId);
         return Ok(classDtos);
     }
     
     [HttpGet("{classId}")]
     public async Task<ActionResult> GetClassById(Guid classId)
     {
-        var classInfo = new ClassInfoDto
-        {
-            Grade = "Grade 1",
-            Name = "Grade 1",
-            TeacherName =  "Teacher A",
-            RoomName = "Room A",
-            MaxCapacity = 30,
-            Description = "This is Grade 1 class."
-        };
-        return Ok(classInfo);
+        var result = await classService.GetClassByIdAsync(classId);
+        return result.IsSuccess ? Ok(result.Value!) : NotFound(result.ErrorMessage!);
     }
 
     [HttpGet("{classId}/students")]
-    public async Task<ActionResult> GetStudentsByClassId(Guid classId)
+    public async Task<ActionResult> GetStudentsByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
     {
-        return Ok();
+        var pagedStudents = await classService.GetPagedStudentsByClassAsync(classId, pageNumber, pageSize);
+        return Ok(pagedStudents);
     }
     
     [HttpPost]
