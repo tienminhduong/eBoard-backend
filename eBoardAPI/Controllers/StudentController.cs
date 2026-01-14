@@ -1,3 +1,4 @@
+using eBoardAPI.Consts;
 using eBoardAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +10,7 @@ public class StudentController : ControllerBase
 {
     // authorize as teacher or parent
     [HttpGet("{id}")]
-    public async Task<ActionResult<StudentInfoDto>> GetStudentById(int id)
+    public async Task<ActionResult<StudentInfoDto>> GetStudentById(Guid id)
     {
         var student = new StudentInfoDto
         {
@@ -32,5 +33,22 @@ public class StudentController : ControllerBase
         };
 
         return Ok(student);
+    }
+    
+    // authorize as teacher
+    [HttpPost]
+    public async Task<ActionResult<StudentInfoDto>> CreateStudent([FromBody] CreateStudentDto student)
+    {
+        var createdStudent = new StudentInfoDto
+        {
+            Id = Guid.NewGuid(),
+            FirstName = student.FirstName,
+            LastName = student.LastName,
+            FullAddress = student.Address,
+            RelationshipWithParent = student.RelationshipWithParent,
+            DateOfBirth = student.DateOfBirth,
+            Gender = Gender.Male,
+        };
+        return CreatedAtAction(nameof(GetStudentById), new { id = createdStudent.Id }, createdStudent);
     }
 }

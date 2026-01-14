@@ -1,3 +1,5 @@
+namespace eBoardAPI.Consts;
+
 public static class RelationshipWithParent
 {
     public const string Father = "Cha";
