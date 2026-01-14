@@ -3,6 +3,7 @@ using eBoardAPI.Common;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
+using eBoardAPI.Models;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.Student;
 
@@ -51,5 +52,33 @@ public class ClassService(
             ClassId = classId
         };
         return pagedResult;
+    }
+
+    public async Task<PagedDto<ClassInfoDto>> GetPagedClassesByTeacherAsync(Guid teacherId, int pageNumber, int pageSize)
+    {
+        var classes = await classRepository.GetAllClassesByTeacherAsync(teacherId, pageNumber, pageSize);
+        var classDtos = mapper.Map<IEnumerable<ClassInfoDto>>(classes);
+        var pagedResult = new PagedDto<ClassInfoDto>
+        {
+            Data = classDtos,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalRecords = classes.Count(),
+        };
+        return pagedResult;
+    }
+
+    public async Task<Result<ClassInfoDto>> AddNewClassAsync(CreateClassDto createClassDto, Guid teacherId)
+    {
+        var newClass = mapper.Map<Class>(createClassDto);
+        newClass.TeacherId = teacherId;
+        
+        var result = await classRepository.AddNewClassAsync(newClass);
+        
+        if (!result.IsSuccess)
+            return Result<ClassInfoDto>.Failure(result.ErrorMessage!);
+        
+        var classDto = mapper.Map<ClassInfoDto>(result.Value);
+        return Result<ClassInfoDto>.Success(classDto);
     }
 }

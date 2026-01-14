@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using eBoardAPI.Context;
@@ -11,9 +12,11 @@ using eBoardAPI.Context;
 namespace eBoardAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260114185746_ChangeStudentAndClassNullableField")]
+    partial class ChangeStudentAndClassNullableField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,139 +68,6 @@ namespace eBoardAPI.Migrations
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Classes");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.ClassFund", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ClassId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("CurrentBalance")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ClassFunds");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.FundExpense", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("ClassFundId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateOnly>("ExpenseDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("InvoiceImgUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("SpenderName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassFundId");
-
-                    b.ToTable("FundExpenses");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.FundIncome", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("AmountPerStudent")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid?>("ClassFundId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("CollectedAmount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("ExpectedAmount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassFundId");
-
-                    b.ToTable("FundIncomes");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.FundIncomeDetail", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("ContributedAmount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateOnly>("ContributedAt")
-                        .HasColumnType("date");
-
-                    b.Property<string>("ContributedInfo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ContributionStatus")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("FundIncomeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FundIncomeId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("FundIncomeDetails");
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.Grade", b =>
@@ -372,45 +242,6 @@ namespace eBoardAPI.Migrations
                     b.Navigation("Grade");
 
                     b.Navigation("Teacher");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.FundExpense", b =>
-                {
-                    b.HasOne("eBoardAPI.Entities.ClassFund", "ClassFund")
-                        .WithMany()
-                        .HasForeignKey("ClassFundId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ClassFund");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.FundIncome", b =>
-                {
-                    b.HasOne("eBoardAPI.Entities.ClassFund", "ClassFund")
-                        .WithMany()
-                        .HasForeignKey("ClassFundId");
-
-                    b.Navigation("ClassFund");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.FundIncomeDetail", b =>
-                {
-                    b.HasOne("eBoardAPI.Entities.FundIncome", "FundIncome")
-                        .WithMany()
-                        .HasForeignKey("FundIncomeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("eBoardAPI.Entities.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FundIncome");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.InClass", b =>

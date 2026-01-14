@@ -29,7 +29,17 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
 
     public async Task<IEnumerable<Class>> GetAllClassesByTeacherAsync(Guid teacherId, int pageNumber, int pageSize)
     {
-        throw new NotImplementedException();
+        var query = from c in dbContext.Classes
+            where c.TeacherId == teacherId
+            orderby c.StartDate descending
+            select c;
+        
+        return await query
+            .Include(c => c.Teacher)
+            .Include(c => c.Grade)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<Student>> GetStudentsByClassAsync(Guid classId, int pageNumber, int pageSize)
@@ -41,6 +51,7 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
             select s;
         
         return await query
+            .Include(s => s.Parent)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -60,8 +71,10 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
         return classEntity == null ? Result<Class>.Failure("Lớp không tồn tại") : Result<Class>.Success(classEntity);
     }
 
-    public async Task<Result> AddNewClassAsync(Class newClass)
+    public async Task<Result<Class>> AddNewClassAsync(Class newClass)
     {
-        throw new NotImplementedException();
+        await dbContext.Classes.AddAsync(newClass);
+        var saveCount = await dbContext.SaveChangesAsync();
+        return saveCount > 0 ? Result<Class>.Success(newClass) : Result<Class>.Failure("Thêm lớp học mới thất bại");
     }
 }

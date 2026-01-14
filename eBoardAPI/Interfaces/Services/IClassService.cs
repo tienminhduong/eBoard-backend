@@ -1,5 +1,6 @@
 using eBoardAPI.Common;
 using eBoardAPI.Entities;
+using eBoardAPI.Models;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.Student;
 
@@ -11,4 +12,7 @@ public interface IClassService
     Task<IEnumerable<Grade>> GetAllGradesAsync();
     Task<Result<ClassInfoDto>> GetClassByIdAsync(Guid classId);
     Task<PagedStudentInClassDto> GetPagedStudentsByClassAsync(Guid classId, int pageNumber, int pageSize);
+    Task<PagedDto<ClassInfoDto>> GetPagedClassesByTeacherAsync(Guid teacherId, int pageNumber, int pageSize);
+    
+    Task<Result<ClassInfoDto>> AddNewClassAsync(CreateClassDto createClassDto, Guid teacherId);
 }
