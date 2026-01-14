@@ -1,4 +1,4 @@
-namespace eBoardAPI.Models;
+namespace eBoardAPI.Models.Auth;
 
 public class LoginResponseDto
 {
