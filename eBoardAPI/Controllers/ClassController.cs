@@ -1,3 +1,4 @@
+using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Class;
 using Microsoft.AspNetCore.Mvc;
 
@@ -5,7 +6,7 @@ namespace eBoardAPI.Controllers;
 
 [ApiController]
 [Route("api/classes")]
-public class ClassController : ControllerBase
+public class ClassController(IClassService classService) : ControllerBase
 {
     [HttpGet("/api/grades")]
     public async Task<ActionResult> GetAllGrades()
@@ -21,37 +22,10 @@ public class ClassController : ControllerBase
     
     // authorize as teacher
     [HttpGet]
-    public async Task<ActionResult> GetAllClassesByTeacher(
-        string? ClassName = null,
-        string? RoomName = null,
-        string? GradeName = null,
-        int? AcdemicStartYear = null,
-        int? AcdemicEndYear = null)
+    public async Task<ActionResult> GetAllClassesByTeacher(Guid teacherId)
     {
-        var classes = new[]
-        {
-            new
-            {
-                Id = Guid.NewGuid(),
-                Grade = new { Id = Guid.NewGuid(), Name = "Grade 1" },
-                RoomName = "Room A",
-                StartDate = new DateOnly(2023, 9, 1),
-                EndDate = new DateOnly(2024, 6, 15),
-                MaxCapacity = 30,
-                Description = "This is Grade 1 class."
-            },
-            new
-            {
-                Id = Guid.NewGuid(),
-                Grade = new { Id = Guid.NewGuid(), Name = "Grade 2" },
-                RoomName = "Room B",
-                StartDate = new DateOnly(2023, 9, 1),
-                EndDate = new DateOnly(2024, 6, 15),
-                MaxCapacity = 25,
-                Description = "This is Grade 2 class."
-            }
-        };
-        return Ok(classes);
+        var classDtos = await classService.GetAllTeachingClassesByTeacher(teacherId);
+        return Ok(classDtos);
     }
     
     [HttpGet("{classId}")]

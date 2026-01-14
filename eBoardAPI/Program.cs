@@ -12,7 +12,8 @@ builder.Services
     .AddSwagger()
     .AddDatabase()
     .AddRepositories()
-    .AddServices();
+    .AddServices()
+    .AddAutoMapper();
 
 var app = builder.Build();
 
