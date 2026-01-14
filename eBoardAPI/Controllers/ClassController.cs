@@ -1,3 +1,4 @@
+using eBoardAPI.Models.Class;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBoardAPI.Controllers;
@@ -19,8 +20,13 @@ public class ClassController : ControllerBase
     }
     
     // authorize as teacher
-    [HttpGet("/api/classes")]
-    public async Task<ActionResult> GetAllClassesByTeacher()
+    [HttpGet]
+    public async Task<ActionResult> GetAllClassesByTeacher(
+        string? ClassName = null,
+        string? RoomName = null,
+        string? GradeName = null,
+        int? AcdemicStartYear = null,
+        int? AcdemicEndYear = null)
     {
         var classes = new[]
         {
@@ -46,5 +52,32 @@ public class ClassController : ControllerBase
             }
         };
         return Ok(classes);
+    }
+    
+    [HttpGet("{classId}")]
+    public async Task<ActionResult> GetClassById(Guid classId)
+    {
+        var classInfo = new ClassInfoDto
+        {
+            Grade = "Grade 1",
+            Name = "Grade 1",
+            TeacherName =  "Teacher A",
+            RoomName = "Room A",
+            MaxCapacity = 30,
+            Description = "This is Grade 1 class."
+        };
+        return Ok(classInfo);
+    }
+
+    [HttpGet("{classId}/students")]
+    public async Task<ActionResult> GetStudentsByClassId(Guid classId)
+    {
+        return Ok();
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult> CreateClass([FromBody] CreateClassDto createClassDto)
+    {
+        return Ok();
     }
 }

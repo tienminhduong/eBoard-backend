@@ -10,7 +10,9 @@ builder.Services.AddControllers();
 builder.Services
     .AddOpenApi()
     .AddSwagger()
-    .AddDatabase();
+    .AddDatabase()
+    .AddRepositories()
+    .AddServices();
 
 var app = builder.Build();
 

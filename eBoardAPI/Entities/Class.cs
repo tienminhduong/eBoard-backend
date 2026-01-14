@@ -12,7 +12,11 @@ public class Class
     public Teacher? Teacher { get; set; }
     
     public string RoomName { get; set; } = string.Empty;
-    public string AcademicYear { get; set; } = string.Empty;
-    public int MaxCapacity { get; set; }
     public string Description { get; set; } = string.Empty;
+    
+    public int AcademicStartYear { get; set; }
+    public int AcademicEndYear { get; set; }
+    
+    public int CurrentStudentCount { get; set; }
+    public int MaxCapacity { get; set; }
 }
