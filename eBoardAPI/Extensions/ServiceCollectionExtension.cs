@@ -4,8 +4,11 @@ using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Class;
+using eBoardAPI.Models.Parent;
+using eBoardAPI.Models.Student;
 using eBoardAPI.Repositories;
 using eBoardAPI.Services;
+using Microsoft.AspNetCore.Routing.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 
@@ -62,6 +65,11 @@ public static class ServiceCollectionExtension
             services.AddAutoMapper(cfg =>
             {
                 cfg.LicenseKey = licenseKey;
+                
+                cfg.CreateMap<Parent, ParentInfoDto>();
+
+                cfg.CreateMap<Student, StudentInfoDto>()
+                    .ForMember(dest => dest.FullAddress, opt => opt.MapFrom(src => src.GetFullAddress()));
 
                 cfg.CreateMap<Class, ClassInfoDto>()
                     .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher!.FullName))

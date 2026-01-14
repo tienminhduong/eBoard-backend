@@ -41,6 +41,7 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
             select s;
         
         return await query
+            .Include(s => s.Parent)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
