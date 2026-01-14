@@ -20,9 +20,9 @@ public class StudentController : ControllerBase
             FirstName = "John",
             LastName = "Doe",
             FullAddress = "123 Main St, Springfield",
-            RelationshipWithParent = RelationshipWithParent.Father,
+            RelationshipWithParent = RelationshipWithParent.FATHER,
             DateOfBirth = new DateOnly(2010, 5, 15),
-            Gender = Gender.Male,
+            Gender = Gender.MALE,
             Parent = new ParentInfoDto
             {
                 Id = Guid.NewGuid(),
@@ -49,7 +49,7 @@ public class StudentController : ControllerBase
             FullAddress = student.Address,
             RelationshipWithParent = student.RelationshipWithParent,
             DateOfBirth = student.DateOfBirth,
-            Gender = Gender.Male,
+            Gender = Gender.MALE,
         };
         return CreatedAtAction(nameof(GetStudentById), new { id = createdStudent.Id }, createdStudent);
     }

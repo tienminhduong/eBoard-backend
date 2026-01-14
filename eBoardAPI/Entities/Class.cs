@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace eBoardAPI.Entities;
 
 public class Class
@@ -14,8 +16,8 @@ public class Class
     public string RoomName { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     
-    public int AcademicStartYear { get; set; }
-    public int AcademicEndYear { get; set; }
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
     
     public int CurrentStudentCount { get; set; }
     public int MaxCapacity { get; set; }

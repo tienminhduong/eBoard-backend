@@ -6,8 +6,8 @@ public class ClassInfoDto
     public required string Grade { get; set; }
     public required string TeacherName { get; set; }
     public string RoomName { get; set; } = string.Empty;
-    public int AcademicStartYear { get; set; }
-    public int AcademicEndYear { get; set; }
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
     public int CurrentStudentCount { get; set; }
     public int MaxCapacity { get; set; }
     public string Description { get; set; } = string.Empty;
