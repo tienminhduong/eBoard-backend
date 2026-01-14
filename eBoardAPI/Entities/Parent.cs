@@ -5,9 +5,9 @@ public class Parent
     public Guid Id { get; set; }
     public required string FullName { get; set; }
     public required string PhoneNumber { get; set; }
-    public string Email { get; set; } = "";
-    public string GeneratedPassword { get; set; } = "";
-    public string PasswordHash { get; set; } = "";
-    public string HealthCondition { get; set; } = "";
-    public string Address { get; set; } = "";
+    public string Email { get; set; } = string.Empty;
+    public string GeneratedPassword { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
+    public string HealthCondition { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
 }

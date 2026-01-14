@@ -7,11 +7,11 @@ public class Class
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     
-    public Guid? GradeId { get; set; }
-    public Grade? Grade { get; set; }
+    public Guid GradeId { get; set; }
+    public Grade Grade { get; set; } = null!;
     
-    public Guid? TeacherId { get; set; }
-    public Teacher? Teacher { get; set; }
+    public Guid TeacherId { get; set; }
+    public Teacher Teacher { get; set; } = null!;
     
     public string RoomName { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
