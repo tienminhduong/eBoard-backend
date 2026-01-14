@@ -1,11 +1,10 @@
-namespace eBoardAPI.Models;
+namespace eBoardAPI.Models.Teacher;
 
-public class ParentInfoDto
+public class TeacherInfoDto
 {
     public required Guid Id { get; set; }
     public required string FullName { get; set; }
     public required string Email { get; set; }
     public required string PhoneNumber { get; set; }
-    public required string Address { get; set; }
-    public string HealthCondition { get; set; } = string.Empty;
+    public required string Qualifications { get; set; }
 }

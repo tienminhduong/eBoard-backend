@@ -1,4 +1,6 @@
-namespace eBoardAPI.Models;
+using eBoardAPI.Models.Parent;
+
+namespace eBoardAPI.Models.Student;
 
 public class StudentInfoDto
 {

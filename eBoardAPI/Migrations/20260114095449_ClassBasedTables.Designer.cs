@@ -12,7 +12,7 @@ using eBoardAPI.Context;
 namespace eBoardAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260114092324_ClassBasedTables")]
+    [Migration("20260114095449_ClassBasedTables")]
     partial class ClassBasedTables
     {
         /// <inheritdoc />
@@ -24,6 +24,46 @@ namespace eBoardAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("eBoardAPI.Entities.Class", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AcademicYear")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("GradeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("MaxCapacity")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoomName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("TeacherId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GradeId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("Classes");
+                });
 
             modelBuilder.Entity("eBoardAPI.Entities.District", b =>
                 {
@@ -43,6 +83,36 @@ namespace eBoardAPI.Migrations
                     b.HasIndex("ProvinceId");
 
                     b.ToTable("Districts");
+                });
+
+            modelBuilder.Entity("eBoardAPI.Entities.Grade", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Grades");
+                });
+
+            modelBuilder.Entity("eBoardAPI.Entities.InClass", b =>
+                {
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClassId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("StudentId", "ClassId");
+
+                    b.HasIndex("ClassId");
+
+                    b.ToTable("InClasses");
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.Parent", b =>
@@ -175,6 +245,10 @@ namespace eBoardAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("ProfileImgUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Qualifications")
                         .IsRequired()
                         .HasColumnType("text");
@@ -204,6 +278,21 @@ namespace eBoardAPI.Migrations
                     b.ToTable("Wards");
                 });
 
+            modelBuilder.Entity("eBoardAPI.Entities.Class", b =>
+                {
+                    b.HasOne("eBoardAPI.Entities.Grade", "Grade")
+                        .WithMany()
+                        .HasForeignKey("GradeId");
+
+                    b.HasOne("eBoardAPI.Entities.Teacher", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId");
+
+                    b.Navigation("Grade");
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("eBoardAPI.Entities.District", b =>
                 {
                     b.HasOne("eBoardAPI.Entities.Province", "Province")
@@ -211,6 +300,25 @@ namespace eBoardAPI.Migrations
                         .HasForeignKey("ProvinceId");
 
                     b.Navigation("Province");
+                });
+
+            modelBuilder.Entity("eBoardAPI.Entities.InClass", b =>
+                {
+                    b.HasOne("eBoardAPI.Entities.Class", "Class")
+                        .WithMany()
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("eBoardAPI.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Class");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.Student", b =>

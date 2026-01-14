@@ -1,5 +1,7 @@
 using eBoardAPI.Consts;
 using eBoardAPI.Models;
+using eBoardAPI.Models.Parent;
+using eBoardAPI.Models.Student;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBoardAPI.Controllers;

@@ -1,4 +1,5 @@
 using eBoardAPI.Models;
+using eBoardAPI.Models.Teacher;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBoardAPI.Controllers;
