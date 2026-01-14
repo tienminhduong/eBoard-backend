@@ -11,4 +11,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Grade> Grades { get; set; }
     public DbSet<Class> Classes { get; set; }
     public DbSet<InClass> InClasses { get; set; }
+    public DbSet<ClassFund> ClassFunds { get; set; }
+    public DbSet<FundIncome> FundIncomes { get; set; }
+    public DbSet<FundIncomeDetail> FundIncomeDetails { get; set; }
+    public DbSet<FundExpense> FundExpenses { get; set; }
 }

@@ -29,7 +29,17 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
 
     public async Task<IEnumerable<Class>> GetAllClassesByTeacherAsync(Guid teacherId, int pageNumber, int pageSize)
     {
-        throw new NotImplementedException();
+        var query = from c in dbContext.Classes
+            where c.TeacherId == teacherId
+            orderby c.StartDate descending
+            select c;
+        
+        return await query
+            .Include(c => c.Teacher)
+            .Include(c => c.Grade)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<Student>> GetStudentsByClassAsync(Guid classId, int pageNumber, int pageSize)

@@ -12,3 +12,10 @@ public static class Gender
     public const string MALE = "Nam";
     public const string FEMALE = "Nữ";
 }
+
+public static class ContributionStatus
+{
+    public const string CONTRIBUTED = "Đã đóng";
+    public const string PARTIALLY_CONTRIBUTED = "Đóng một phần";
+    public const string NOT_CONTRIBUTED = "Chưa đóng";
+}

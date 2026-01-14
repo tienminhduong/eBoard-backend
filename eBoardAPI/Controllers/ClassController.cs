@@ -15,9 +15,16 @@ public class ClassController(IClassService classService) : ControllerBase
         return Ok(grades);
     }
     
-    // authorize as teacher
     [HttpGet]
-    public async Task<ActionResult> GetAllClassesByTeacher(Guid teacherId /*later replaced by id from access token*/)
+    public async Task<ActionResult> GetClassesByTeacher(Guid teacherId, int pageNumber = 1, int pageSize = 20 /*later replaced by id from access token*/)
+    {
+        var classDtos = await classService.GetPagedClassesByTeacherAsync(teacherId, pageNumber, pageSize);
+        return Ok(classDtos);
+    }
+    
+    // authorize as teacher
+    [HttpGet("teaching")]
+    public async Task<ActionResult> GetAllClassesTeachingByTeacher(Guid teacherId /*later replaced by id from access token*/)
     {
         var classDtos = await classService.GetAllTeachingClassesByTeacherAsync(teacherId);
         return Ok(classDtos);
