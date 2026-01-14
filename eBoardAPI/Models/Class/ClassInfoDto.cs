@@ -2,6 +2,7 @@ namespace eBoardAPI.Models.Class;
 
 public class ClassInfoDto
 {
+    public required Guid Id { get; set; }
     public required string Name { get; set; }
     public required string Grade { get; set; }
     public required string TeacherName { get; set; }

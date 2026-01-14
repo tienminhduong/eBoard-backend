@@ -52,4 +52,18 @@ public class ClassService(
         };
         return pagedResult;
     }
+
+    public async Task<Result<ClassInfoDto>> AddNewClassAsync(CreateClassDto createClassDto, Guid teacherId)
+    {
+        var newClass = mapper.Map<Class>(createClassDto);
+        newClass.TeacherId = teacherId;
+        
+        var result = await classRepository.AddNewClassAsync(newClass);
+        
+        if (!result.IsSuccess)
+            return Result<ClassInfoDto>.Failure(result.ErrorMessage!);
+        
+        var classDto = mapper.Map<ClassInfoDto>(result.Value);
+        return Result<ClassInfoDto>.Success(classDto);
+    }
 }

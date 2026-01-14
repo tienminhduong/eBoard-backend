@@ -74,6 +74,7 @@ public static class ServiceCollectionExtension
                 cfg.CreateMap<Class, ClassInfoDto>()
                     .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher!.FullName))
                     .ForMember(dest => dest.Grade, opt => opt.MapFrom(src => src.Grade!.Name));
+                cfg.CreateMap<CreateClassDto, Class>();
 
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;

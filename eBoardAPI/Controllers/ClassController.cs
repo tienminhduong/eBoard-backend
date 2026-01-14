@@ -17,7 +17,7 @@ public class ClassController(IClassService classService) : ControllerBase
     
     // authorize as teacher
     [HttpGet]
-    public async Task<ActionResult> GetAllClassesByTeacher(Guid teacherId)
+    public async Task<ActionResult> GetAllClassesByTeacher(Guid teacherId /*later replaced by id from access token*/)
     {
         var classDtos = await classService.GetAllTeachingClassesByTeacherAsync(teacherId);
         return Ok(classDtos);
@@ -36,10 +36,14 @@ public class ClassController(IClassService classService) : ControllerBase
         var pagedStudents = await classService.GetPagedStudentsByClassAsync(classId, pageNumber, pageSize);
         return Ok(pagedStudents);
     }
-    
+
     [HttpPost]
-    public async Task<ActionResult> CreateClass([FromBody] CreateClassDto createClassDto)
+    public async Task<ActionResult> CreateClass([FromBody] CreateClassDto createClassDto,
+        Guid teacherId /*later replaced by id from access token*/)
     {
-        return Ok();
+        var result = await classService.AddNewClassAsync(createClassDto, teacherId);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetClassById), new { classId = result.Value!.Id }, null)
+            : BadRequest(result.ErrorMessage!);
     }
 }
