@@ -8,7 +8,6 @@ using eBoardAPI.Models.Parent;
 using eBoardAPI.Models.Student;
 using eBoardAPI.Repositories;
 using eBoardAPI.Services;
-using Microsoft.AspNetCore.Routing.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 
@@ -46,6 +45,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IParentRepository, ParentRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IClassRepository, ClassRepository>();
+            services.AddScoped<IClassFundRepository, ClassFundRepository>();
             return services;
         }
 
@@ -56,6 +56,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IParentService, ParentService>();
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IClassService, ClassService>();
+            services.AddScoped<IClassFundService, ClassFundService>();
             return services;
         }
         
