@@ -1,33 +1,34 @@
+using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Parent;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace eBoardAPI.Controllers;
 
 [ApiController]
 [Route("api/parents")]
-public class ParentController : ControllerBase
+public class ParentController(IParentService parentService) : ControllerBase
 {
     // authorize for only that parent and teachers who teach their children
     [HttpGet("info/{id}")]
-    public async Task<ActionResult<ParentInfoDto>> GetParentInfo([FromRoute] int id)
+    public async Task<ActionResult<ParentInfoDto>> GetParentInfo([FromRoute] Guid id)
     {
-        return Ok(new ParentInfoDto
-        {
-            Id = Guid.NewGuid(),
-            FullName = "John Doe",
-            Email = "lmao.abc@example.com",
-            PhoneNumber = "987-654-3210",
-            Address = "123 Main St, Anytown, USA",
-            HealthCondition = "Good"
-        });
+        if(ModelState.IsValid == false)
+            return BadRequest();
+        var result = await parentService.GetByIdAsync(id);
+        return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
     }
 
     // same with above
     [HttpPut("info/{id}")]
-    public async Task<ActionResult> UpdateParentInfo([FromRoute] int id, [FromBody] UpdateParentInfoDto updateParentInfoDto)
+    public async Task<ActionResult> UpdateParentInfo([FromRoute] Guid id, [FromBody] UpdateParentInfoDto updateParentInfoDto)
     {
-        return Ok();
-
+        if (ModelState.IsValid == false)
+        {
+            return BadRequest(ModelState);
+        }
+        var result = await parentService.GetByIdAsync(id);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ErrorMessage);
     }
 }
