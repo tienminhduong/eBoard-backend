@@ -29,7 +29,7 @@ public class StudentController(IStudentService studentService) : ControllerBase
         if(!ModelState.IsValid)
             return BadRequest();
 
-        var result = await studentService.CreateAsync(student);
+        var result = await studentService.AddNewStudentAsync(student);
         return result.IsSuccess ? CreatedAtAction(nameof(GetStudentById), new { id = result.Value!.Id }, result.Value) 
                                 : BadRequest(result.ErrorMessage);
     }

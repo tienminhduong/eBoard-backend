@@ -2,7 +2,7 @@ namespace eBoardAPI.Entities;
 
 public class Parent
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; } = Guid.NewGuid();
     public required string FullName { get; set; }
     public required string PhoneNumber { get; set; }
     public string Email { get; set; } = string.Empty;

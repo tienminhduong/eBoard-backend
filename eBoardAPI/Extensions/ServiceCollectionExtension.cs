@@ -77,6 +77,7 @@ public static class ServiceCollectionExtension
 
                 cfg.CreateMap<Student, StudentInfoDto>()
                     .ForMember(dest => dest.FullAddress, opt => opt.MapFrom(src => StringHelper.ParseFullAddress(src)));
+                cfg.CreateMap<CreateStudentDto, Student>();
 
                 cfg.CreateMap<Class, ClassInfoDto>()
                     .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher.FullName))

@@ -1,19 +1,19 @@
 namespace eBoardAPI.Consts;
 
-public static class RelationshipWithParent
+public static class ERelationshipWithParent
 {
     public const string FATHER = "Cha";
     public const string MOTHER = "Mẹ";
     public const string GUARDIAN = "Người giám hộ";
 }
 
-public static class Gender
+public static class EGender
 {
     public const string MALE = "Nam";
     public const string FEMALE = "Nữ";
 }
 
-public static class ContributionStatus
+public static class EContributionStatus
 {
     public const string CONTRIBUTED = "Đã đóng";
     public const string PARTIALLY_CONTRIBUTED = "Đóng một phần";

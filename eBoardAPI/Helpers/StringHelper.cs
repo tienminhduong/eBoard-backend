@@ -1,4 +1,5 @@
 using eBoardAPI.Entities;
+using eBoardAPI.Models.Student;
 
 namespace eBoardAPI.Helpers;
 
@@ -23,4 +24,6 @@ public static class StringHelper
         return result;
     }
     public static string ParseFullAddress(Student student) => ParseFullAddress(student.Address, student.Ward, student.District, student.Province);
+    public static string ParseFullAddress(CreateStudentDto createStudentDto)
+        => ParseFullAddress(createStudentDto.Address, createStudentDto.Ward, createStudentDto.District, createStudentDto.Province);
 }

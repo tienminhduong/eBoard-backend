@@ -12,4 +12,5 @@ public interface IClassRepository
     Task<Result<Class>> GetClassByIdAsync(Guid classId);
     
     Task<Class> AddNewClassAsync(Class newClass);
+    Task<Result> AddNewStudentsToClassAsync(Guid classId, List<Guid> studentIds);
 }

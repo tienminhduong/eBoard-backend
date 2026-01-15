@@ -8,28 +8,25 @@ namespace eBoardAPI.Repositories;
 
 public class StudentRepository(AppDbContext db) : IStudentRepository
 {
-    public async Task<Result> AddAsync(Student student)
+    public async Task<Student> AddAsync(Student student)
     {
         await db.Students.AddAsync(student);
-        var row_effect = await db.SaveChangesAsync();
-        return row_effect > 0
-            ? Result.Success()
-            : Result.Failure("Failed to add student");
+        return student;
     }
 
     public async Task<Result<Student>> GetByIdAsync(Guid id)
     {
         if(id == Guid.Empty)
-        {
-            return Result<Student>.Failure("Id must be not empty");
-        }
+            return Result<Student>.Failure("Id không được để trống");
         
         var query = from s in db.Students
                     where s.Id == id
                     select s;
+        
         var student = await query.Include(s => s.Parent)
                                  .FirstOrDefaultAsync();
+        
         return (student != null) ? Result<Student>.Success(student)
-                                 : Result<Student>.Failure("Student is not exsist");
+                                 : Result<Student>.Failure("Học sinh không tồn tại");
     }
 }

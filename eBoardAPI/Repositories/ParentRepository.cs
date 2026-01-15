@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace eBoardAPI.Repositories;
 
-public class ParentRepository(AppDbContext db) : IParentRepository
+public class ParentRepository(AppDbContext dbContext) : IParentRepository
 {
     public async Task<Result<Parent>> GetByIdAsync(Guid id)
     {
-        var parent = await db.Parents.FindAsync(id);
+        var parent = await dbContext.Parents.FindAsync(id);
         var result = parent == null
             ? Result<Parent>.Failure("Parent not found")
             : Result<Parent>.Success(parent);
@@ -19,10 +19,31 @@ public class ParentRepository(AppDbContext db) : IParentRepository
 
     public async Task<Result> Update(Parent parent)
     {
-        db.Parents.Update(parent);
-        var effectRow = await db.SaveChangesAsync();
+        dbContext.Parents.Update(parent);
+        var effectRow = await dbContext.SaveChangesAsync();
         return effectRow > 0
             ? Result.Success()
             : Result.Failure("Failed to update parent");
+    }
+
+    public async Task<Result<Parent>> GetByPhoneNumberAsync(string phoneNumber)
+    {
+        var query = from p in dbContext.Parents
+            where p.PhoneNumber == phoneNumber
+            select p;
+
+        var parent = await query
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+        
+        return parent != null
+            ? Result<Parent>.Success(parent)
+            : Result<Parent>.Failure("Không tìm thấy phụ huynh với số điện thoại đã cho.");
+    }
+
+    public async Task<Parent> AddNewParentAsync(Parent parent)
+    {
+        await dbContext.Parents.AddAsync(parent);
+        return parent;
     }
 }
