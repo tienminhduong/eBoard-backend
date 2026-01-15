@@ -1,3 +1,4 @@
+using eBoardAPI.Common;
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
@@ -7,25 +8,21 @@ namespace eBoardAPI.Repositories;
 
 public class ParentRepository(AppDbContext db) : IParentRepository
 {
-    public async Task<Parent?> GetByIdAsync(Guid id)
+    public async Task<Result<Parent>> GetByIdAsync(Guid id)
     {
-        if(id == Guid.Empty)
-        {
-            throw new ArgumentException("The provided ID is empty.", nameof(id));
-        }
-
         var parent = await db.Parents.FindAsync(id);
-        return parent;
+        var result = parent == null
+            ? Result<Parent>.Failure("Parent not found")
+            : Result<Parent>.Success(parent);
+        return result;
     }
 
-    public void Update(Parent parent)
+    public async Task<Result> Update(Parent parent)
     {
-        if(parent == null)
-        {
-            throw new ArgumentNullException(nameof(parent), "Parent entity cannot be null.");
-        }
-
         db.Parents.Update(parent);
-        db.SaveChanges();
+        var effectRow = await db.SaveChangesAsync();
+        return effectRow > 0
+            ? Result.Success()
+            : Result.Failure("Failed to update parent");
     }
 }

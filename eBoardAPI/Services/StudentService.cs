@@ -1,4 +1,5 @@
 using AutoMapper;
+using eBoardAPI.Common;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
@@ -8,36 +9,21 @@ namespace eBoardAPI.Services;
 
 public class StudentService(IStudentRepository studentRepository, IMapper mapper) : IStudentService
 {
-    public async Task<StudentInfoDto> CreateAsync(CreateStudentDto student)
+    public async Task<Result<StudentInfoDto>> CreateAsync(CreateStudentDto student)
     {
-        if(student == null)
-            throw new ArgumentNullException(nameof(student));
-        try
-        {
-            var createStudent = mapper.Map<Student>(student);
-            var createdStudent = await studentRepository.AddAsync(createStudent);
-            return mapper.Map<StudentInfoDto>(createdStudent);
+        var createStudent = mapper.Map<Student>(student);
+        var addResult = await studentRepository.AddAsync(createStudent);
 
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("An error occurred while creating the student.", ex);
-        }
+        return addResult.IsSuccess
+            ? Result<StudentInfoDto>.Success(mapper.Map<StudentInfoDto>(createStudent))
+            : Result<StudentInfoDto>.Failure("Failed to create student.");
     }
 
-    public async Task<StudentInfoDto?> GetByIdAsync(Guid id)
+    public async Task<Result<StudentInfoDto>> GetByIdAsync(Guid id)
     {
-        if(id == Guid.Empty)
-            throw new ArgumentException("Invalid student ID.", nameof(id));
-
-        try
-        {
-            var student = await studentRepository.GetByIdAsync(id);
-            return student == null ? null : mapper.Map<StudentInfoDto>(student);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("An error occurred while retrieving the student.", ex);
-        }
+            var studentResult = await studentRepository.GetByIdAsync(id);
+            return studentResult.IsSuccess 
+                ? Result<StudentInfoDto>.Success(mapper.Map<StudentInfoDto>(studentResult.Value)) 
+                : Result<StudentInfoDto>.Failure("Student not found.");
     }
 }

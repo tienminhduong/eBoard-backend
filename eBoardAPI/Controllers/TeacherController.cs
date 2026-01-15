@@ -1,3 +1,4 @@
+using eBoardAPI.Common;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Teacher;
@@ -11,50 +12,41 @@ public class TeacherController(ITeacherService teacherService) : ControllerBase
 {
     // authorize parent and teacher role
     [HttpGet("info/{id}")]
-    public async Task<ActionResult<TeacherInfoDto>> GetTeacherInfo([FromRoute] string id)
+    public async Task<ActionResult<TeacherInfoDto>> GetTeacherInfo([FromRoute] Guid id)
     {
-        var teacherId = Guid.Parse(id);
-        if(teacherId == Guid.Empty)
+        if (ModelState.IsValid == false)
         {
-            return BadRequest("Invalid teacher ID.");
+            return BadRequest(ModelState);
         }
-        try
+
+        var result = await teacherService.GetTeacherInfoAsync(id);
+        if (result.IsSuccess)
         {
-            var teacherInfo = await teacherService.GetTeacherInfoAsync(teacherId);
-            if(teacherInfo == null)
-            {
-                return NotFound("Teacher not found.");
-            }
-            return Ok(teacherInfo);
+            return Ok(result.Value);
         }
-        catch(Exception ex)
+        else
         {
-            return StatusCode(500, ex.Message);
+            return NotFound(result.ErrorMessage);
         }
     }
 
     // authorize teacher role
     [HttpPut("info/{id}")]
-    public async Task<ActionResult> UpdateTeacherInfo([FromRoute] string id, [FromBody] UpdateTeacherInfoDto updateTeacherInfoDto)
+    public async Task<ActionResult> UpdateTeacherInfo([FromRoute] Guid id, [FromBody] UpdateTeacherInfoDto updateTeacherInfoDto)
     {
-        var teacherId = Guid.Parse(id);
-        if(teacherId == Guid.Empty)
+        if(ModelState.IsValid == false)
         {
-            return BadRequest("Invalid teacher ID.");
+            return BadRequest(ModelState);
         }
 
-        try
+        var result = await teacherService.UpdateTeacherInfoAsync(id, updateTeacherInfoDto);
+        if (result.IsSuccess)
         {
-            var updateInfo = await teacherService.UpdateTeacherInfoAsync(teacherId, updateTeacherInfoDto);
-            if(updateInfo == null)
-            {
-                return NotFound("Teacher not found.");
-            }
-            return Ok(updateInfo);
+            return Ok(result.Value);
         }
-        catch(Exception ex)
+        else
         {
-            return StatusCode(500, ex.Message);
+            return NotFound(result.ErrorMessage);
         }
     }
 }

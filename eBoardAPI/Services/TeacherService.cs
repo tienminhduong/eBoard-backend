@@ -1,4 +1,5 @@
 using AutoMapper;
+using eBoardAPI.Common;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
@@ -8,56 +9,28 @@ namespace eBoardAPI.Services;
 
 public class TeacherService(ITeacherRepository teacherRepository, IMapper mapper) : ITeacherService
 {
-    public async Task<TeacherInfoDto?> GetTeacherInfoAsync(Guid id)
-    {
-        if(id == Guid.Empty)
-        {
-            throw new ArgumentException("Invalid teacher ID.", nameof(id));
-        }
-        
-        try
-        {
-            var teacher = await teacherRepository.GetByIdAsync(id);
-            var teacherInfoDto = (teacher != null) ? mapper.Map<TeacherInfoDto>(teacher) : null;
-            return teacherInfoDto;
-        }
-        catch (Exception ex)
-        {
-            // Log the exception (not implemented here)
-            throw new ApplicationException("An error occurred while retrieving teacher information.", ex);
-        }
-
+    public async Task<Result<TeacherInfoDto>> GetTeacherInfoAsync(Guid id)
+    {       
+        var teacherResult = await teacherRepository.GetByIdAsync(id);
+        return teacherResult.IsSuccess 
+            ? Result<TeacherInfoDto>.Success(mapper.Map<TeacherInfoDto>(teacherResult.Value)) 
+            : Result<TeacherInfoDto>.Failure(teacherResult.ErrorMessage!);
     }
 
-    public async Task<TeacherInfoDto?> UpdateTeacherInfoAsync(Guid id, UpdateTeacherInfoDto updateTeacherInfoDto)
+    public async Task<Result<TeacherInfoDto>> UpdateTeacherInfoAsync(Guid id, UpdateTeacherInfoDto updateTeacherInfoDto)
     {
-        // Validate inputs
-        if (id == Guid.Empty)
+        var exsitingTeacherResult = await teacherRepository.GetByIdAsync(id);
+        if(!exsitingTeacherResult.IsSuccess)
         {
-            throw new ArgumentException("Invalid teacher ID.", nameof(id));
-        }
-        if(updateTeacherInfoDto == null)
-        {
-            throw new ArgumentNullException(nameof(updateTeacherInfoDto), "Update data cannot be null.");
+            return Result<TeacherInfoDto>.Failure(exsitingTeacherResult.ErrorMessage!);
         }
 
-        try
-        {
-            var exsitingTeacher = await teacherRepository.GetByIdAsync(id);
-            if(exsitingTeacher == null)
-            {
-                return null;
-            }
-            
-            mapper.Map(updateTeacherInfoDto, exsitingTeacher);
-            var rowUpdate = await teacherRepository.Update(exsitingTeacher);
+        var exsitingTeacher = exsitingTeacherResult.Value!;
+        mapper.Map(updateTeacherInfoDto, exsitingTeacher);
+        var updateResult = await teacherRepository.UpdateAsync(exsitingTeacher);
 
-            return mapper.Map<TeacherInfoDto>(exsitingTeacher);
-        }
-        catch (Exception ex)
-        {
-            // Log the exception (not implemented here)
-            throw new ApplicationException("An error occurred while updating teacher information.", ex);
-        }
+        return updateResult.IsSuccess
+            ? Result<TeacherInfoDto>.Success(mapper.Map<TeacherInfoDto>(updateResult.Value))
+            : Result<TeacherInfoDto>.Failure(updateResult.ErrorMessage!);
     }
 }

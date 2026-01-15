@@ -1,9 +1,10 @@
+using eBoardAPI.Common;
 using eBoardAPI.Entities;
 
 namespace eBoardAPI.Interfaces.Repositories;
 
 public interface ITeacherRepository
 {
-    Task<Teacher?> GetByIdAsync(Guid id);
-    Task<int> Update(Teacher teacher);
+    Task<Result<Teacher>> GetByIdAsync(Guid id);
+    Task<Result<Teacher>> UpdateAsync(Teacher teacher);
 }

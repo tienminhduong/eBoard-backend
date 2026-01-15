@@ -2,6 +2,7 @@ using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Parent;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace eBoardAPI.Controllers;
 
@@ -11,44 +12,23 @@ public class ParentController(IParentService parentService) : ControllerBase
 {
     // authorize for only that parent and teachers who teach their children
     [HttpGet("info/{id}")]
-    public async Task<ActionResult<ParentInfoDto>> GetParentInfo([FromRoute] string id)
+    public async Task<ActionResult<ParentInfoDto>> GetParentInfo([FromRoute] Guid id)
     {
-        var guidId = Guid.TryParse(id, out var parsedId) ? parsedId : Guid.Empty;
-
-        try
-        {
-            var parentInfo = await parentService.GetByIdAsync(guidId);
-
-            if (parentInfo is null)
-            {
-                return NotFound($"Parent with ID {id} not found.");
-            }
-            return Ok(parentInfo);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        if(ModelState.IsValid == false)
+            return BadRequest();
+        var result = await parentService.GetByIdAsync(id);
+        return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
     }
 
     // same with above
     [HttpPut("info/{id}")]
-    public async Task<ActionResult> UpdateParentInfo([FromRoute] string id, [FromBody] UpdateParentInfoDto updateParentInfoDto)
+    public async Task<ActionResult> UpdateParentInfo([FromRoute] Guid id, [FromBody] UpdateParentInfoDto updateParentInfoDto)
     {
-        var guidId = Guid.TryParse(id, out var parsedId) ? parsedId : Guid.Empty;
-        try
+        if (ModelState.IsValid == false)
         {
-            var updateParent = await parentService.UpdateAsync(guidId, updateParentInfoDto);
-            if (updateParent is null)
-            {
-                return NotFound($"Parent with ID {id} not found.");
-            }
-
-            return Ok(updateParent);
+            return BadRequest(ModelState);
         }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var result = await parentService.GetByIdAsync(id);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ErrorMessage);
     }
 }

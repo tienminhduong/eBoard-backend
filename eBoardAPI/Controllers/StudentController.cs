@@ -13,31 +13,13 @@ public class StudentController(IStudentService studentService) : ControllerBase
 {
     // authorize as teacher or parent
     [HttpGet("{id}")]
-    public async Task<ActionResult<StudentInfoDto>> GetStudentById([FromRoute] string id)
+    public async Task<ActionResult<StudentInfoDto>> GetStudentById([FromRoute] Guid id)
     {
-        if(string.IsNullOrWhiteSpace(id))
-        {
-            return BadRequest("Student ID is required.");
-        }
-        var guidId = Guid.Parse(id);
-        if(guidId == Guid.Empty)
-        {
-            return BadRequest("Invalid student ID.");
-        }
-
-        try
-        {
-            var studentInfo = await studentService.GetByIdAsync(guidId);
-            if(studentInfo == null)
-            {
-                return NotFound("Student not found.");
-            }
-            return Ok(studentInfo);
-        }
-        catch(Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+        if (ModelState.IsValid == false)
+            return BadRequest();
+        
+        var result = await studentService.GetByIdAsync(id);
+        return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
     }
     
     // authorize as teacher
@@ -47,16 +29,8 @@ public class StudentController(IStudentService studentService) : ControllerBase
         if(!ModelState.IsValid)
             return BadRequest();
 
-        try
-        {
-            var studentInfo = await studentService.CreateAsync(student);
-            if (studentInfo == null)
-                return BadRequest();
-            return CreatedAtAction(nameof(GetStudentById), new { id = studentInfo.Id }, studentInfo);
-        }
-        catch(Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+        var result = await studentService.CreateAsync(student);
+        return result.IsSuccess ? CreatedAtAction(nameof(GetStudentById), new { id = result.Value!.Id }, result.Value) 
+                                : BadRequest(result.ErrorMessage);
     }
 }
