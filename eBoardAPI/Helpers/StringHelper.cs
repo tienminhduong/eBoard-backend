@@ -6,4 +6,21 @@ public static class StringHelper
 {
     public static string ParseAcademicYear(DateOnly startDate, DateOnly endDate) => $"{startDate.Year}-{endDate.Year}";
     public static string ParseAcademicYear(Class @class) => ParseAcademicYear(@class.StartDate, @class.EndDate);
+
+    public static string ParseFullAddress(string baseAddress, string ward, string district, string province)
+    {
+        var result = baseAddress;
+        
+        if (!string.IsNullOrWhiteSpace(ward))
+            result += $", {ward}";
+        
+        if (!string.IsNullOrWhiteSpace(district))
+            result += $", {district}";
+        
+        if (!string.IsNullOrWhiteSpace(province))
+            result += $", {province}";
+        
+        return result;
+    }
+    public static string ParseFullAddress(Student student) => ParseFullAddress(student.Address, student.Ward, student.District, student.Province);
 }

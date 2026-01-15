@@ -15,22 +15,4 @@ public class Student
     public string Province { get; set; } = string.Empty;
     public string District { get; set; } = string.Empty;
     public string Ward { get; set; } = string.Empty;
-    
-    public string GetFullAddress()
-    {
-        var address = Address;
-        if (!string.IsNullOrEmpty(Ward))
-        {
-            address += $", {Ward}";
-        }
-        if (!string.IsNullOrEmpty(District))
-        {
-            address += $", {District}";
-        }
-        if (!string.IsNullOrEmpty(Province))
-        {
-            address += $", {Province}";
-        }
-        return address;
-    }
 }

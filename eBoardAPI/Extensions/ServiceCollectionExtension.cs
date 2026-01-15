@@ -76,15 +76,14 @@ public static class ServiceCollectionExtension
                 cfg.CreateMap<Parent, ParentInfoDto>();
 
                 cfg.CreateMap<Student, StudentInfoDto>()
-                    .ForMember(dest => dest.FullAddress, opt => opt.MapFrom(src => src.GetFullAddress()));
+                    .ForMember(dest => dest.FullAddress, opt => opt.MapFrom(src => StringHelper.ParseFullAddress(src)));
 
                 cfg.CreateMap<Class, ClassInfoDto>()
                     .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher.FullName))
                     .ForMember(dest => dest.Grade, opt => opt.MapFrom(src => src.Grade.Name));
                 cfg.CreateMap<CreateClassDto, Class>();
 
-                cfg.CreateMap<UpdateTeacherInfoDto, Teacher>()
-                    .ForAllMembers( opt => opt.Condition((src, des, srcMember) => srcMember != null));
+                cfg.CreateMap<UpdateTeacherInfoDto, Teacher>();
 
                 cfg.CreateMap<Teacher, TeacherInfoDto>();
                 cfg.CreateMap<ClassFund, ClassFundDto>()

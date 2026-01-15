@@ -23,7 +23,7 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
     {
         get
         {
-            _studentRepository ??= new StudentRepository();
+            _studentRepository ??= new StudentRepository(dbContext);
             return _studentRepository;
         }
     }
@@ -41,7 +41,7 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
     {
         get
         {
-            _parentRepository ??= new ParentRepository();
+            _parentRepository ??= new ParentRepository(dbContext);
             return _parentRepository;
         }
     }
