@@ -1,16 +1,17 @@
 using eBoardAPI.Consts;
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
+using eBoardAPI.Helpers;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Class;
+using eBoardAPI.Models.ClassFund;
 using eBoardAPI.Models.Parent;
 using eBoardAPI.Models.Student;
 using eBoardAPI.Models.Teacher;
 using eBoardAPI.Repositories;
 using eBoardAPI.Services;
-using Microsoft.AspNetCore.Routing.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 
@@ -48,6 +49,9 @@ public static class ServiceCollectionExtension
             services.AddScoped<IParentRepository, ParentRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IClassRepository, ClassRepository>();
+            services.AddScoped<IClassFundRepository, ClassFundRepository>();
+            
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
 
@@ -58,6 +62,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IParentService, ParentService>();
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IClassService, ClassService>();
+            services.AddScoped<IClassFundService, ClassFundService>();
             return services;
         }
         
@@ -82,6 +87,10 @@ public static class ServiceCollectionExtension
                     .ForAllMembers( opt => opt.Condition((src, des, srcMember) => srcMember != null));
 
                 cfg.CreateMap<Teacher, TeacherInfoDto>();
+                cfg.CreateMap<ClassFund, ClassFundDto>()
+                    .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
+                    .ForMember(dest => dest.AcademicYear,
+                        opt => opt.MapFrom(src => StringHelper.ParseAcademicYear(src.Class)));
 
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
