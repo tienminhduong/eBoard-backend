@@ -1,3 +1,4 @@
+using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Teacher;
 using Microsoft.AspNetCore.Mvc;
@@ -6,26 +7,54 @@ namespace eBoardAPI.Controllers;
 
 [ApiController]
 [Route("api/teachers")]
-public class TeacherController : ControllerBase
+public class TeacherController(ITeacherService teacherService) : ControllerBase
 {
     // authorize parent and teacher role
     [HttpGet("info/{id}")]
-    public async Task<ActionResult<TeacherInfoDto>> GetTeacherInfo([FromRoute] int id)
+    public async Task<ActionResult<TeacherInfoDto>> GetTeacherInfo([FromRoute] string id)
     {
-        return Ok(new TeacherInfoDto
+        var teacherId = Guid.Parse(id);
+        if(teacherId == Guid.Empty)
         {
-            Id = Guid.NewGuid(),
-            FullName = "Tien Minh Duong",
-            Email = "tien.minh.duong@example.com",
-            PhoneNumber = "123-456-7890",
-            Qualifications = "MSc in Mathematics"
-        });
+            return BadRequest("Invalid teacher ID.");
+        }
+        try
+        {
+            var teacherInfo = await teacherService.GetTeacherInfoAsync(teacherId);
+            if(teacherInfo == null)
+            {
+                return NotFound("Teacher not found.");
+            }
+            return Ok(teacherInfo);
+        }
+        catch(Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
 
     // authorize teacher role
     [HttpPut("info/{id}")]
-    public async Task<ActionResult> UpdateTeacherInfo([FromRoute] int id, [FromBody] UpdateTeacherInfoDto updateTeacherInfoDto)
+    public async Task<ActionResult> UpdateTeacherInfo([FromRoute] string id, [FromBody] UpdateTeacherInfoDto updateTeacherInfoDto)
     {
-        return Ok();
+        var teacherId = Guid.Parse(id);
+        if(teacherId == Guid.Empty)
+        {
+            return BadRequest("Invalid teacher ID.");
+        }
+
+        try
+        {
+            var updateInfo = await teacherService.UpdateTeacherInfoAsync(teacherId, updateTeacherInfoDto);
+            if(updateInfo == null)
+            {
+                return NotFound("Teacher not found.");
+            }
+            return Ok(updateInfo);
+        }
+        catch(Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
 }
