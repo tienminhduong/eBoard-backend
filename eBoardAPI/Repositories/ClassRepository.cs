@@ -71,10 +71,9 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
         return classEntity == null ? Result<Class>.Failure("Lớp không tồn tại") : Result<Class>.Success(classEntity);
     }
 
-    public async Task<Result<Class>> AddNewClassAsync(Class newClass)
+    public async Task<Class> AddNewClassAsync(Class newClass)
     {
         await dbContext.Classes.AddAsync(newClass);
-        var saveCount = await dbContext.SaveChangesAsync();
-        return saveCount > 0 ? Result<Class>.Success(newClass) : Result<Class>.Failure("Thêm lớp học mới thất bại");
+        return newClass;
     }
 }

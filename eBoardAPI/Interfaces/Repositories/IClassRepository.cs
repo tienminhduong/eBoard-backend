@@ -11,5 +11,5 @@ public interface IClassRepository
     Task<IEnumerable<Student>> GetStudentsByClassAsync(Guid classId, int pageNumber, int pageSize);
     Task<Result<Class>> GetClassByIdAsync(Guid classId);
     
-    Task<Result<Class>> AddNewClassAsync(Class newClass);
+    Task<Class> AddNewClassAsync(Class newClass);
 }

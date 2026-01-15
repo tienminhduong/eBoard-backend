@@ -48,6 +48,8 @@ public static class ServiceCollectionExtension
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IClassRepository, ClassRepository>();
             services.AddScoped<IClassFundRepository, ClassFundRepository>();
+            
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
 

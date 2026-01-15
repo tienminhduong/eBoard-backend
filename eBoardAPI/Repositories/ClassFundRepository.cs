@@ -8,13 +8,10 @@ namespace eBoardAPI.Repositories;
 
 public class ClassFundRepository(AppDbContext dbContext) : IClassFundRepository
 {
-    public async Task<Result<ClassFund>> AddNewClassFundAsync(ClassFund classFund)
+    public async Task<ClassFund> AddNewClassFundAsync(ClassFund classFund)
     {
         await dbContext.ClassFunds.AddAsync(classFund);
-        var saveCount = await dbContext.SaveChangesAsync();
-        return saveCount > 0
-            ? Result<ClassFund>.Success(classFund)
-            : Result<ClassFund>.Failure("Tạo quỹ lớp mới thất bại");
+        return classFund;
     }
 
     public async Task<Result<ClassFund>> GetClassFundByIdAsync(Guid classFundId)
