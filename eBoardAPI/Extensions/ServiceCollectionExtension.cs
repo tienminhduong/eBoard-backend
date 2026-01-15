@@ -1,9 +1,11 @@
 using eBoardAPI.Consts;
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
+using eBoardAPI.Helpers;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Class;
+using eBoardAPI.Models.ClassFund;
 using eBoardAPI.Models.Parent;
 using eBoardAPI.Models.Student;
 using eBoardAPI.Repositories;
@@ -76,6 +78,11 @@ public static class ServiceCollectionExtension
                     .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher.FullName))
                     .ForMember(dest => dest.Grade, opt => opt.MapFrom(src => src.Grade.Name));
                 cfg.CreateMap<CreateClassDto, Class>();
+
+                cfg.CreateMap<ClassFund, ClassFundDto>()
+                    .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
+                    .ForMember(dest => dest.AcademicYear,
+                        opt => opt.MapFrom(src => StringHelper.ParseAcademicYear(src.Class)));
 
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;

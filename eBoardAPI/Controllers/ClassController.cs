@@ -1,5 +1,7 @@
+using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Class;
+using eBoardAPI.Models.Student;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBoardAPI.Controllers;
@@ -9,14 +11,17 @@ namespace eBoardAPI.Controllers;
 public class ClassController(IClassService classService) : ControllerBase
 {
     [HttpGet("/api/grades")]
-    public async Task<ActionResult> GetAllGrades()
+    public async Task<ActionResult<IEnumerable<Grade>>> GetAllGrades()
     {
         var grades = await classService.GetAllGradesAsync();
         return Ok(grades);
     }
     
     [HttpGet]
-    public async Task<ActionResult> GetClassesByTeacher(Guid teacherId, int pageNumber = 1, int pageSize = 20 /*later replaced by id from access token*/)
+    public async Task<ActionResult<ClassInfoDto>> GetClassesByTeacher(
+        Guid teacherId,
+        int pageNumber = 1,
+        int pageSize = 20 /*later replaced by id from access token*/)
     {
         var classDtos = await classService.GetPagedClassesByTeacherAsync(teacherId, pageNumber, pageSize);
         return Ok(classDtos);
@@ -24,21 +29,21 @@ public class ClassController(IClassService classService) : ControllerBase
     
     // authorize as teacher
     [HttpGet("teaching")]
-    public async Task<ActionResult> GetAllClassesTeachingByTeacher(Guid teacherId /*later replaced by id from access token*/)
+    public async Task<ActionResult<ClassInfoDto>> GetAllClassesTeachingByTeacher(Guid teacherId /*later replaced by id from access token*/)
     {
         var classDtos = await classService.GetAllTeachingClassesByTeacherAsync(teacherId);
         return Ok(classDtos);
     }
     
     [HttpGet("{classId}")]
-    public async Task<ActionResult> GetClassById(Guid classId)
+    public async Task<ActionResult<ClassInfoDto>> GetClassById(Guid classId)
     {
         var result = await classService.GetClassByIdAsync(classId);
         return result.IsSuccess ? Ok(result.Value!) : NotFound(result.ErrorMessage!);
     }
 
     [HttpGet("{classId}/students")]
-    public async Task<ActionResult> GetStudentsByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
+    public async Task<ActionResult<PagedStudentInClassDto>> GetStudentsByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
     {
         var pagedStudents = await classService.GetPagedStudentsByClassAsync(classId, pageNumber, pageSize);
         return Ok(pagedStudents);

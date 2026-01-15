@@ -1,17 +1,21 @@
+using eBoardAPI.Interfaces.Services;
+using eBoardAPI.Models.ClassFund;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBoardAPI.Controllers;
 
 [ApiController]
 [Route("api/funds")]
-public class ClassFundController : ControllerBase
+public class ClassFundController(IClassFundService classFundService) : ControllerBase
 {
     //authorize as teacher and parent
     [HttpGet("{classId}")]
-    public async Task<ActionResult> GetClassFundByClassId(Guid classId)
+    public async Task<ActionResult<ClassFundDto>> GetClassFundByClassId(Guid classId)
     {
-        await Task.Delay(1); // Simulate async operation;
-        return Ok();
+        var result = await classFundService.GetClassFundByClassIdAsync(classId);
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : NotFound(result.ErrorMessage);
     }
     
     [HttpGet("{classId}/income")]
