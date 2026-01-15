@@ -67,9 +67,9 @@ public class StudentService(
 
     public async Task<Result<StudentInfoDto>> GetByIdAsync(Guid id)
     {
-            var studentResult = await studentRepository.GetByIdAsync(id);
-            return studentResult.IsSuccess 
-                ? Result<StudentInfoDto>.Success(mapper.Map<StudentInfoDto>(studentResult.Value)) 
-                : Result<StudentInfoDto>.Failure("Không tìm thấy học sinh với ID đã cho.");
+        var studentResult = await studentRepository.GetByIdAsync(id);
+        return studentResult.IsSuccess 
+            ? Result<StudentInfoDto>.Success(mapper.Map<StudentInfoDto>(studentResult.Value)) 
+            : Result<StudentInfoDto>.Failure("Không tìm thấy học sinh với ID đã cho.");
     }
 }
