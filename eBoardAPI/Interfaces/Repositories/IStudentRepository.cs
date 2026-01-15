@@ -6,5 +6,5 @@ namespace eBoardAPI.Interfaces.Repositories;
 public interface IStudentRepository
 {
     Task<Result<Student>> GetByIdAsync(Guid id);
-    Task<Result> AddAsync(Student student);
+    Task<Student> AddAsync(Student student);
 }

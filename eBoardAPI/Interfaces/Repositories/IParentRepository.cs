@@ -7,4 +7,6 @@ public interface IParentRepository
 {
     Task<Result<Parent>> GetByIdAsync(Guid id);
     Task<Result> Update(Parent parent);
+    Task<Result<Parent>> GetByPhoneNumberAsync(string phoneNumber);
+    Task<Parent> AddNewParentAsync(Parent parent);
 }

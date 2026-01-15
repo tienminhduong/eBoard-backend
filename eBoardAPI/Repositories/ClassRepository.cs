@@ -10,7 +10,7 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
 {
     public async Task<IEnumerable<Grade>> GetAllGradesAsync()
     {
-        return await dbContext.Grades.ToListAsync();
+        return await dbContext.Grades.AsNoTracking().ToListAsync();
     }
 
     public async Task<IEnumerable<Class>> GetAllTeachingClassByTeacherAsync(Guid teacherId)
@@ -24,6 +24,7 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
         return await query
             .Include(c => c.Teacher)
             .Include(c => c.Grade)
+            .AsNoTracking()
             .ToListAsync();
     }
 
@@ -39,6 +40,7 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
             .Include(c => c.Grade)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
+            .AsNoTracking()
             .ToListAsync();
     }
 
@@ -54,6 +56,7 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
             .Include(s => s.Parent)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
+            .AsNoTracking()
             .ToListAsync();
     }
 
@@ -66,6 +69,7 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
         var classEntity = await query
             .Include(c => c.Teacher)
             .Include(c => c.Grade)
+            .AsNoTracking()
             .FirstOrDefaultAsync();
         
         return classEntity == null ? Result<Class>.Failure("Lớp không tồn tại") : Result<Class>.Success(classEntity);
@@ -75,5 +79,41 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
     {
         await dbContext.Classes.AddAsync(newClass);
         return newClass;
+    }
+
+    public async Task<Result> AddNewStudentsToClassAsync(Guid classId, List<Guid> studentIds)
+    {
+        var result = await GetClassByIdAsync(classId);
+        if (!result.IsSuccess)
+            return Result.Failure(result.ErrorMessage!);
+        
+        // Check if all students exist, if not return error with missing student ids
+        var pendingStudent = dbContext.ChangeTracker
+            .Entries<Student>()
+            .Where(s => s.State == EntityState.Added && studentIds.Contains(s.Entity.Id))
+            .Select(s => s.Entity.Id)
+            .ToList();
+        
+        var existingStudents = await dbContext.Students
+            .Where(s => studentIds.Contains(s.Id))
+            .Select(s => s.Id)
+            .ToListAsync();
+        
+        existingStudents.AddRange(pendingStudent);
+        
+        var missingStudentIds = studentIds.Except(existingStudents).ToList();
+        if (missingStudentIds.Any())
+            return Result.Failure("Một số học sinh không tồn tại: " + string.Join(", ", missingStudentIds));
+        
+        // Add students to class
+        foreach (var studentId in studentIds)
+        {
+            await dbContext.InClasses.AddAsync(new InClass
+            {
+                ClassId = classId,
+                StudentId = studentId,
+            });
+        }
+        return Result.Success();
     }
 }

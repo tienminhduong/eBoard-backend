@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace eBoardAPI.Entities;
 
 public class Class
