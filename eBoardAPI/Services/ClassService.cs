@@ -10,6 +10,7 @@ using eBoardAPI.Models.Student;
 namespace eBoardAPI.Services;
 
 public class ClassService(
+    IUnitOfWork unitOfWork,
     IClassRepository classRepository,
     IMapper mapper
     ) : IClassService
@@ -70,15 +71,25 @@ public class ClassService(
 
     public async Task<Result<ClassInfoDto>> AddNewClassAsync(CreateClassDto createClassDto, Guid teacherId)
     {
-        var newClass = mapper.Map<Class>(createClassDto);
-        newClass.TeacherId = teacherId;
-        
-        var result = await classRepository.AddNewClassAsync(newClass);
-        
-        if (!result.IsSuccess)
-            return Result<ClassInfoDto>.Failure(result.ErrorMessage!);
-        
-        var classDto = mapper.Map<ClassInfoDto>(result.Value);
-        return Result<ClassInfoDto>.Success(classDto);
+        try
+        {
+            var newClass = mapper.Map<Class>(createClassDto);
+            newClass.TeacherId = teacherId;
+            await unitOfWork.ClassRepository.AddNewClassAsync(newClass);
+
+            var newClassFund = new ClassFund { ClassId = newClass.Id };
+            await unitOfWork.ClassFundRepository.AddNewClassFundAsync(newClassFund);
+
+            var saveCount = await unitOfWork.SaveChangesAsync();
+            if (saveCount == 0)
+                return Result<ClassInfoDto>.Failure("Tạo lớp học thất bại");
+            
+            var classDto = mapper.Map<ClassInfoDto>(newClass);
+            return Result<ClassInfoDto>.Success(classDto);
+        }
+        catch (Exception ex)
+        {
+            return Result<ClassInfoDto>.Failure($"Đã xảy ra lỗi khi tạo lớp học: {ex.Message}");
+        }
     }
 }
