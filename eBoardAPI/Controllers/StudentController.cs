@@ -1,4 +1,5 @@
 using eBoardAPI.Consts;
+using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Parent;
 using eBoardAPI.Models.Student;
@@ -8,49 +9,54 @@ namespace eBoardAPI.Controllers;
 
 [ApiController]
 [Route("api/students")]
-public class StudentController : ControllerBase
+public class StudentController(IStudentService studentService) : ControllerBase
 {
     // authorize as teacher or parent
     [HttpGet("{id}")]
-    public async Task<ActionResult<StudentInfoDto>> GetStudentById(Guid id)
+    public async Task<ActionResult<StudentInfoDto>> GetStudentById([FromRoute] string id)
     {
-        var student = new StudentInfoDto
+        if(string.IsNullOrWhiteSpace(id))
         {
-            Id = id,
-            FirstName = "John",
-            LastName = "Doe",
-            FullAddress = "123 Main St, Springfield",
-            RelationshipWithParent = RelationshipWithParent.FATHER,
-            DateOfBirth = new DateOnly(2010, 5, 15),
-            Gender = Gender.MALE,
-            Parent = new ParentInfoDto
-            {
-                Id = Guid.NewGuid(),
-                FullName = "Michael Doe",
-                PhoneNumber = "123-456-7890",
-                Email = "lmao@example.com",
-                HealthCondition = "Healthy",
-                Address = "123 Main St, Springfield"
-            }
-        };
+            return BadRequest("Student ID is required.");
+        }
+        var guidId = Guid.Parse(id);
+        if(guidId == Guid.Empty)
+        {
+            return BadRequest("Invalid student ID.");
+        }
 
-        return Ok(student);
+        try
+        {
+            var studentInfo = await studentService.GetByIdAsync(guidId);
+            if(studentInfo == null)
+            {
+                return NotFound("Student not found.");
+            }
+            return Ok(studentInfo);
+        }
+        catch(Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
     
     // authorize as teacher
     [HttpPost]
     public async Task<ActionResult<StudentInfoDto>> CreateStudent([FromBody] CreateStudentDto student)
     {
-        var createdStudent = new StudentInfoDto
+        if(!ModelState.IsValid)
+            return BadRequest();
+
+        try
         {
-            Id = Guid.NewGuid(),
-            FirstName = student.FirstName,
-            LastName = student.LastName,
-            FullAddress = student.Address,
-            RelationshipWithParent = student.RelationshipWithParent,
-            DateOfBirth = student.DateOfBirth,
-            Gender = Gender.MALE,
-        };
-        return CreatedAtAction(nameof(GetStudentById), new { id = createdStudent.Id }, createdStudent);
+            var studentInfo = await studentService.CreateAsync(student);
+            if (studentInfo == null)
+                return BadRequest();
+            return CreatedAtAction(nameof(GetStudentById), new { id = studentInfo.Id }, studentInfo);
+        }
+        catch(Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
 }
