@@ -2,6 +2,7 @@ using eBoardAPI.Common;
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace eBoardAPI.Repositories;
 
@@ -23,7 +24,11 @@ public class StudentRepository(AppDbContext db) : IStudentRepository
             return Result<Student>.Failure("Id must be not empty");
         }
         
-        var student = await db.Students.FindAsync(id);
+        var query = from s in db.Students
+                    where s.Id == id
+                    select s;
+        var student = await query.Include(s => s.Parent)
+                                 .FirstOrDefaultAsync();
         return (student != null) ? Result<Student>.Success(student)
                                  : Result<Student>.Failure("Student is not exsist");
     }

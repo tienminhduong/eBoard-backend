@@ -17,7 +17,12 @@ public class ParentService(IParentRepository parentRepository, IMapper mapper) :
 
         var resultGet = await parentRepository.GetByIdAsync(id);
 
-        var parentDto = resultGet.IsSuccess ? mapper.Map<ParentInfoDto?>(resultGet.Value) : null;
+        if(resultGet.IsSuccess == false)
+        {
+            return Result<ParentInfoDto>.Failure(resultGet.ErrorMessage ?? "Error retrieving parent");
+        }
+
+        var parentDto = mapper.Map<ParentInfoDto?>(resultGet.Value);
         Result<ParentInfoDto> result;
         if (parentDto == null)
         {
