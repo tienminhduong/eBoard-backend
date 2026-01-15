@@ -1,3 +1,4 @@
+using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Parent;
 using Microsoft.AspNetCore.Mvc;
@@ -6,28 +7,48 @@ namespace eBoardAPI.Controllers;
 
 [ApiController]
 [Route("api/parents")]
-public class ParentController : ControllerBase
+public class ParentController(IParentService parentService) : ControllerBase
 {
     // authorize for only that parent and teachers who teach their children
     [HttpGet("info/{id}")]
-    public async Task<ActionResult<ParentInfoDto>> GetParentInfo([FromRoute] int id)
+    public async Task<ActionResult<ParentInfoDto>> GetParentInfo([FromRoute] string id)
     {
-        return Ok(new ParentInfoDto
+        var guidId = Guid.TryParse(id, out var parsedId) ? parsedId : Guid.Empty;
+
+        try
         {
-            Id = Guid.NewGuid(),
-            FullName = "John Doe",
-            Email = "lmao.abc@example.com",
-            PhoneNumber = "987-654-3210",
-            Address = "123 Main St, Anytown, USA",
-            HealthCondition = "Good"
-        });
+            var parentInfo = await parentService.GetByIdAsync(guidId);
+
+            if (parentInfo is null)
+            {
+                return NotFound($"Parent with ID {id} not found.");
+            }
+            return Ok(parentInfo);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     // same with above
     [HttpPut("info/{id}")]
-    public async Task<ActionResult> UpdateParentInfo([FromRoute] int id, [FromBody] UpdateParentInfoDto updateParentInfoDto)
+    public async Task<ActionResult> UpdateParentInfo([FromRoute] string id, [FromBody] UpdateParentInfoDto updateParentInfoDto)
     {
-        return Ok();
+        var guidId = Guid.TryParse(id, out var parsedId) ? parsedId : Guid.Empty;
+        try
+        {
+            var updateParent = await parentService.UpdateAsync(guidId, updateParentInfoDto);
+            if (updateParent is null)
+            {
+                return NotFound($"Parent with ID {id} not found.");
+            }
 
+            return Ok(updateParent);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
