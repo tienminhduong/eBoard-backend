@@ -10,16 +10,18 @@ public static class StringHelper
 
     public static string ParseFullAddress(string baseAddress, string ward, string district, string province)
     {
-        var result = baseAddress;
+        var result = "";
+        if (!string.IsNullOrWhiteSpace(baseAddress))
+            result += $"{baseAddress}, ";
         
         if (!string.IsNullOrWhiteSpace(ward))
-            result += $", {ward}";
+            result += $"{ward}, ";
         
         if (!string.IsNullOrWhiteSpace(district))
-            result += $", {district}";
+            result += $"{district}, ";
         
         if (!string.IsNullOrWhiteSpace(province))
-            result += $", {province}";
+            result += $"{province}";
         
         return result;
     }

@@ -28,7 +28,6 @@ public class StudentService(
             {
                 newStudent.ParentId = result.Value!.Id;
                 parent = result.Value;
-                // newStudent.Parent = result.Value;
             }
             else
             {
@@ -46,7 +45,6 @@ public class StudentService(
                 await unitOfWork.ParentRepository.AddNewParentAsync(newParent);
                 newStudent.ParentId = newParent.Id;
                 parent = newParent;
-                // newStudent.Parent = newParent;
             }
             
             await unitOfWork.StudentRepository.AddAsync(newStudent);
