@@ -2,6 +2,7 @@ using System.Runtime.InteropServices.ComTypes;
 using AutoMapper;
 using eBoardAPI.Common;
 using eBoardAPI.Entities;
+using eBoardAPI.Extensions;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Class;
@@ -63,7 +64,10 @@ public class ScheduleService(
         if (updateClassPeriodDto.DayOfWeek != null)
             existingClassPeriod.DayOfWeek = updateClassPeriodDto.DayOfWeek.Value;
         
-        unitOfWork.ScheduleRepository.UpdateClassPeriod(existingClassPeriod);
+        var result = unitOfWork.ScheduleRepository.UpdateClassPeriod(existingClassPeriod);
+        if (!result.IsSuccess)
+            return Result<ClassPeriodDto>.Failure(result.ErrorMessage!);
+        
         await unitOfWork.SaveChangesAsync();
         
         return Result<ClassPeriodDto>.Success(mapper.Map<ClassPeriodDto>(existingClassPeriod));
@@ -94,5 +98,63 @@ public class ScheduleService(
         };
         
         return Result<ScheduleDto>.Success(returnDto);
+    }
+
+    public async Task<Result<ScheduleSettingDto>> GetScheduleSettingsAsync(Guid classId)
+    {
+        var result = await unitOfWork.ScheduleRepository.GetScheduleSettingByClassIdAsync(classId);
+        if (!result.IsSuccess)
+            return Result<ScheduleSettingDto>.Failure(result.ErrorMessage!);
+        
+        var scheduleSettingDto = mapper.Map<ScheduleSettingDto>(result.Value);
+        return Result<ScheduleSettingDto>.Success(scheduleSettingDto);
+    }
+
+    public async Task<Result> UpdateScheduleSettingAsync(Guid scheduleSettingId, UpdateScheduleSettingDto updateScheduleSettingDetailDto)
+    {
+        var scheduleSettingResult = await unitOfWork.ScheduleRepository.GetScheduleSettingByIdAsync(scheduleSettingId);
+        if (!scheduleSettingResult.IsSuccess)
+            return Result.Failure(scheduleSettingResult.ErrorMessage!);
+        
+        var scheduleSetting = scheduleSettingResult.Value!;
+        scheduleSetting.MorningPeriodCount = updateScheduleSettingDetailDto.MorningPeriodCount;
+        scheduleSetting.AfternoonPeriodCount = updateScheduleSettingDetailDto.AfternoonPeriodCount;
+
+        var periodCount = scheduleSetting.MorningPeriodCount + scheduleSetting.AfternoonPeriodCount;
+        var removedSettings =
+            await unitOfWork.ScheduleRepository.CleanOverflowScheduleSettingsAsync(scheduleSettingId, periodCount);
+        scheduleSetting.Details.RemoveRange(removedSettings);
+
+        foreach (var detail in updateScheduleSettingDetailDto.Details)
+        {
+            if (detail.PeriodNumber > periodCount)
+                continue;
+            
+            var existingDetail = scheduleSetting.Details
+                .FirstOrDefault(d => d.PeriodNumber == detail.PeriodNumber);
+            if (existingDetail != null)
+            {
+                existingDetail.StartTime = detail.StartTime;
+                existingDetail.EndTime = detail.EndTime;
+            }
+            else
+            {
+                var newDetail = new ScheduleSettingDetail
+                {
+                    ScheduleSettingId = scheduleSettingId,
+                    PeriodNumber = detail.PeriodNumber,
+                    StartTime = detail.StartTime,
+                    EndTime = detail.EndTime
+                };
+                scheduleSetting.Details.Add(newDetail);
+            }
+        }
+        
+        var updateResult = unitOfWork.ScheduleRepository.UpdateScheduleSetting(scheduleSetting, scheduleSetting.Details);
+        if (!updateResult.IsSuccess)
+            return Result.Failure(updateResult.ErrorMessage!);
+        
+        await unitOfWork.SaveChangesAsync();
+        return Result.Success();
     }
 }

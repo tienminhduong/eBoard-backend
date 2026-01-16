@@ -42,4 +42,19 @@ public class ScheduleController(IScheduleService scheduleService) : ControllerBa
         var result = await scheduleService.DeleteClassPeriodAsync(classPeriodId);
         return result ? NoContent() : BadRequest("Không tìm thấy tiết học để xóa");
     }
+    
+    [HttpGet("{classId}/settings")]
+    public async Task<ActionResult<ScheduleSettingDto>> GetScheduleSettings(Guid classId)
+    {
+        var result = await scheduleService.GetScheduleSettingsAsync(classId);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("settings/{scheduleSettingId}")]
+    public async Task<IActionResult> UpdateScheduleSetting(Guid scheduleSettingId,
+        [FromBody] UpdateScheduleSettingDto settingDto)
+    {
+        var result = await scheduleService.UpdateScheduleSettingAsync(scheduleSettingId, settingDto);
+        return result.IsSuccess ? NoContent() : BadRequest(result.ErrorMessage);
+    }
 }

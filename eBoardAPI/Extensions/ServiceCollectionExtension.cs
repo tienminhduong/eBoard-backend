@@ -107,6 +107,9 @@ public static class ServiceCollectionExtension
                 
                 cfg.CreateMap<ClassPeriod, ClassPeriodDto>();
                 cfg.CreateMap<Subject, SubjectDto>();
+                
+                cfg.CreateMap<ScheduleSetting, ScheduleSettingDto>();
+                cfg.CreateMap<ScheduleSettingDetail, ScheduleSettingDetailDto>();
 
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;

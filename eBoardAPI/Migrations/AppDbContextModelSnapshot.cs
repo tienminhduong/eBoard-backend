@@ -64,7 +64,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Classes");
+                    b.ToTable("Classes", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.ClassFund", b =>
@@ -89,7 +89,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasIndex("ClassId");
 
-                    b.ToTable("ClassFunds");
+                    b.ToTable("ClassFunds", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.ClassPeriod", b =>
@@ -125,7 +125,7 @@ namespace eBoardAPI.Migrations
                     b.HasIndex("ClassId", "PeriodNumber")
                         .IsUnique();
 
-                    b.ToTable("ClassPeriods");
+                    b.ToTable("ClassPeriods", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.FundExpense", b =>
@@ -163,7 +163,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasIndex("ClassFundId");
 
-                    b.ToTable("FundExpenses");
+                    b.ToTable("FundExpenses", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.FundIncome", b =>
@@ -202,7 +202,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasIndex("ClassFundId");
 
-                    b.ToTable("FundIncomes");
+                    b.ToTable("FundIncomes", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.FundIncomeDetail", b =>
@@ -241,7 +241,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("FundIncomeDetails");
+                    b.ToTable("FundIncomeDetails", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.Grade", b =>
@@ -256,7 +256,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Grades");
+                    b.ToTable("Grades", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.InClass", b =>
@@ -271,7 +271,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasIndex("ClassId");
 
-                    b.ToTable("InClasses");
+                    b.ToTable("InClasses", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.Parent", b =>
@@ -310,7 +310,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Parents");
+                    b.ToTable("Parents", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.ScheduleSetting", b =>
@@ -332,7 +332,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasIndex("ClassId");
 
-                    b.ToTable("ScheduleSettings");
+                    b.ToTable("ScheduleSettings", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.ScheduleSettingDetail", b =>
@@ -353,7 +353,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasIndex("ScheduleSettingId");
 
-                    b.ToTable("ScheduleSettingDetails");
+                    b.ToTable("ScheduleSettingDetails", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.Student", b =>
@@ -404,7 +404,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.Subject", b =>
@@ -419,7 +419,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("Subjects", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.Teacher", b =>
@@ -454,7 +454,7 @@ namespace eBoardAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Teachers");
+                    b.ToTable("Teachers", (string)null);
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.Class", b =>

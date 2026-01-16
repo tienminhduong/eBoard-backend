@@ -10,4 +10,8 @@ public interface IScheduleService
         UpdateClassPeriodDto updateClassPeriodDto);
     Task<bool> DeleteClassPeriodAsync(Guid classPeriodId);
     Task<Result<ScheduleDto>> GetClassPeriodsByClassAsync(Guid classId);
+    
+    Task<Result<ScheduleSettingDto>> GetScheduleSettingsAsync(Guid classId);
+    Task<Result> UpdateScheduleSettingAsync(Guid scheduleSettingId,
+        UpdateScheduleSettingDto updateScheduleSettingDetailDto);
 }

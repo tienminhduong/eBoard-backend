@@ -58,4 +58,77 @@ public class ScheduleRepository(AppDbContext dbContext) : IScheduleRepository
             .Include(cp => cp.Subject)
             .ToListAsync();
     }
+
+    public async Task<ScheduleSetting> AddNewScheduleSettingAsync(ScheduleSetting scheduleSetting)
+    {
+        await dbContext.ScheduleSettings.AddAsync(scheduleSetting);
+        
+        for (var i = 0; i < scheduleSetting.MorningPeriodCount + scheduleSetting.AfternoonPeriodCount; i++)
+        {
+            var detail = new ScheduleSettingDetail
+            {
+                ScheduleSettingId = scheduleSetting.Id,
+                PeriodNumber = i + 1,
+                StartTime = TimeOnly.Parse("08:00"),
+                EndTime = TimeOnly.Parse("08:45")
+            };
+            await dbContext.ScheduleSettingDetails.AddAsync(detail);
+        }
+        return scheduleSetting;
+    }
+
+    public Result<ScheduleSetting> UpdateScheduleSetting(ScheduleSetting scheduleSetting, IEnumerable<ScheduleSettingDetail> details)
+    {
+        try
+        {
+            dbContext.ScheduleSettings.Update(scheduleSetting);
+            dbContext.ScheduleSettingDetails.UpdateRange(details);
+            return Result<ScheduleSetting>.Success(scheduleSetting);
+        }
+        catch (Exception ex)
+        {
+            return Result<ScheduleSetting>.Failure($"Cập nhật cài đặt thời khóa biểu thất bại: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<ScheduleSetting>> GetScheduleSettingByClassIdAsync(Guid classId)
+    {
+        var query = from ss in dbContext.ScheduleSettings
+                    where ss.ClassId == classId
+                    select ss;
+
+        var scheduleSetting = await query
+            .AsNoTracking()
+            .Include(s => s.Details)
+            .FirstOrDefaultAsync();
+
+        return scheduleSetting == null
+            ? Result<ScheduleSetting>.Failure("Không tìm thấy cài đặt thời khóa biểu")
+            : Result<ScheduleSetting>.Success(scheduleSetting);
+    }
+
+    public async Task<Result<ScheduleSetting>> GetScheduleSettingByIdAsync(Guid scheduleSettingId)
+    {
+        var scheduleSetting = await dbContext.ScheduleSettings
+            .Include(s => s.Details)
+            .FirstOrDefaultAsync(s => s.Id == scheduleSettingId);
+
+        return scheduleSetting == null
+            ? Result<ScheduleSetting>.Failure("Không tìm thấy cài đặt thời khóa biểu")
+            : Result<ScheduleSetting>.Success(scheduleSetting);
+    }
+
+    public async Task<IEnumerable<ScheduleSettingDetail>> CleanOverflowScheduleSettingsAsync(Guid scheduleSettingId,
+        int validPeriodCount)
+    {
+        var query = from d in dbContext.ScheduleSettingDetails
+                    where d.ScheduleSettingId == scheduleSettingId &&
+                          d.PeriodNumber > validPeriodCount
+                    select d;
+        
+        var overflowDetails = await query.ToListAsync();
+        
+        dbContext.ScheduleSettingDetails.RemoveRange(overflowDetails);
+        return overflowDetails;
+    }
 }

@@ -6,7 +6,9 @@ public class ScheduleSetting
     
     public Guid ClassId { get; set; }
     public Class Class { get; set; } = null!;
+
+    public int MorningPeriodCount { get; set; } = 5;
+    public int AfternoonPeriodCount { get; set; } = 4;
     
-    public int MorningPeriodCount { get; set; }
-    public int AfternoonPeriodCount { get; set; }
+    public ICollection<ScheduleSettingDetail> Details { get; set; } = [];
 }
