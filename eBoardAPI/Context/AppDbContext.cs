@@ -15,4 +15,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<FundIncome> FundIncomes { get; set; }
     public DbSet<FundIncomeDetail> FundIncomeDetails { get; set; }
     public DbSet<FundExpense> FundExpenses { get; set; }
+    public DbSet<ClassPeriod> ClassPeriods { get; set; }
+    public DbSet<Subject> Subjects { get; set; }
+    public DbSet<ScheduleSetting> ScheduleSettings { get; set; }
+    public DbSet<ScheduleSettingDetail> ScheduleSettingDetails { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ClassPeriod>()
+            .HasIndex(e => new { e.IsMorningPeriod, e.PeriodNumber, e.DayOfWeek, e.ClassId }).IsUnique();
+    }
 }

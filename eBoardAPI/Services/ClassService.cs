@@ -79,6 +79,9 @@ public class ClassService(
 
             var newClassFund = new ClassFund { ClassId = newClass.Id };
             await unitOfWork.ClassFundRepository.AddNewClassFundAsync(newClassFund);
+            
+            var newScheduleSetting = new ScheduleSetting { ClassId = newClass.Id };
+            await unitOfWork.ScheduleRepository.AddNewScheduleSettingAsync(newScheduleSetting);
 
             var saveCount = await unitOfWork.SaveChangesAsync();
             if (saveCount == 0)

@@ -8,7 +8,9 @@ using eBoardAPI.Models;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
 using eBoardAPI.Models.Parent;
+using eBoardAPI.Models.Schedule;
 using eBoardAPI.Models.Student;
+using eBoardAPI.Models.Subject;
 using eBoardAPI.Models.Teacher;
 using eBoardAPI.Repositories;
 using eBoardAPI.Services;
@@ -50,6 +52,8 @@ public static class ServiceCollectionExtension
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IClassRepository, ClassRepository>();
             services.AddScoped<IClassFundRepository, ClassFundRepository>();
+            services.AddScoped<IScheduleRepository, ScheduleRepository>();
+            services.AddScoped<ISubjectRepository, SubjectRepository>();
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
@@ -63,6 +67,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IClassService, ClassService>();
             services.AddScoped<IClassFundService, ClassFundService>();
+            services.AddScoped<IScheduleService, ScheduleService>();
             return services;
         }
         
@@ -91,6 +96,20 @@ public static class ServiceCollectionExtension
                     .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
                     .ForMember(dest => dest.AcademicYear,
                         opt => opt.MapFrom(src => StringHelper.ParseAcademicYear(src.Class)));
+
+                cfg.CreateMap<CreateClassPeriodDto, ClassPeriod>()
+                    .ForSourceMember(src => src.Subject, opt => opt.DoNotValidate())
+                    .ForMember(dest => dest.Subject, opt => opt.Ignore());
+                
+                cfg.CreateMap<UpdateClassPeriodDto, ClassPeriod>()
+                    .ForSourceMember(src => src.Subject, opt => opt.DoNotValidate())
+                    .ForMember(dest => dest.Subject, opt => opt.Ignore());
+                
+                cfg.CreateMap<ClassPeriod, ClassPeriodDto>();
+                cfg.CreateMap<Subject, SubjectDto>();
+                
+                cfg.CreateMap<ScheduleSetting, ScheduleSettingDto>();
+                cfg.CreateMap<ScheduleSettingDetail, ScheduleSettingDetailDto>();
 
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;

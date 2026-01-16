@@ -9,6 +9,8 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
     IClassRepository? _classRepository;
     IParentRepository? _parentRepository;
     IClassFundRepository? _classFundRepository;
+    IScheduleRepository? _scheduleRepository;
+    ISubjectRepository? _subjectRepository;
 
     public IClassFundRepository ClassFundRepository
     {
@@ -43,6 +45,24 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
         {
             _parentRepository ??= new ParentRepository(dbContext);
             return _parentRepository;
+        }
+    }
+
+    public ISubjectRepository SubjectRepository
+    {
+        get
+        {
+            _subjectRepository ??= new SubjectRepository(dbContext);
+            return _subjectRepository;
+        }
+    }
+    
+    public IScheduleRepository ScheduleRepository
+    {
+        get
+        {
+            _scheduleRepository ??= new ScheduleRepository(dbContext);
+            return _scheduleRepository;
         }
     }
 
