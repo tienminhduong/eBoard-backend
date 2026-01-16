@@ -24,7 +24,9 @@ public class ScheduleService(
             var classPeriod = mapper.Map<ClassPeriod>(createClassPeriodDto);
             classPeriod.SubjectId = subject.Id;
 
-            await unitOfWork.ScheduleRepository.AddClassPeriodAsync(classPeriod);
+            var result = await unitOfWork.ScheduleRepository.AddClassPeriodAsync(classPeriod);
+            if (!result.IsSuccess)
+                return Result<ClassPeriodDto>.Failure(result.ErrorMessage!);
             await unitOfWork.SaveChangesAsync();
 
             classPeriod.Subject = subject;

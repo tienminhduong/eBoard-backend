@@ -16,10 +16,23 @@ public class ScheduleRepository(AppDbContext dbContext) : IScheduleRepository
             : Result<ClassPeriod>.Success(classPeriod);
     }
 
-    public async Task<ClassPeriod> AddClassPeriodAsync(ClassPeriod classPeriod)
+    public async Task<Result<ClassPeriod>> AddClassPeriodAsync(ClassPeriod classPeriod)
     {
+        var query = from setting in dbContext.ScheduleSettings
+                    where setting.ClassId == classPeriod.ClassId
+                    select setting;
+        var scheduleSetting = await query.FirstOrDefaultAsync();
+        if (scheduleSetting == null)
+            return Result<ClassPeriod>.Failure("Không tìm thấy cài đặt thời khóa biểu cho lớp học này");
+        
+        if (classPeriod.IsMorningPeriod && classPeriod.PeriodNumber > scheduleSetting.MorningPeriodCount ||
+            !classPeriod.IsMorningPeriod && classPeriod.PeriodNumber > scheduleSetting.AfternoonPeriodCount)
+        {
+            return Result<ClassPeriod>.Failure("Tiết học vượt quá số tiết học trong cài đặt thời khóa biểu");
+        }
+        
         await dbContext.ClassPeriods.AddAsync(classPeriod);
-        return classPeriod;
+        return Result<ClassPeriod>.Success(classPeriod);
     }
 
     public Result<ClassPeriod> UpdateClassPeriod(ClassPeriod classPeriod)
