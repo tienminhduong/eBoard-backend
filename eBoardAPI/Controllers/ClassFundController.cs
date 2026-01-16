@@ -23,8 +23,17 @@ public class ClassFundController(IClassFundService classFundService,
     [HttpGet("{classId}/income")]
     public async Task<ActionResult> GetFundIncomeByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
     {
-        await Task.Delay(1); // Simulate async operation;
-        return Ok();
+        if(ModelState.IsValid == false)
+        {
+            return BadRequest(ModelState);
+        }
+        
+        var result = await fundIncomeService.GetFundIncomesByClassIdAsync(classId, pageNumber, pageSize);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        return (result.Value!.Any()) ? Ok(result.Value) : NotFound();
     }
     
     [HttpPost("{classId}/income")]

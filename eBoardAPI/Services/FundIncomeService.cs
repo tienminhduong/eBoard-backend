@@ -26,7 +26,7 @@ namespace eBoardAPI.Services
             {
                 return Result<FundIncomeDto>.Failure("Class Fund not found.");
             }
-            fundIncomeEntity.ClassFundId = classFundResult.Value.Id;
+            fundIncomeEntity.ClassFundId = classFundResult.Value!.Id;
 
             // tim entity class de lay so luong hoc sinh
             var classResult = await classRepository.GetClassByIdAsync(classId);
@@ -48,6 +48,19 @@ namespace eBoardAPI.Services
         public Task<Result<FundIncomeDto>> GetFundIncomeByIdAsync(Guid id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Result<IEnumerable<FundIncomeDto>>> GetFundIncomesByClassIdAsync(Guid classId, int pageNumber, int pageSize)
+        {
+            var fundIncomesResult = await fundIncomeRepository.GetAllByClassIdAsync(classId, pageNumber, pageSize);
+
+            if(!fundIncomesResult.IsSuccess)
+            {
+                return Result<IEnumerable<FundIncomeDto>>.Failure(fundIncomesResult.ErrorMessage ?? "Failed to retrieve Fund Incomes.");
+            }    
+
+            var fundIncomeDtos = mapper.Map<IEnumerable<FundIncomeDto>>(fundIncomesResult.Value);
+            return Result<IEnumerable<FundIncomeDto>>.Success(fundIncomeDtos);
         }
     }
 }

@@ -5,7 +5,8 @@ namespace eBoardAPI.Interfaces.Services
 {
     public interface IFundIncomeService
     {
-        Task<Result<FundIncomeDto>> CreateFundIncomeAsync(Guid classFundId, CreateFundIncomeDto fundIncome);
+        Task<Result<FundIncomeDto>> CreateFundIncomeAsync(Guid classId, CreateFundIncomeDto fundIncome);
         Task<Result<FundIncomeDto>> GetFundIncomeByIdAsync(Guid id);
+        Task<Result<IEnumerable<FundIncomeDto>>> GetFundIncomesByClassIdAsync(Guid classId, int pageNumber, int pageSize);
     }
 }
