@@ -1,12 +1,14 @@
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.ClassFund;
+using eBoardAPI.Models.FundIncome;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBoardAPI.Controllers;
 
 [ApiController]
 [Route("api/funds")]
-public class ClassFundController(IClassFundService classFundService) : ControllerBase
+public class ClassFundController(IClassFundService classFundService,
+                                 IFundIncomeService fundIncomeService) : ControllerBase
 {
     //authorize as teacher and parent
     [HttpGet("{classId}")]
@@ -26,10 +28,22 @@ public class ClassFundController(IClassFundService classFundService) : Controlle
     }
     
     [HttpPost("{classId}/income")]
-    public async Task<ActionResult> AddNewFundIncome(Guid classId, [FromBody] object fundRecord)
+    public async Task<ActionResult> AddNewFundIncome(Guid classId, [FromBody] CreateFundIncomeDto fundRecord)
     {
-        await Task.Delay(1); // Simulate async operation;
-        return CreatedAtAction(nameof(GetClassFundByClassId), new { classId = classId }, null);
+        if(ModelState.IsValid == false)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var validationError = fundRecord.ValidateData();
+        if(validationError != string.Empty)
+        {
+            return BadRequest(validationError);
+        }
+
+        var res = await fundIncomeService.CreateFundIncomeAsync(classId, fundRecord);
+        return res.IsSuccess ? CreatedAtAction(nameof(GetClassFundByClassId), new { classId = classId }, res.Value)
+                            : BadRequest(res.ErrorMessage);
     }
 
     [HttpGet("income/{incomeId}/details")]

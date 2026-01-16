@@ -14,5 +14,10 @@ public class FundIncome
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
     public string Description { get; set; } = string.Empty;
-    
+
+    public void CalculateExpectedAmount(int numberOfStudents)
+    {
+        ExpectedAmount = AmountPerStudent * numberOfStudents;
+    }
+
 }

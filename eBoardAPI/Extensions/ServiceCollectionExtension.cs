@@ -7,6 +7,7 @@ using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
+using eBoardAPI.Models.FundIncome;
 using eBoardAPI.Models.Parent;
 using eBoardAPI.Models.Student;
 using eBoardAPI.Models.Teacher;
@@ -50,7 +51,8 @@ public static class ServiceCollectionExtension
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IClassRepository, ClassRepository>();
             services.AddScoped<IClassFundRepository, ClassFundRepository>();
-            
+            services.AddScoped<IFundIncomeRepository, FundIncomeRepository>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
@@ -63,6 +65,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IClassService, ClassService>();
             services.AddScoped<IClassFundService, ClassFundService>();
+            services.AddScoped<IFundIncomeService, FundIncomeService>();
             return services;
         }
         
@@ -91,6 +94,11 @@ public static class ServiceCollectionExtension
                     .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
                     .ForMember(dest => dest.AcademicYear,
                         opt => opt.MapFrom(src => StringHelper.ParseAcademicYear(src.Class)));
+
+                cfg.CreateMap<CreateFundIncomeDto, FundIncome>()
+                    .ForMember(dest => dest.StartDate,
+                    opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
+                cfg.CreateMap<FundIncome, FundIncomeDto>();
 
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
