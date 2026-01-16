@@ -114,5 +114,19 @@ public static class ServiceCollectionExtension
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
         }
+        
+        public IServiceCollection AddCorsPolicy()
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowLocalHost", builder =>
+                {
+                    builder.WithOrigins("http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+            return services;
+        }
     }
 }
