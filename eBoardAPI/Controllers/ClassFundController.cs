@@ -71,14 +71,25 @@ public class ClassFundController(IClassFundService classFundService,
     [HttpGet("income/{incomeId}/details/{studentId}")]
     public async Task<ActionResult> GetFundIncomeDetailByStudent(Guid incomeId, Guid studentId)
     {
-        await Task.Delay(1); // Simulate async operation;
-        return Ok();
+        if(ModelState.IsValid == false)
+        {
+            return BadRequest(ModelState);
+        }
+        var result = await fundIncomeDetailService.GetFundIncomeDetailsByIncomeIdAndStudentIdAsync(incomeId, studentId);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        return (result.Value!.Any()) ? Ok(result.Value) : NotFound();
     }
 
     [HttpGet("income/{studentId}")]
     public async Task<ActionResult> GetFundIncomeByStudent(Guid studentId)
     {
-        await Task.Delay(1); // Simulate async operation;
+        if(ModelState.IsValid == false)
+        {
+            return BadRequest(ModelState);
+        }
         var result = await fundIncomeService.GetFundIncomeDetailsByStudentIdAsync(studentId);
         if(!result.IsSuccess)
         {
@@ -105,6 +116,10 @@ public class ClassFundController(IClassFundService classFundService,
     [HttpGet("classes/{classId}/students/{studentId}/income-details")]
     public async Task<ActionResult> GetIncomeDetailsByClassAndStudent(Guid classId, Guid studentId)
     {
+        if(ModelState.IsValid == false)
+        {
+            return BadRequest(ModelState);
+        }
         //await Task.Delay(1); // Simulate async operation;
         var result = await fundIncomeDetailService.GetFundIncomeDetailsByClassAndStudentAsync(classId, studentId);
         if (!result.IsSuccess)

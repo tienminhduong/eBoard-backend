@@ -2,6 +2,7 @@
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
+using eBoardAPI.Models.FundIncome;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
@@ -78,15 +79,22 @@ namespace eBoardAPI.Repositories
                 return Result<IEnumerable<FundIncomeStudent>>.Failure($"Error retrieving FundIncomeDetails for Class ID {classId} and Student ID {studentId}: {ex.Message}");
             }
         }
-    }
-}
 
-public class FundIncomeStudent
-{
-    public Guid Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public int ExpectedAmount { get; set; }
-    public int PaidAmount { get; set; }
-    public DateOnly EndDate { get; set; }
-    public string Description { get; set; } = string.Empty;
+        public async Task<Result<IEnumerable<FundIncomeDetail>>> GetFundIncomeDetailsByIncomeIdAndStudentIdAsync(Guid incomeId, Guid studentId)
+        {
+            try
+            {
+                var fundIncomeDetails = await dbContext.FundIncomeDetails
+                    .AsNoTracking()
+                    .Where(fid => fid.FundIncomeId == incomeId && fid.StudentId == studentId)
+                    .Include(fid => fid.FundIncome)
+                    .ToListAsync();
+                return Result<IEnumerable<FundIncomeDetail>>.Success(fundIncomeDetails);
+            }
+            catch (Exception ex)
+            {
+                return Result<IEnumerable<FundIncomeDetail>>.Failure($"Error retrieving FundIncomeDetails for Income ID {incomeId} and Student ID {studentId}: {ex.Message}");
+            }
+        }
+    }
 }
