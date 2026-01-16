@@ -9,6 +9,7 @@ using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
 using eBoardAPI.Models.Parent;
 using eBoardAPI.Models.Schedule;
+using eBoardAPI.Models.ScoreSheet;
 using eBoardAPI.Models.Student;
 using eBoardAPI.Models.Subject;
 using eBoardAPI.Models.Teacher;
@@ -54,6 +55,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IClassFundRepository, ClassFundRepository>();
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
+            services.AddScoped<IScoreRepository, ScoreRepository>();
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
@@ -68,6 +70,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IClassService, ClassService>();
             services.AddScoped<IClassFundService, ClassFundService>();
             services.AddScoped<IScheduleService, ScheduleService>();
+            services.AddScoped<IScoreService, ScoreService>();
             return services;
         }
         
@@ -110,6 +113,10 @@ public static class ServiceCollectionExtension
                 
                 cfg.CreateMap<ScheduleSetting, ScheduleSettingDto>();
                 cfg.CreateMap<ScheduleSettingDetail, ScheduleSettingDetailDto>();
+                
+                cfg.CreateMap<ScoreSheet, StudentScoreSheetDto>()
+                    .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"))
+                    .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name));
 
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
