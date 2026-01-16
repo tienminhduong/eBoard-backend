@@ -101,4 +101,16 @@ public class ClassFundController(IClassFundService classFundService,
         await Task.Delay(1); // Simulate async operation;
         return CreatedAtAction(nameof(GetClassFundByClassId), new { classId = Guid.NewGuid() }, null);
     }
+
+    [HttpGet("classes/{classId}/students/{studentId}/income-details")]
+    public async Task<ActionResult> GetIncomeDetailsByClassAndStudent(Guid classId, Guid studentId)
+    {
+        //await Task.Delay(1); // Simulate async operation;
+        var result = await fundIncomeDetailService.GetFundIncomeDetailsByClassAndStudentAsync(classId, studentId);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        return (result.Value!.Any()) ? Ok(result.Value) : NotFound();
+    }
 }

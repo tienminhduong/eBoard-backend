@@ -104,7 +104,8 @@ public static class ServiceCollectionExtension
 
                 cfg.CreateMap<CreateFundIncomeDetailDto, FundIncomeDetail>()
                     .ForMember(dest => dest.ContributedAt, opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
-                cfg.CreateMap<FundIncomeDetail, FundIncomeDetailDto>();
+                cfg.CreateMap<FundIncomeDetail, FundIncomeDetailDto>()
+                    .ForMember(dest => dest.Deadline, opt => opt.MapFrom(src => src.FundIncome.EndDate));
 
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;

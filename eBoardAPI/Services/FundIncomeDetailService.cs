@@ -21,5 +21,17 @@ namespace eBoardAPI.Services
             var incomeDetailDto = (incomeDetail != null) ? mapper.Map<FundIncomeDetailDto>(incomeDetail) : null;
             return Result<FundIncomeDetailDto?>.Success(incomeDetailDto);
         }
+
+        public async Task<Result<IEnumerable<FundIncomeStudent>>> GetFundIncomeDetailsByClassAndStudentAsync(Guid classId, Guid studentId)
+        {
+            var result = await fundIncomeDetailRepository.GetFundIncomeDetailsByClassAndStudentAsync(classId, studentId);
+            if(result.IsSuccess == false)
+            {
+                return Result<IEnumerable<FundIncomeStudent>>.Failure(result.ErrorMessage!);
+            }
+            var incomeDetails = result.Value;
+            //var incomeDetailsDto = mapper.Map<IEnumerable<FundIncomeStudent>>(incomeDetails);
+            return Result<IEnumerable<FundIncomeStudent>>.Success(incomeDetails);
+        }
     }
 }

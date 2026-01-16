@@ -4,7 +4,7 @@ public class FundIncome
 {
     public Guid Id { get; set; }
     
-    public Guid? ClassFundId { get; set; }
+    public Guid ClassFundId { get; set; }
     public ClassFund? ClassFund { get; set; }
     
     public string Title { get; set; } = string.Empty;
