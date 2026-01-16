@@ -39,15 +39,29 @@ public class ScheduleService(
         UpdateClassPeriodDto updateClassPeriodDto)
     {
         var existingResult = await unitOfWork.ScheduleRepository.GetClassPeriodByIdAsync(classPeriodId);
-        var subjectCheckTask = unitOfWork.SubjectRepository.GetOrAddSubjectByNameAsync(updateClassPeriodDto.Subject.Name);
         if (!existingResult.IsSuccess)
             return Result<ClassPeriodDto>.Failure(existingResult.ErrorMessage!);
-        
         var existingClassPeriod = existingResult.Value!;
+
+        if (updateClassPeriodDto.Subject != null)
+        {
+            var subject =
+                await unitOfWork.SubjectRepository.GetOrAddSubjectByNameAsync(updateClassPeriodDto.Subject.Name);
+            existingClassPeriod.SubjectId = subject.Id;
+            existingClassPeriod.Subject = subject;
+        }
         
-        existingClassPeriod.Notes = updateClassPeriodDto.Notes;
-        existingClassPeriod.TeacherName = updateClassPeriodDto.TeacherName;
-        existingClassPeriod.Subject = await subjectCheckTask;
+        if (updateClassPeriodDto.Notes != null)
+            existingClassPeriod.Notes = updateClassPeriodDto.Notes;
+        
+        if (updateClassPeriodDto.TeacherName != null)
+            existingClassPeriod.TeacherName = updateClassPeriodDto.TeacherName;
+        
+        if (updateClassPeriodDto.PeriodNumber != null)
+            existingClassPeriod.PeriodNumber = updateClassPeriodDto.PeriodNumber.Value;
+        
+        if (updateClassPeriodDto.DayOfWeek != null)
+            existingClassPeriod.DayOfWeek = updateClassPeriodDto.DayOfWeek.Value;
         
         unitOfWork.ScheduleRepository.UpdateClassPeriod(existingClassPeriod);
         await unitOfWork.SaveChangesAsync();

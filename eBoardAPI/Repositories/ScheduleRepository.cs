@@ -55,6 +55,7 @@ public class ScheduleRepository(AppDbContext dbContext) : IScheduleRepository
 
         return await query
             .AsNoTracking()
+            .Include(cp => cp.Subject)
             .ToListAsync();
     }
 }

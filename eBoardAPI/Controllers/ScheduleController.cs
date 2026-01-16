@@ -15,7 +15,7 @@ public class ScheduleController(IScheduleService scheduleService) : ControllerBa
         return scheduleResult.IsSuccess ? Ok(scheduleResult.Value) : BadRequest(scheduleResult.ErrorMessage);
     }
 
-    [HttpPut("periods")]
+    [HttpPatch("periods")]
     public async Task<IActionResult> UpdateClassPeriods(Guid classPeriodId, [FromBody] UpdateClassPeriodDto periodDto)
     {
         var updateResult = await scheduleService.UpdateClassPeriodAsync(classPeriodId, periodDto);
