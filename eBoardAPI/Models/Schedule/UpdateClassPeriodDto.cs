@@ -9,4 +9,5 @@ public class UpdateClassPeriodDto
     public string? Notes { get; set; }
     public int? PeriodNumber { get; set; }
     public DayOfWeek? DayOfWeek { get; set; }
+    public bool? IsMorningPeriod { get; set; }
 }

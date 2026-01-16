@@ -11,4 +11,5 @@ public class ClassPeriodDto
     public string TeacherName { get; set; } = string.Empty;
     public string Notes { get; set; } = string.Empty;
     public SubjectDto Subject { get; set; } = null!;
+    public bool IsMorningPeriod { get; set; }
 }

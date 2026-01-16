@@ -15,6 +15,7 @@ public interface IScheduleRepository
     Result<ScheduleSetting> UpdateScheduleSetting(ScheduleSetting scheduleSetting, IEnumerable<ScheduleSettingDetail> details);
     Task<Result<ScheduleSetting>> GetScheduleSettingByClassIdAsync(Guid classId);
     Task<Result<ScheduleSetting>> GetScheduleSettingByIdAsync(Guid scheduleSettingId);
-    Task<IEnumerable<ScheduleSettingDetail>> CleanOverflowScheduleSettingsAsync(Guid scheduleSettingId,
-        int validPeriodCount);
+    Task<IEnumerable<ScheduleSettingDetail>> CleanUpOverflowScheduleSettingsAsync(Guid scheduleSettingId,
+        int validMorningPeriodCount, int validAfternoonPeriodCount);
+    Task<bool> ValidateEditableScheduleSettingAsync(Guid classId, int morningPeriodCount, int afternoonPeriodCount);
 }

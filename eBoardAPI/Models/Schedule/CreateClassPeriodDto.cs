@@ -10,4 +10,5 @@ public class CreateClassPeriodDto
     public required string TeacherName { get; set; }
     public string Notes { get; set; } = string.Empty;
     public Guid ClassId { get; set; }
+    public bool IsMorningPeriod { get; set; }
 }

@@ -25,6 +25,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<ClassPeriod>()
-            .HasIndex(e => new { e.ClassId, e.PeriodNumber }).IsUnique();
+            .HasIndex(e => new { e.IsMorningPeriod, e.PeriodNumber, e.DayOfWeek, e.ClassId }).IsUnique();
     }
 }

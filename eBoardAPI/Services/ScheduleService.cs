@@ -52,17 +52,7 @@ public class ScheduleService(
             existingClassPeriod.Subject = subject;
         }
         
-        if (updateClassPeriodDto.Notes != null)
-            existingClassPeriod.Notes = updateClassPeriodDto.Notes;
-        
-        if (updateClassPeriodDto.TeacherName != null)
-            existingClassPeriod.TeacherName = updateClassPeriodDto.TeacherName;
-        
-        if (updateClassPeriodDto.PeriodNumber != null)
-            existingClassPeriod.PeriodNumber = updateClassPeriodDto.PeriodNumber.Value;
-        
-        if (updateClassPeriodDto.DayOfWeek != null)
-            existingClassPeriod.DayOfWeek = updateClassPeriodDto.DayOfWeek.Value;
+        ApplyUpdateClassPeriodDto(updateClassPeriodDto, existingClassPeriod);
         
         var result = unitOfWork.ScheduleRepository.UpdateClassPeriod(existingClassPeriod);
         if (!result.IsSuccess)
@@ -119,15 +109,24 @@ public class ScheduleService(
         var scheduleSetting = scheduleSettingResult.Value!;
         scheduleSetting.MorningPeriodCount = updateScheduleSettingDetailDto.MorningPeriodCount;
         scheduleSetting.AfternoonPeriodCount = updateScheduleSettingDetailDto.AfternoonPeriodCount;
+        
+        var validate = await unitOfWork.ScheduleRepository
+            .ValidateEditableScheduleSettingAsync(scheduleSetting.ClassId, 
+                scheduleSetting.MorningPeriodCount, 
+                scheduleSetting.AfternoonPeriodCount);
+        if (!validate)
+            return Result.Failure("Không thể cập nhật cài đặt thời khóa biểu có thể dẫn tới mất tiết học");
 
-        var periodCount = scheduleSetting.MorningPeriodCount + scheduleSetting.AfternoonPeriodCount;
         var removedSettings =
-            await unitOfWork.ScheduleRepository.CleanOverflowScheduleSettingsAsync(scheduleSettingId, periodCount);
+            await unitOfWork.ScheduleRepository.CleanUpOverflowScheduleSettingsAsync(
+                scheduleSettingId,
+                scheduleSetting.MorningPeriodCount,
+                scheduleSetting.AfternoonPeriodCount);
         scheduleSetting.Details.RemoveRange(removedSettings);
 
         foreach (var detail in updateScheduleSettingDetailDto.Details)
         {
-            if (detail.PeriodNumber > periodCount)
+            if (!ValidateSettingDetail(detail, scheduleSetting.MorningPeriodCount, scheduleSetting.AfternoonPeriodCount))
                 continue;
             
             var existingDetail = scheduleSetting.Details
@@ -156,5 +155,35 @@ public class ScheduleService(
         
         await unitOfWork.SaveChangesAsync();
         return Result.Success();
+    }
+
+    private void ApplyUpdateClassPeriodDto(UpdateClassPeriodDto updateClassPeriodDto, ClassPeriod existingClassPeriod)
+    {
+        if (updateClassPeriodDto.Notes != null)
+            existingClassPeriod.Notes = updateClassPeriodDto.Notes;
+        
+        if (updateClassPeriodDto.TeacherName != null)
+            existingClassPeriod.TeacherName = updateClassPeriodDto.TeacherName;
+        
+        if (updateClassPeriodDto.PeriodNumber != null)
+            existingClassPeriod.PeriodNumber = updateClassPeriodDto.PeriodNumber.Value;
+        
+        if (updateClassPeriodDto.DayOfWeek != null)
+            existingClassPeriod.DayOfWeek = updateClassPeriodDto.DayOfWeek.Value;
+        
+        if (updateClassPeriodDto.IsMorningPeriod != null)
+            existingClassPeriod.IsMorningPeriod = updateClassPeriodDto.IsMorningPeriod.Value;
+    }
+    
+    private bool ValidateSettingDetail(UpdateScheduleSettingDetailDto detail, int morningCount, int afternoonCount)
+    {
+        switch (detail.IsMorningPeriod)
+        {
+            case true when detail.PeriodNumber > morningCount:
+            case false when detail.PeriodNumber > afternoonCount:
+                return false;
+            default:
+                return true;
+        }
     }
 }

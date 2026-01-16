@@ -118,17 +118,29 @@ public class ScheduleRepository(AppDbContext dbContext) : IScheduleRepository
             : Result<ScheduleSetting>.Success(scheduleSetting);
     }
 
-    public async Task<IEnumerable<ScheduleSettingDetail>> CleanOverflowScheduleSettingsAsync(Guid scheduleSettingId,
-        int validPeriodCount)
+    public async Task<IEnumerable<ScheduleSettingDetail>> CleanUpOverflowScheduleSettingsAsync(Guid scheduleSettingId,
+        int validMorningPeriodCount, int validAfternoonPeriodCount)
     {
         var query = from d in dbContext.ScheduleSettingDetails
                     where d.ScheduleSettingId == scheduleSettingId &&
-                          d.PeriodNumber > validPeriodCount
+                          (d.IsMorningPeriod && d.PeriodNumber > validMorningPeriodCount
+                            || !d.IsMorningPeriod && d.PeriodNumber > validAfternoonPeriodCount)
                     select d;
         
         var overflowDetails = await query.ToListAsync();
         
         dbContext.ScheduleSettingDetails.RemoveRange(overflowDetails);
         return overflowDetails;
+    }
+
+    public async Task<bool> ValidateEditableScheduleSettingAsync(Guid classId, int morningPeriodCount, int afternoonPeriodCount)
+    {
+        var query = from cp in dbContext.ClassPeriods
+                    where cp.ClassId == classId &&
+                          ((cp.PeriodNumber > morningPeriodCount && cp.IsMorningPeriod) ||
+                           (cp.PeriodNumber > afternoonPeriodCount && !cp.IsMorningPeriod))
+                    select cp;
+        
+        return !await query.AsNoTracking().AnyAsync();
     }
 }
