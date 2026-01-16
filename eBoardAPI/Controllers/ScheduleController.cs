@@ -35,5 +35,11 @@ public class ScheduleController(IScheduleService scheduleService) : ControllerBa
             createdAt = DateTime.UtcNow
         });
     }
-    
+
+    [HttpDelete("periods/{classPeriodId}")]
+    public async Task<IActionResult> DeleteClassPeriod(Guid classPeriodId)
+    {
+        var result = await scheduleService.DeleteClassPeriodAsync(classPeriodId);
+        return result ? NoContent() : BadRequest("Không tìm thấy tiết học để xóa");
+    }
 }
