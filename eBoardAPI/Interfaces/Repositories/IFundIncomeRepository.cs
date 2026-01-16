@@ -13,5 +13,6 @@ namespace eBoardAPI.Interfaces.Repositories
         Task<Result<IEnumerable<FundIncome>>> GetAllByClassIdAsync(Guid classId, 
                                                           int pageNumber, 
                                                           int pageSize);
+        Task<Result<IEnumerable<FundIncomeDetail>>> GetFundIncomeDetailsByStudentIdAsync(Guid studentId);
     }
 }

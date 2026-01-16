@@ -54,13 +54,15 @@ namespace eBoardAPI.Repositories
 
         public async Task<Result<FundIncome>> GetByIdAsync(Guid id)
         {
-            var fundIncome = await dbContext.FundIncomes.FindAsync(id);
-
-            if (fundIncome == null)
+            try
             {
-                return Result<FundIncome>.Failure("FundIncome not found.");
+                var fundIncome = await dbContext.FundIncomes.FindAsync(id);
+                return Result<FundIncome>.Success(fundIncome);
             }
-            return Result<FundIncome>.Success(fundIncome);
+            catch (Exception ex)
+            {
+                return Result<FundIncome>.Failure($"An error occurred while retrieving FundIncome: {ex.Message}");
+            }
         }
 
         public async Task<Result> UpdateAsync(FundIncome fundIncome)
@@ -68,6 +70,23 @@ namespace eBoardAPI.Repositories
             dbContext.FundIncomes.Update(fundIncome);
             await dbContext.SaveChangesAsync();
             return Result.Success();
+        }
+
+        public async Task<Result<IEnumerable<FundIncomeDetail>>> GetFundIncomeDetailsByStudentIdAsync(Guid studentId)
+        {
+            try
+            {
+                var fundIncomeDetails = await dbContext.FundIncomeDetails
+                    .AsNoTracking()
+                    .Where(fid => fid.StudentId == studentId)
+                    .ToListAsync();
+                return Result<IEnumerable<FundIncomeDetail>>.Success(fundIncomeDetails);
+
+            }
+            catch (Exception ex)
+            {
+                return Result<IEnumerable<FundIncomeDetail>>.Failure($"An error occurred while retrieving FundIncomeDetails: {ex.Message}");
+            }
         }
     }
 }

@@ -52,6 +52,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IClassRepository, ClassRepository>();
             services.AddScoped<IClassFundRepository, ClassFundRepository>();
             services.AddScoped<IFundIncomeRepository, FundIncomeRepository>();
+            services.AddScoped<IFundIncomeDetailRepository, FundIncomeDetailRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
@@ -66,6 +67,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IClassService, ClassService>();
             services.AddScoped<IClassFundService, ClassFundService>();
             services.AddScoped<IFundIncomeService, FundIncomeService>();
+            services.AddScoped<IFundIncomeDetailService, FundIncomeDetailService>();
             return services;
         }
         
@@ -99,6 +101,10 @@ public static class ServiceCollectionExtension
                     .ForMember(dest => dest.StartDate,
                     opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
                 cfg.CreateMap<FundIncome, FundIncomeDto>();
+
+                cfg.CreateMap<CreateFundIncomeDetailDto, FundIncomeDetail>()
+                    .ForMember(dest => dest.ContributedAt, opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
+                cfg.CreateMap<FundIncomeDetail, FundIncomeDetailDto>();
 
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;

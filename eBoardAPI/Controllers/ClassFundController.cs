@@ -8,7 +8,8 @@ namespace eBoardAPI.Controllers;
 [ApiController]
 [Route("api/funds")]
 public class ClassFundController(IClassFundService classFundService,
-                                 IFundIncomeService fundIncomeService) : ControllerBase
+                                 IFundIncomeService fundIncomeService,
+                                 IFundIncomeDetailService fundIncomeDetailService) : ControllerBase
 {
     //authorize as teacher and parent
     [HttpGet("{classId}")]
@@ -55,11 +56,16 @@ public class ClassFundController(IClassFundService classFundService,
                             : BadRequest(res.ErrorMessage);
     }
 
-    [HttpGet("income/{incomeId}/details")]
-    public async Task<ActionResult> GetFundIncomeDetailsById(Guid incomeId)
+    [HttpGet("income/{incomeDetailId}/details")]
+    public async Task<ActionResult> GetFundIncomeDetailsById(Guid incomeDetailId)
     {
         await Task.Delay(1); // Simulate async operation;
-        return Ok();
+        var result = await fundIncomeDetailService.GetFundIncomeDetailByIdAsync(incomeDetailId);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        return (result.Value != null) ? Ok(result.Value) : NotFound();
     }
 
     [HttpGet("income/{incomeId}/details/{studentId}")]
@@ -73,7 +79,12 @@ public class ClassFundController(IClassFundService classFundService,
     public async Task<ActionResult> GetFundIncomeByStudent(Guid studentId)
     {
         await Task.Delay(1); // Simulate async operation;
-        return Ok();
+        var result = await fundIncomeService.GetFundIncomeDetailsByStudentIdAsync(studentId);
+        if(!result.IsSuccess)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        return (result.Value!.Any()) ? Ok(result.Value) : NotFound();
     }
 
     [HttpGet("{classId}/expenses")]

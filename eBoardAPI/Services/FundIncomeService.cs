@@ -45,7 +45,7 @@ namespace eBoardAPI.Services
                 : Result<FundIncomeDto>.Failure(addResult.ErrorMessage ?? "Failed to create Fund Income.");
         }
 
-        public Task<Result<FundIncomeDto>> GetFundIncomeByIdAsync(Guid id)
+        public async Task<Result<FundIncomeDto>> GetFundIncomeByIdAsync(Guid id)
         {
             throw new NotImplementedException();
         }
@@ -61,6 +61,18 @@ namespace eBoardAPI.Services
 
             var fundIncomeDtos = mapper.Map<IEnumerable<FundIncomeDto>>(fundIncomesResult.Value);
             return Result<IEnumerable<FundIncomeDto>>.Success(fundIncomeDtos);
+        }
+
+        public async Task<Result<IEnumerable<FundIncomeDetailDto>>> GetFundIncomeDetailsByStudentIdAsync(Guid studentId)
+        {
+            var fundIncomeDetailsResult = await fundIncomeRepository.GetFundIncomeDetailsByStudentIdAsync(studentId);
+            if(!fundIncomeDetailsResult.IsSuccess)
+            {
+                return Result<IEnumerable<FundIncomeDetailDto>>.Failure(fundIncomeDetailsResult.ErrorMessage ?? "Failed to retrieve Fund Income Details.");
+            }
+
+            var fundIncomeDetailDtos = mapper.Map<IEnumerable<FundIncomeDetailDto>>(fundIncomeDetailsResult.Value);
+            return Result<IEnumerable<FundIncomeDetailDto>>.Success(fundIncomeDetailDtos);
         }
     }
 }
