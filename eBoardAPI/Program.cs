@@ -13,7 +13,8 @@ builder.Services
     .AddDatabase()
     .AddRepositories()
     .AddServices()
-    .AddAutoMapper();
+    .AddAutoMapper()
+    .AddCorsPolicy();
 
 var app = builder.Build();
 
@@ -22,6 +23,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseCors("AllowLocalHost");
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
