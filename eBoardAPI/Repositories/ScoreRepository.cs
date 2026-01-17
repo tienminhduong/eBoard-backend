@@ -2,6 +2,7 @@ using eBoardAPI.Common;
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
+using eBoardAPI.Models.ScoreSheet;
 using Microsoft.EntityFrameworkCore;
 
 namespace eBoardAPI.Repositories;
@@ -82,5 +83,27 @@ public class ScoreRepository(AppDbContext dbContext) : IScoreRepository
     {
         await dbContext.ScoreSheets.AddAsync(scoreSheet);
         return scoreSheet;
+    }
+
+    public async Task<IEnumerable<StudentScoreBySubjectDto>> GetScoresBySubjectAsync(Guid classId, Guid subjectId, int semester)
+    {
+        var query = from scoreSheet in dbContext.ScoreSheets
+            join scoreDetail in dbContext.ScoreSheetDetails on scoreSheet.Id equals scoreDetail.ScoreSheetId
+            join student in dbContext.Students on scoreSheet.StudentId equals student.Id
+            where scoreSheet.ClassId == classId
+                  && scoreSheet.Semester == semester
+                  && scoreDetail.SubjectId == subjectId
+            orderby student.FirstName
+            select new StudentScoreBySubjectDto
+            {
+                StudentId = student.Id,
+                StudentName = student.LastName + " " + student.FirstName,
+                MidtermScore = scoreDetail.MidtermScore,
+                FinalScore = scoreDetail.FinalScore,
+                AverageScore = scoreDetail.AverageScore,
+                Grade = scoreSheet.Grade
+            };
+        
+        return await query.AsNoTracking().ToListAsync();
     }
 }

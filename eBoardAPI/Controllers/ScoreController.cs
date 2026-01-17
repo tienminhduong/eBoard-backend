@@ -31,6 +31,13 @@ public class ScoreController(IScoreService scoreService) : ControllerBase
             return NotFound(result.ErrorMessage);
         return Ok(result.Value);
     }
+    
+    [HttpGet("{classId}/subject/{subjectId}/scores/{semester}")]
+    public async Task<ActionResult<IEnumerable<StudentScoreBySubjectDto>>> GetStudentScoresBySubject(Guid classId, Guid subjectId, int semester)
+    {
+        var result = await scoreService.GetStudentScoreBySubjectsAsync(classId, subjectId, semester);
+        return Ok(result);
+    }
 
     [HttpPut("{classId}/student/{studentId}/scores/{semester}")]
     public async Task<ActionResult> UpdateStudentScores(Guid classId, Guid studentId, int semester,

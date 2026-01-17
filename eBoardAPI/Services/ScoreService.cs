@@ -115,4 +115,9 @@ public class ScoreService(
         var subjects = await unitOfWork.SubjectRepository.GetAllSubjectsByClassAsync(classId);
         return mapper.Map<IEnumerable<SubjectDto>>(subjects);
     }
+
+    public async Task<IEnumerable<StudentScoreBySubjectDto>> GetStudentScoreBySubjectsAsync(Guid classId, Guid subjectId, int semester)
+    {
+        return await unitOfWork.ScoreRepository.GetScoresBySubjectAsync(classId, subjectId, semester);
+    }
 }

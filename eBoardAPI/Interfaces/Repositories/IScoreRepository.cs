@@ -1,5 +1,6 @@
 using eBoardAPI.Common;
 using eBoardAPI.Entities;
+using eBoardAPI.Models.ScoreSheet;
 
 namespace eBoardAPI.Interfaces.Repositories;
 
@@ -17,4 +18,6 @@ public interface IScoreRepository
     public Task<ScoreSheet?> GetStudentScoreSheetAsync(Guid classId, Guid studentId, int semester);
     public void UpdateScoreSheetDetailsAsync(ScoreSheetDetail scoreSheetDetail);
     public Task<ScoreSheet> AddScoreSheetAsync(ScoreSheet scoreSheet);
+    
+    public Task<IEnumerable<StudentScoreBySubjectDto>> GetScoresBySubjectAsync(Guid classId, Guid subjectId, int semester);
 }

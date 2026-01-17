@@ -12,4 +12,5 @@ public interface IScoreService
         int semester,
         UpdateIndividualStudentScoreSheetDto updateDto);
     Task<IEnumerable<SubjectDto>> GetClassSubjectsAsync(Guid classId);
+    Task<IEnumerable<StudentScoreBySubjectDto>> GetStudentScoreBySubjectsAsync(Guid classId, Guid subjectId, int semester);
 }
