@@ -15,4 +15,5 @@ public interface IClassRepository
     Task<Class> AddNewClassAsync(Class newClass);
     Task<Result> AddNewStudentsToClassAsync(Guid classId, List<Guid> studentIds);
     Task<bool> IsStudentInClassAsync(Guid classId, Guid studentId);
+    Task<IEnumerable<Guid>> ValidateStudentsInClassAsync(Guid classId, IEnumerable<Guid> studentIds);
 }

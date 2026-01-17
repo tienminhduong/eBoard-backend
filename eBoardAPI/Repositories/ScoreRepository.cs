@@ -42,7 +42,8 @@ public class ScoreRepository(AppDbContext dbContext) : IScoreRepository
             : Result<ScoreSheet>.Success(scoreSheet);
     }
 
-    public async Task<IEnumerable<ScoreSheet>> GetScoreSheetsByClassAndSemesterAsync(Guid classId, int semester)
+    public async Task<IEnumerable<ScoreSheet>> GetScoreSheetsByClassAndSemesterAsync(Guid classId, int semester,
+        bool includeStudent = true, bool includeClass = true)
     {
         var query = from scoreSheet in dbContext.ScoreSheets
             join student in dbContext.Students on scoreSheet.StudentId equals student.Id
@@ -50,11 +51,24 @@ public class ScoreRepository(AppDbContext dbContext) : IScoreRepository
             orderby student.FirstName
             select scoreSheet;
         
-        return await query
-            .AsNoTracking()
-            .Include(s => s.Student)
-            .Include(s => s.Class)
-            .ToListAsync();
+        if (includeStudent)
+            query = query.Include(s => s.Student);
+        if (includeClass)
+            query = query.Include(s => s.Class);
+        
+        return await query.ToListAsync();
+    }
+
+    public async Task<IEnumerable<ScoreSheetDetail>> GetScoreSheetDetailsBySubjectInClassAsync(Guid classId, Guid subjectId, int semester)
+    {
+        var query = from scoreSheet in dbContext.ScoreSheets
+            join scoreDetail in dbContext.ScoreSheetDetails on scoreSheet.Id equals scoreDetail.ScoreSheetId
+            where scoreSheet.ClassId == classId
+                  && scoreSheet.Semester == semester
+                  && scoreDetail.SubjectId == subjectId
+            select scoreDetail;
+        
+        return await query.ToListAsync();
     }
 
     public async Task<ScoreSheet?> GetStudentScoreSheetAsync(Guid classId, Guid studentId, int semester)
@@ -105,5 +119,10 @@ public class ScoreRepository(AppDbContext dbContext) : IScoreRepository
             };
         
         return await query.AsNoTracking().ToListAsync();
+    }
+
+    public async Task AddScoreSheetDetailAsync(ScoreSheetDetail scoreSheetDetail)
+    {
+        await dbContext.ScoreSheetDetails.AddAsync(scoreSheetDetail);
     }
 }

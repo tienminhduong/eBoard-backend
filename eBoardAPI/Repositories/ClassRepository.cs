@@ -127,4 +127,14 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
     {
         return await dbContext.InClasses.AnyAsync(ic => ic.ClassId == classId && ic.StudentId == studentId);
     }
+
+    public async Task<IEnumerable<Guid>> ValidateStudentsInClassAsync(Guid classId, IEnumerable<Guid> studentIds)
+    {
+        var query = from ic in dbContext.InClasses
+            where ic.ClassId == classId
+            select ic.StudentId;
+
+        var studentsInClass = await query.ToListAsync();
+        return studentIds.Intersect(studentsInClass);
+    }
 }

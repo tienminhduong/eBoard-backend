@@ -54,4 +54,14 @@ public class ScoreController(IScoreService scoreService) : ControllerBase
         
         return Ok(result.Value);
     }
+
+    [HttpPut("{classId}/subject/{subjectId}/scores/{semester}")]
+    public async Task<ActionResult> UpdateScoresBySubject(Guid classId, Guid subjectId, int semester,
+        [FromBody] IEnumerable<UpdateStudentScoreBySubjectDto> updateDtos)
+    {
+        var isSuccess = await scoreService.UpdateScoresBySubjectAsync(classId, subjectId, semester, updateDtos);
+        if (!isSuccess)
+            return BadRequest("Cập nhật điểm thất bại");
+        return NoContent();
+    }
 }

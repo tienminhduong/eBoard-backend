@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using eBoardAPI.Common;
 using eBoardAPI.Entities;
@@ -110,6 +111,56 @@ public class ScoreService(
         return (Result<StudentScoreSheetDto>.Success(resultDto), isCreated);
     }
 
+    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+    public async Task<bool> UpdateScoresBySubjectAsync(Guid classId, Guid subjectId, int semester, IEnumerable<UpdateStudentScoreBySubjectDto> updateDtos)
+    {
+        var studentIds = updateDtos.Select(d => d.StudentId);
+        await CreateScoreSheetsIfNotExists(classId, semester, studentIds);
+        
+        var existingSheets = await unitOfWork.ScoreRepository.GetScoreSheetsByClassAndSemesterAsync(classId, semester,
+            includeStudent: false, includeClass: false);
+        var scoreSheetDict = existingSheets.ToDictionary(s => s.StudentId, s => s.Id);
+        
+        var existingDetails = await unitOfWork.ScoreRepository.GetScoreSheetDetailsBySubjectInClassAsync(classId, subjectId, semester);
+        var detailDict = existingDetails.ToDictionary(d => d.ScoreSheetId);
+        
+        foreach (var updateDto in updateDtos)
+        {
+            if (!scoreSheetDict.TryGetValue(updateDto.StudentId, out var scoreSheetId))
+                continue;
+            
+            if (detailDict.TryGetValue(scoreSheetId, out var detail))
+            {
+                detail.MidtermScore = updateDto.MidtermScore;
+                detail.FinalScore = updateDto.FinalScore;
+                detail.AverageScore = (updateDto.MidtermScore + updateDto.FinalScore) / 2;
+                unitOfWork.ScoreRepository.UpdateScoreSheetDetailsAsync(detail);
+            }
+            else
+            {
+                var newDetail = new ScoreSheetDetail
+                {
+                    ScoreSheetId = scoreSheetId,
+                    SubjectId = subjectId,
+                    MidtermScore = updateDto.MidtermScore,
+                    FinalScore = updateDto.FinalScore,
+                    AverageScore = (updateDto.MidtermScore + updateDto.FinalScore) / 2
+                };
+                await unitOfWork.ScoreRepository.AddScoreSheetDetailAsync(newDetail);
+            }
+        }
+
+        try
+        {
+            await unitOfWork.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public async Task<IEnumerable<SubjectDto>> GetClassSubjectsAsync(Guid classId)
     {
         var subjects = await unitOfWork.SubjectRepository.GetAllSubjectsByClassAsync(classId);
@@ -119,5 +170,26 @@ public class ScoreService(
     public async Task<IEnumerable<StudentScoreBySubjectDto>> GetStudentScoreBySubjectsAsync(Guid classId, Guid subjectId, int semester)
     {
         return await unitOfWork.ScoreRepository.GetScoresBySubjectAsync(classId, subjectId, semester);
+    }
+
+    private async Task CreateScoreSheetsIfNotExists(Guid classId, int semester, IEnumerable<Guid> studentIds)
+    {
+        var existingSheets = await unitOfWork.ScoreRepository.GetScoreSheetsByClassAndSemesterAsync(classId, semester);
+        var existingStudentIds = existingSheets.Select(s => s.StudentId).ToHashSet();
+
+        var notExistingStudentIds = studentIds.Except(existingStudentIds).ToList();
+        var notExistingValidStudentIds = await unitOfWork.ClassRepository
+            .ValidateStudentsInClassAsync(classId, notExistingStudentIds);
+        
+        foreach (var scoreSheet in notExistingValidStudentIds.Select(studentId => new ScoreSheet
+                 {
+                     StudentId = studentId,
+                     ClassId = classId,
+                     Semester = semester
+                 }))
+        {
+            await unitOfWork.ScoreRepository.AddScoreSheetAsync(scoreSheet);
+        }
+        await unitOfWork.SaveChangesAsync();
     }
 }
