@@ -97,13 +97,6 @@ namespace eBoardAPI.Repositories
             }
         }
 
-        void PrintList(IEnumerable<object> list)
-        {
-            foreach (var item in list)
-            {
-                Console.WriteLine(item);
-            }
-        }
         public async Task<Result<IEnumerable<StudentFundIncomeSummary>>> GetAllFundIncomeDetailsByIdFundIncomeAsync(Guid fundIncomeId)
         {
             try
@@ -135,8 +128,6 @@ namespace eBoardAPI.Repositories
                                     f.ExpectedAmount
                                 };
                 
-                var t = await studentsInClassQuery.ToListAsync();
-                PrintList(t);
                 // group fund income detail theo student
                 var fundDetailAggQuery =
                                 from fd in dbContext.FundIncomeDetails.AsNoTracking()
@@ -149,8 +140,6 @@ namespace eBoardAPI.Repositories
                                     LatestContributedAt = g.Max(x => (DateOnly?)x.ContributedAt)
                                 };
                 
-                var s2 = await fundDetailAggQuery.ToListAsync();
-                PrintList(s2);
                 // left join va lay ket qua
                 var result =
                              from s in studentsInClassQuery
