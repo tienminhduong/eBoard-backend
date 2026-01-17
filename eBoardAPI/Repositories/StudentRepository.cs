@@ -19,6 +19,17 @@ public class StudentRepository(AppDbContext db) : IStudentRepository
         return await db.Students.AnyAsync(s => s.Id == studentId);
     }
 
+    public async Task<IEnumerable<Tuple<Guid, string>>> GetStudentsOptionInClassAsync(Guid classId)
+    {
+        var query = from s in db.Students
+            join ic in db.InClasses on s.Id equals ic.StudentId
+            where ic.ClassId == classId
+            select new Tuple<Guid, string>(s.Id, $"{s.LastName} {s.FirstName}");
+        
+        var result = await query.ToListAsync();
+        return result;
+    }
+
     public async Task<Result<Student>> GetByIdAsync(Guid id)
     {
         if(id == Guid.Empty)
