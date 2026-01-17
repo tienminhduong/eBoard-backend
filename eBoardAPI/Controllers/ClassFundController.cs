@@ -59,7 +59,6 @@ public class ClassFundController(IClassFundService classFundService,
     [HttpGet("income/{incomeDetailId}/details")]
     public async Task<ActionResult> GetFundIncomeDetailsById(Guid incomeDetailId)
     {
-        await Task.Delay(1); // Simulate async operation;
         var result = await fundIncomeDetailService.GetFundIncomeDetailByIdAsync(incomeDetailId);
         if (!result.IsSuccess)
         {
@@ -123,6 +122,17 @@ public class ClassFundController(IClassFundService classFundService,
         //await Task.Delay(1); // Simulate async operation;
         var result = await fundIncomeDetailService.GetFundIncomeDetailsByClassAndStudentAsync(classId, studentId);
         if (!result.IsSuccess)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        return (result.Value!.Any()) ? Ok(result.Value) : NotFound();
+    }
+
+    [HttpGet("{fundIncomeId}/summary")]
+    public async Task<ActionResult> GetSummaryFundIncomeByIdAsync(Guid fundIncomeId)
+    {
+        var result = await fundIncomeDetailService.GetAllFundIncomeDetailsByIdFundIncomeAsync(fundIncomeId);
+        if(!result.IsSuccess)
         {
             return BadRequest(result.ErrorMessage);
         }

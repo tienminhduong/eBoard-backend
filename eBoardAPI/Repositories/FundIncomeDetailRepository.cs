@@ -96,5 +96,102 @@ namespace eBoardAPI.Repositories
                 return Result<IEnumerable<FundIncomeDetail>>.Failure($"Error retrieving FundIncomeDetails for Income ID {incomeId} and Student ID {studentId}: {ex.Message}");
             }
         }
+
+        void PrintList(IEnumerable<object> list)
+        {
+            foreach (var item in list)
+            {
+                Console.WriteLine(item);
+            }
+        }
+        public async Task<Result<IEnumerable<StudentFundIncomeSummary>>> GetAllFundIncomeDetailsByIdFundIncomeAsync(Guid fundIncomeId)
+        {
+            try
+            {
+                //get fund income
+                var fundIncomeInfoQuery =
+                                from fi in dbContext.FundIncomes.AsNoTracking()
+                                join cf in dbContext.ClassFunds.AsNoTracking()
+                                    on fi.ClassFundId equals cf.Id
+                                where fi.Id == fundIncomeId
+                                select new
+                                {
+                                    FundIncomeId = fi.Id,
+                                    ClassId = cf.ClassId,
+                                    fi.ExpectedAmount
+                                };
+                //lay tat ca hoc sinh trong lop
+                var studentsInClassQuery =
+                                from f in fundIncomeInfoQuery
+                                join ic in dbContext.InClasses.AsNoTracking()
+                                    on f.ClassId equals ic.ClassId
+                                join s in dbContext.Students.AsNoTracking()
+                                    on ic.StudentId equals s.Id
+                                select new
+                                {
+                                    StudentId = s.Id,
+                                    FullName = s.LastName + " " + s.FirstName,
+                                    f.FundIncomeId,
+                                    f.ExpectedAmount
+                                };
+                
+                var t = await studentsInClassQuery.ToListAsync();
+                PrintList(t);
+                // group fund income detail theo student
+                var fundDetailAggQuery =
+                                from fd in dbContext.FundIncomeDetails.AsNoTracking()
+                                where fd.FundIncomeId == fundIncomeId
+                                group fd by fd.StudentId into g
+                                select new
+                                {
+                                    StudentId = g.Key,
+                                    TotalContributedAmount = (int?)g.Sum(x => x.ContributedAmount),
+                                    LatestContributedAt = g.Max(x => (DateOnly?)x.ContributedAt)
+                                };
+                
+                var s2 = await fundDetailAggQuery.ToListAsync();
+                PrintList(s2);
+                // left join va lay ket qua
+                var result =
+                             from s in studentsInClassQuery
+
+                             join agg in fundDetailAggQuery
+                                 on s.StudentId equals agg.StudentId into aggGroup
+                             from agg in aggGroup.DefaultIfEmpty()
+
+                             select new StudentFundIncomeSummary
+                             {
+                                 StudentId = s.StudentId,
+                                 FullName = s.FullName,
+                                 ExpectedAmount = s.ExpectedAmount,
+
+                                 TotalContributedAmount = agg.TotalContributedAmount ?? 0,
+
+                                 LatestContributedAt = agg.LatestContributedAt ?? null,
+
+                                 LatestNotes = agg.LatestContributedAt != null
+                                 ? dbContext.FundIncomeDetails
+                                     .Where(fd =>
+                                         fd.StudentId == s.StudentId &&
+                                         fd.FundIncomeId == fundIncomeId &&
+                                         fd.ContributedAt == agg.LatestContributedAt
+                                     )
+                                     .OrderByDescending(fd => fd.Id)
+                                     .Select(fd => fd.Notes)
+                                     .FirstOrDefault() ?? string.Empty
+                                 : string.Empty
+                             };
+
+
+                var data = await result
+                    .AsNoTracking()
+                    .ToListAsync();
+                return Result<IEnumerable<StudentFundIncomeSummary>>.Success(data);
+            }
+            catch (Exception ex)
+            {
+                return Result<IEnumerable<StudentFundIncomeSummary>>.Failure($"Error retrieving FundIncomeDetails for Fund Income ID {fundIncomeId}: {ex.Message}");
+            }
+        }
     }
 }

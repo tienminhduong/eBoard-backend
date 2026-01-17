@@ -10,6 +10,16 @@ namespace eBoardAPI.Services
     public class FundIncomeDetailService(IFundIncomeDetailRepository fundIncomeDetailRepository,
         IMapper mapper) : IFundIncomeDetailService
     {
+        public async Task<Result<IEnumerable<StudentFundIncomeSummary>>> GetAllFundIncomeDetailsByIdFundIncomeAsync(Guid fundIncomeId)
+        {
+            var result = await fundIncomeDetailRepository.GetAllFundIncomeDetailsByIdFundIncomeAsync(fundIncomeId);
+            if(result.IsSuccess == false)
+            {
+                return Result<IEnumerable<StudentFundIncomeSummary>>.Failure(result.ErrorMessage!);
+            }
+            return Result<IEnumerable<StudentFundIncomeSummary>>.Success(result.Value!);
+        }
+
         public async Task<Result<FundIncomeDetailDto?>> GetFundIncomeDetailByIdAsync(Guid incomeDetailId)
         {
             var result = await fundIncomeDetailRepository.GetFundIncomeDetailByIdAsync(incomeDetailId);
