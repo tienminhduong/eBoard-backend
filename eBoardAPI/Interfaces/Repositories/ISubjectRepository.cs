@@ -10,4 +10,5 @@ public interface ISubjectRepository
     Task<Subject> GetOrAddSubjectByNameAsync(string subjectName);
     Task<Subject> AddSubjectAsync(Subject subject);
     Task<IEnumerable<Subject>> GetAllSubjectsAsync();
+    Task<IEnumerable<Subject>> GetAllSubjectsByClassAsync(Guid classId);
 }

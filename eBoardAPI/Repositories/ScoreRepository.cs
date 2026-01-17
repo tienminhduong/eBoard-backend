@@ -31,6 +31,8 @@ public class ScoreRepository(AppDbContext dbContext) : IScoreRepository
     public async Task<Result<ScoreSheet>> GetScoreSheetByIdAsync(Guid scoreSheetId)
     {
         var scoreSheet = await dbContext.ScoreSheets
+            .Include(s => s.Student)
+            .Include(s => s.Class)
             .Include(s => s.Details)
             .FirstOrDefaultAsync(s => s.Id == scoreSheetId);
         
@@ -52,5 +54,33 @@ public class ScoreRepository(AppDbContext dbContext) : IScoreRepository
             .Include(s => s.Student)
             .Include(s => s.Class)
             .ToListAsync();
+    }
+
+    public async Task<ScoreSheet?> GetStudentScoreSheetAsync(Guid classId, Guid studentId, int semester)
+    {
+        var query = from scoreSheet in dbContext.ScoreSheets
+            where scoreSheet.ClassId == classId
+                  && scoreSheet.StudentId == studentId
+                  && scoreSheet.Semester == semester
+            select scoreSheet;
+        
+        var sheet = await query
+            .Include(s => s.Student)
+            .Include(s => s.Class)
+            .Include(s => s.Details).ThenInclude(d => d.Subject)
+            .FirstOrDefaultAsync();
+        
+        return sheet;
+    }
+
+    public void UpdateScoreSheetDetailsAsync(ScoreSheetDetail scoreSheetDetail)
+    {
+        dbContext.ScoreSheetDetails.Update(scoreSheetDetail);
+    }
+
+    public async Task<ScoreSheet> AddScoreSheetAsync(ScoreSheet scoreSheet)
+    {
+        await dbContext.ScoreSheets.AddAsync(scoreSheet);
+        return scoreSheet;
     }
 }

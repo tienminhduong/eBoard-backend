@@ -8,6 +8,7 @@ public interface IUnitOfWork : IDisposable
     IParentRepository ParentRepository { get; }
     IScheduleRepository ScheduleRepository { get; }
     ISubjectRepository SubjectRepository { get; }
+    IScoreRepository ScoreRepository { get; }
     
     Task<int> SaveChangesAsync();
 }
