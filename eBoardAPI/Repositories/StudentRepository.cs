@@ -14,6 +14,11 @@ public class StudentRepository(AppDbContext db) : IStudentRepository
         return student;
     }
 
+    public async Task<bool> StudentExistsAsync(Guid studentId)
+    {
+        return await db.Students.AnyAsync(s => s.Id == studentId);
+    }
+
     public async Task<Result<Student>> GetByIdAsync(Guid id)
     {
         if(id == Guid.Empty)

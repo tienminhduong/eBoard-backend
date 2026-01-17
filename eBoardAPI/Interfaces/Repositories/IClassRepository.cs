@@ -10,7 +10,9 @@ public interface IClassRepository
     Task<IEnumerable<Class>> GetAllClassesByTeacherAsync(Guid teacherId, int pageNumber, int pageSize);
     Task<IEnumerable<Student>> GetStudentsByClassAsync(Guid classId, int pageNumber, int pageSize);
     Task<Result<Class>> GetClassByIdAsync(Guid classId);
+    Task<bool> ClassExistsAsync(Guid classId);
     
     Task<Class> AddNewClassAsync(Class newClass);
     Task<Result> AddNewStudentsToClassAsync(Guid classId, List<Guid> studentIds);
+    Task<bool> IsStudentInClassAsync(Guid classId, Guid studentId);
 }

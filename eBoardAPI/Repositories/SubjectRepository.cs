@@ -50,4 +50,14 @@ public class SubjectRepository(AppDbContext dbContext) : ISubjectRepository
     }
 
     public async Task<IEnumerable<Subject>> GetAllSubjectsAsync() => await dbContext.Subjects.AsNoTracking().ToListAsync();
+    public async Task<IEnumerable<Subject>> GetAllSubjectsByClassAsync(Guid classId)
+    {
+        var query = from cs in dbContext.Subjects
+                    where cs.ClassId == classId || cs.ClassId == null
+                    select cs;
+        
+        return await query
+            .AsNoTracking()
+            .ToListAsync();
+    }
 }

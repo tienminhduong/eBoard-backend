@@ -11,6 +11,7 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
     IClassFundRepository? _classFundRepository;
     IScheduleRepository? _scheduleRepository;
     ISubjectRepository? _subjectRepository;
+    IScoreRepository? _scoreRepository;
 
     public IClassFundRepository ClassFundRepository
     {
@@ -56,7 +57,16 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
             return _subjectRepository;
         }
     }
-    
+
+    public IScoreRepository ScoreRepository
+    {
+        get
+        {
+            _scoreRepository ??= new ScoreRepository(dbContext);
+            return _scoreRepository;
+        }
+    }
+
     public IScheduleRepository ScheduleRepository
     {
         get

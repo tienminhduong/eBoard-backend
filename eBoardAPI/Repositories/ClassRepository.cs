@@ -75,6 +75,11 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
         return classEntity == null ? Result<Class>.Failure("Lớp không tồn tại") : Result<Class>.Success(classEntity);
     }
 
+    public async Task<bool> ClassExistsAsync(Guid classId)
+    {
+        return await dbContext.Classes.AnyAsync(c => c.Id == classId);
+    }
+
     public async Task<Class> AddNewClassAsync(Class newClass)
     {
         await dbContext.Classes.AddAsync(newClass);
@@ -83,9 +88,9 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
 
     public async Task<Result> AddNewStudentsToClassAsync(Guid classId, List<Guid> studentIds)
     {
-        var result = await GetClassByIdAsync(classId);
-        if (!result.IsSuccess)
-            return Result.Failure(result.ErrorMessage!);
+        var classResult = await GetClassByIdAsync(classId);
+        if (!classResult.IsSuccess)
+            return Result.Failure(classResult.ErrorMessage!);
         
         // Check if all students exist, if not return error with missing student ids
         var pendingStudent = dbContext.ChangeTracker
@@ -113,7 +118,13 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
                 ClassId = classId,
                 StudentId = studentId,
             });
+            classResult.Value!.CurrentStudentCount += 1;
         }
         return Result.Success();
+    }
+
+    public async Task<bool> IsStudentInClassAsync(Guid classId, Guid studentId)
+    {
+        return await dbContext.InClasses.AnyAsync(ic => ic.ClassId == classId && ic.StudentId == studentId);
     }
 }
