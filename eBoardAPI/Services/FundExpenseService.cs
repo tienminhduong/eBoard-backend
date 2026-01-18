@@ -35,6 +35,7 @@ namespace eBoardAPI.Services
                 }
                 // deduct amount from current balance
                 classFundEntity.CurrentBalance -= fundExpenseCreateDto.Amount;
+                classFundEntity.TotalExpenses += fundExpenseCreateDto.Amount;
                 // update class fund
                 var updateResult = await unitOfWork.ClassFundRepository.UpdateAsync(classFundEntity);
                 if (!updateResult.IsSuccess)
