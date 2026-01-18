@@ -35,4 +35,17 @@ public class ClassFundRepository(AppDbContext dbContext) : IClassFundRepository
             ? Result<ClassFund>.Success(classFund)
             : Result<ClassFund>.Failure("Không tìm thấy quỹ lớp cho lớp này");
     }
+
+    public async Task<Result<ClassFund>> UpdateAsync(ClassFund classFund)
+    {
+        try
+        {
+            dbContext.ClassFunds.Update(classFund);
+            return Result<ClassFund>.Success(classFund);
+        }
+        catch (Exception ex)
+        {
+            return Result<ClassFund>.Failure($"Cập nhật quỹ lớp thất bại: {ex.Message}");
+        }
+    }
 }

@@ -8,4 +8,5 @@ public interface IClassFundRepository
     Task<ClassFund> AddNewClassFundAsync(ClassFund classFund);
     Task<Result<ClassFund>> GetClassFundByIdAsync(Guid classFundId);
     Task<Result<ClassFund>> GetClassFundByClassIdAsync(Guid classId);
+    Task<Result<ClassFund>> UpdateAsync(ClassFund classFund);
 }

@@ -1,5 +1,6 @@
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.ClassFund;
+using eBoardAPI.Models.FundExpense;
 using eBoardAPI.Models.FundIncome;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +10,8 @@ namespace eBoardAPI.Controllers;
 [Route("api/funds")]
 public class ClassFundController(IClassFundService classFundService,
                                  IFundIncomeService fundIncomeService,
-                                 IFundIncomeDetailService fundIncomeDetailService) : ControllerBase
+                                 IFundIncomeDetailService fundIncomeDetailService,
+                                 IFundExpenseService fundExpenseService) : ControllerBase
 {
     //authorize as teacher and parent
     [HttpGet("{classId}")]
@@ -106,9 +108,13 @@ public class ClassFundController(IClassFundService classFundService,
     }
 
     [HttpPost("{classId}/expenses")]
-    public async Task<ActionResult> AddNewFundExpense(Guid classId, [FromBody] object expenseRecord)
+    public async Task<ActionResult> AddNewFundExpense(Guid classId, [FromBody] FundExpenseCreateDto expenseRecord)
     {
         await Task.Delay(1); // Simulate async operation;
+        var result = await fundExpenseService.CreateNewFundExpenseAsync(classId, expenseRecord);
+        if(!result.IsSuccess) {
+            return BadRequest(result.ErrorMessage);
+        }
         return CreatedAtAction(nameof(GetClassFundByClassId), new { classId = Guid.NewGuid() }, null);
     }
 

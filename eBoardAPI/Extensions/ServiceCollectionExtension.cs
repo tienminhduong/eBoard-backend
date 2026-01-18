@@ -7,6 +7,7 @@ using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
+using eBoardAPI.Models.FundExpense;
 using eBoardAPI.Models.FundIncome;
 using eBoardAPI.Models.Parent;
 using eBoardAPI.Models.Student;
@@ -53,6 +54,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IClassFundRepository, ClassFundRepository>();
             services.AddScoped<IFundIncomeRepository, FundIncomeRepository>();
             services.AddScoped<IFundIncomeDetailRepository, FundIncomeDetailRepository>();
+            services.AddScoped<IFundExpenseRepository, FundExpenseRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
@@ -68,6 +70,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IClassFundService, ClassFundService>();
             services.AddScoped<IFundIncomeService, FundIncomeService>();
             services.AddScoped<IFundIncomeDetailService, FundIncomeDetailService>();
+            services.AddScoped<IFundExpenseService, FundExpenseService>();
             return services;
         }
         
@@ -106,6 +109,9 @@ public static class ServiceCollectionExtension
                     .ForMember(dest => dest.ContributedAt, opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
                 cfg.CreateMap<FundIncomeDetail, FundIncomeDetailDto>()
                     .ForMember(dest => dest.Deadline, opt => opt.MapFrom(src => src.FundIncome.EndDate));
+
+                cfg.CreateMap<FundExpenseCreateDto, FundExpense>();
+                cfg.CreateMap<FundExpense, FundExpenseDto>();
 
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
