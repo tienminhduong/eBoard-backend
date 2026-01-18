@@ -182,5 +182,18 @@ namespace eBoardAPI.Repositories
                 return Result<IEnumerable<StudentFundIncomeSummary>>.Failure($"Error retrieving FundIncomeDetails for Fund Income ID {fundIncomeId}: {ex.Message}");
             }
         }
+
+        public async Task<Result<FundIncomeDetail>> AddAsync(FundIncomeDetail fundIncomeDetail)
+        {
+            try
+            {
+                var res = await dbContext.FundIncomeDetails.AddAsync(fundIncomeDetail);
+                return Result<FundIncomeDetail>.Success(res.Entity);
+            }
+            catch (Exception ex)
+            {
+                return Result<FundIncomeDetail>.Failure($"Error adding FundIncomeDetail: {ex.Message}");
+            }
+        }
     }
 }

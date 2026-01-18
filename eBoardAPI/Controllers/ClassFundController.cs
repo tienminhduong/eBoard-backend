@@ -147,4 +147,15 @@ public class ClassFundController(IClassFundService classFundService,
         }
         return (result.Value!.Any()) ? Ok(result.Value) : NotFound();
     }
+
+    [HttpPost("contributions/{fundIncomeId}")]
+    public async Task<ActionResult> ContributeFundIncome(Guid fundIncomeId, [FromBody]ContributeFundIncomeDto contributeFund)
+    {
+        var result = await fundIncomeDetailService.CreateContributeFundIncome(fundIncomeId, contributeFund);
+        if(!result.IsSuccess)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        return CreatedAtAction(nameof(GetFundIncomeDetailsById), new { incomeDetailId = fundIncomeId }, result.Value);
+    }
 }
