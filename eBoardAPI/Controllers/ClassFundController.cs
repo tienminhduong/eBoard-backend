@@ -103,14 +103,17 @@ public class ClassFundController(IClassFundService classFundService,
     public async Task<ActionResult> GetFundExpensesByClassId(Guid classId, int pageNumber = 1, int pageSize = 20,
         DateOnly? startDate = null, DateOnly? endDate = null)
     {
-        await Task.Delay(1); // Simulate async operation;
-        return Ok();
+        var result = await fundExpenseService.GetFundExpensesByClassId(classId,  pageNumber, pageSize, startDate, endDate);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        return (result.Value!.Any()) ? Ok(result.Value) : NotFound();
     }
 
     [HttpPost("{classId}/expenses")]
     public async Task<ActionResult> AddNewFundExpense(Guid classId, [FromBody] FundExpenseCreateDto expenseRecord)
     {
-        await Task.Delay(1); // Simulate async operation;
         var result = await fundExpenseService.CreateNewFundExpenseAsync(classId, expenseRecord);
         if(!result.IsSuccess) {
             return BadRequest(result.ErrorMessage);

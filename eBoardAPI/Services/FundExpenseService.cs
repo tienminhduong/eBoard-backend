@@ -57,5 +57,16 @@ namespace eBoardAPI.Services
             }
             
         }
+
+        public async Task<Result<IEnumerable<FundExpenseDto>>> GetFundExpensesByClassId(Guid classId, int pageNumber, int pageSize, DateOnly? startDate, DateOnly? endDate)
+        {
+            var result = await fundExpenseRepository.GetAllByClassIdAsync(classId, pageNumber, pageSize, startDate, endDate);
+            if(!result.IsSuccess)
+            {
+                return Result<IEnumerable<FundExpenseDto>>.Failure("Failed to retrieve fund expenses.");
+            }
+            var dtos = mapper.Map<IEnumerable<FundExpenseDto>>(result.Value);
+            return Result<IEnumerable<FundExpenseDto>>.Success(dtos);
+        }
     }
 }
