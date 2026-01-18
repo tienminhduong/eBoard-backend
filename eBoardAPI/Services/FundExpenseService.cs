@@ -13,6 +13,11 @@ namespace eBoardAPI.Services
     {
         public async Task<Result<FundExpenseDto?>> CreateNewFundExpenseAsync(Guid classId, FundExpenseCreateDto fundExpenseCreateDto)
         {
+            var errorMessage = fundExpenseCreateDto.ValidateData();
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                return Result<FundExpenseDto?>.Failure(errorMessage);
+            }
             try
             {
                 // Start a transaction
