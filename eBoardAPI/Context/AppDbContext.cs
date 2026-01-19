@@ -21,6 +21,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ScheduleSettingDetail> ScheduleSettingDetails { get; set; }
     public DbSet<ScoreSheet> ScoreSheets { get; set; }
     public DbSet<ScoreSheetDetail> ScoreSheetDetails { get; set; }
+    public DbSet<Violation> Violations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
