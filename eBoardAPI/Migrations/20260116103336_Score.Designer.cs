@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using eBoardAPI.Context;
@@ -11,9 +12,11 @@ using eBoardAPI.Context;
 namespace eBoardAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260116103336_Score")]
+    partial class Score
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -479,16 +482,11 @@ namespace eBoardAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ClassId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
 
                     b.ToTable("Subjects");
                 });
@@ -704,15 +702,6 @@ namespace eBoardAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.Subject", b =>
-                {
-                    b.HasOne("eBoardAPI.Entities.Class", "Class")
-                        .WithMany()
-                        .HasForeignKey("ClassId");
-
-                    b.Navigation("Class");
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.ScheduleSetting", b =>

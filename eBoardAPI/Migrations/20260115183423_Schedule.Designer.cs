@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using eBoardAPI.Context;
@@ -11,9 +12,11 @@ using eBoardAPI.Context;
 namespace eBoardAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260115183423_Schedule")]
+    partial class Schedule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,9 +107,6 @@ namespace eBoardAPI.Migrations
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("IsMorningPeriod")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("text");
@@ -123,11 +123,9 @@ namespace eBoardAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClassId");
-
                     b.HasIndex("SubjectId");
 
-                    b.HasIndex("IsMorningPeriod", "PeriodNumber", "DayOfWeek", "ClassId")
+                    b.HasIndex("ClassId", "PeriodNumber")
                         .IsUnique();
 
                     b.ToTable("ClassPeriods");
@@ -348,78 +346,17 @@ namespace eBoardAPI.Migrations
                     b.Property<Guid>("ScheduleSettingId")
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("IsMorningPeriod")
-                        .HasColumnType("boolean");
-
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time without time zone");
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time without time zone");
 
-                    b.HasKey("PeriodNumber", "ScheduleSettingId", "IsMorningPeriod");
+                    b.HasKey("PeriodNumber", "ScheduleSettingId");
 
                     b.HasIndex("ScheduleSettingId");
 
                     b.ToTable("ScheduleSettingDetails");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.ScoreSheet", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<float>("AverageScore")
-                        .HasColumnType("real");
-
-                    b.Property<Guid>("ClassId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Grade")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Rank")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Semester")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("ScoreSheets");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.ScoreSheetDetail", b =>
-                {
-                    b.Property<Guid>("ScoreSheetId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("SubjectId")
-                        .HasColumnType("uuid");
-
-                    b.Property<float>("AverageScore")
-                        .HasColumnType("real");
-
-                    b.Property<float>("FinalScore")
-                        .HasColumnType("real");
-
-                    b.Property<float>("MidtermScore")
-                        .HasColumnType("real");
-
-                    b.HasKey("ScoreSheetId", "SubjectId");
-
-                    b.HasIndex("SubjectId");
-
-                    b.ToTable("ScoreSheetDetails");
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.Student", b =>
@@ -479,16 +416,11 @@ namespace eBoardAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ClassId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
 
                     b.ToTable("Subjects");
                 });
@@ -649,50 +581,12 @@ namespace eBoardAPI.Migrations
             modelBuilder.Entity("eBoardAPI.Entities.ScheduleSettingDetail", b =>
                 {
                     b.HasOne("eBoardAPI.Entities.ScheduleSetting", "ScheduleSetting")
-                        .WithMany("Details")
+                        .WithMany()
                         .HasForeignKey("ScheduleSettingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ScheduleSetting");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.ScoreSheet", b =>
-                {
-                    b.HasOne("eBoardAPI.Entities.Class", "Class")
-                        .WithMany()
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("eBoardAPI.Entities.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Class");
-
-                    b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.ScoreSheetDetail", b =>
-                {
-                    b.HasOne("eBoardAPI.Entities.ScoreSheet", "ScoreSheet")
-                        .WithMany("Details")
-                        .HasForeignKey("ScoreSheetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("eBoardAPI.Entities.Subject", "Subject")
-                        .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ScoreSheet");
-
-                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("eBoardAPI.Entities.Student", b =>
@@ -704,25 +598,6 @@ namespace eBoardAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.Subject", b =>
-                {
-                    b.HasOne("eBoardAPI.Entities.Class", "Class")
-                        .WithMany()
-                        .HasForeignKey("ClassId");
-
-                    b.Navigation("Class");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.ScheduleSetting", b =>
-                {
-                    b.Navigation("Details");
-                });
-
-            modelBuilder.Entity("eBoardAPI.Entities.ScoreSheet", b =>
-                {
-                    b.Navigation("Details");
                 });
 #pragma warning restore 612, 618
         }

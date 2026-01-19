@@ -29,6 +29,9 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
             return _fundExpenseRepository;
         }
     }
+    IScheduleRepository? _scheduleRepository;
+    ISubjectRepository? _subjectRepository;
+    IScoreRepository? _scoreRepository;
 
     public IClassFundRepository ClassFundRepository
     {
@@ -63,6 +66,33 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
         {
             _parentRepository ??= new ParentRepository(dbContext);
             return _parentRepository;
+        }
+    }
+
+    public ISubjectRepository SubjectRepository
+    {
+        get
+        {
+            _subjectRepository ??= new SubjectRepository(dbContext);
+            return _subjectRepository;
+        }
+    }
+
+    public IScoreRepository ScoreRepository
+    {
+        get
+        {
+            _scoreRepository ??= new ScoreRepository(dbContext);
+            return _scoreRepository;
+        }
+    }
+
+    public IScheduleRepository ScheduleRepository
+    {
+        get
+        {
+            _scheduleRepository ??= new ScheduleRepository(dbContext);
+            return _scheduleRepository;
         }
     }
 

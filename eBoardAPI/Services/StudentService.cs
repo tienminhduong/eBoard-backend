@@ -65,6 +65,11 @@ public class StudentService(
         }
     }
 
+    public Task<IEnumerable<Tuple<Guid, string>>> GetStudentsOptionInClassAsync(Guid classId)
+    {
+        return studentRepository.GetStudentsOptionInClassAsync(classId);
+    }
+
     public async Task<Result<StudentInfoDto>> GetByIdAsync(Guid id)
     {
         var studentResult = await studentRepository.GetByIdAsync(id);

@@ -15,9 +15,6 @@ public class StudentController(IStudentService studentService) : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<StudentInfoDto>> GetStudentById([FromRoute] Guid id)
     {
-        if (ModelState.IsValid == false)
-            return BadRequest();
-        
         var result = await studentService.GetByIdAsync(id);
         return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
     }
@@ -26,11 +23,16 @@ public class StudentController(IStudentService studentService) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<StudentInfoDto>> CreateStudent([FromBody] CreateStudentDto student)
     {
-        if(!ModelState.IsValid)
-            return BadRequest();
-
         var result = await studentService.AddNewStudentAsync(student);
         return result.IsSuccess ? CreatedAtAction(nameof(GetStudentById), new { id = result.Value!.Id }, result.Value) 
                                 : BadRequest(result.ErrorMessage);
+    }
+    
+    [HttpGet("{classId}/lists")]
+    public async Task<ActionResult> GetStudentsOptionInClass([FromRoute] Guid classId)
+    {
+        var result = await studentService.GetStudentsOptionInClassAsync(classId);
+        var options = result.Select(item => new { id = item.Item1, fullName = item.Item2 });
+        return Ok(options);
     }
 }

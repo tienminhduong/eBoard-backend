@@ -10,7 +10,10 @@ using eBoardAPI.Models.ClassFund;
 using eBoardAPI.Models.FundExpense;
 using eBoardAPI.Models.FundIncome;
 using eBoardAPI.Models.Parent;
+using eBoardAPI.Models.Schedule;
+using eBoardAPI.Models.ScoreSheet;
 using eBoardAPI.Models.Student;
+using eBoardAPI.Models.Subject;
 using eBoardAPI.Models.Teacher;
 using eBoardAPI.Repositories;
 using eBoardAPI.Services;
@@ -56,6 +59,10 @@ public static class ServiceCollectionExtension
             services.AddScoped<IFundIncomeDetailRepository, FundIncomeDetailRepository>();
             services.AddScoped<IFundExpenseRepository, FundExpenseRepository>();
 
+            services.AddScoped<IScheduleRepository, ScheduleRepository>();
+            services.AddScoped<ISubjectRepository, SubjectRepository>();
+            services.AddScoped<IScoreRepository, ScoreRepository>();
+            
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
@@ -71,6 +78,8 @@ public static class ServiceCollectionExtension
             services.AddScoped<IFundIncomeService, FundIncomeService>();
             services.AddScoped<IFundIncomeDetailService, FundIncomeDetailService>();
             services.AddScoped<IFundExpenseService, FundExpenseService>();
+            services.AddScoped<IScheduleService, ScheduleService>();
+            services.AddScoped<IScoreService, ScoreService>();
             return services;
         }
         
@@ -115,8 +124,53 @@ public static class ServiceCollectionExtension
                 cfg.CreateMap<FundExpenseCreateDto, FundExpense>();
                 cfg.CreateMap<FundExpense, FundExpenseDto>();
 
+                cfg.CreateMap<CreateClassPeriodDto, ClassPeriod>()
+                    .ForSourceMember(src => src.Subject, opt => opt.DoNotValidate())
+                    .ForMember(dest => dest.Subject, opt => opt.Ignore());
+                
+                cfg.CreateMap<UpdateClassPeriodDto, ClassPeriod>()
+                    .ForSourceMember(src => src.Subject, opt => opt.DoNotValidate())
+                    .ForMember(dest => dest.Subject, opt => opt.Ignore());
+                
+                cfg.CreateMap<ClassPeriod, ClassPeriodDto>();
+                cfg.CreateMap<Subject, SubjectDto>();
+                
+                cfg.CreateMap<ScheduleSetting, ScheduleSettingDto>();
+                cfg.CreateMap<ScheduleSettingDetail, ScheduleSettingDetailDto>();
+
+                cfg.CreateMap<ScoreSheet, StudentScoreSummaryDto>()
+                    .ForMember(dest => dest.StudentName,
+                        opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"));
+
+                cfg.CreateMap<ScoreSheet, StudentScoreSheetDto>()
+                    .ForMember(dest => dest.StudentName,
+                        opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"))
+                    .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
+                    .ForMember(dest => dest.AcademicYear,
+                        opt => opt.MapFrom(src => $"{src.Class.StartDate.Year}-{src.Class.EndDate.Year}"))
+                    .ForMember(dest => dest.SubjectScores, opt => opt.MapFrom(src => src.Details))
+                    .ForMember(dest => dest.RankInClass,
+                        opt => opt.MapFrom(src => $"{src.Rank}/{src.Class.CurrentStudentCount}"));
+
+                cfg.CreateMap<ScoreSheetDetail, SubjectScoreDto>()
+                    .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.Subject.Name));
+                
 
             }, AppDomain.CurrentDomain.GetAssemblies());
+            return services;
+        }
+        
+        public IServiceCollection AddCorsPolicy()
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowLocalHost", builder =>
+                {
+                    builder.WithOrigins("http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
             return services;
         }
     }
