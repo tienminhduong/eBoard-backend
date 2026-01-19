@@ -1,5 +1,6 @@
 using AutoMapper;
 using eBoardAPI.Common;
+using eBoardAPI.Consts;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
@@ -80,8 +81,13 @@ public class ClassService(
 
             var newClassFund = new ClassFund { ClassId = newClass.Id };
             await unitOfWork.ClassFundRepository.AddNewClassFundAsync(newClassFund);
-            
-            var newScheduleSetting = new ScheduleSetting { ClassId = newClass.Id };
+
+            var newScheduleSetting = new ScheduleSetting
+            {
+                ClassId = newClass.Id,
+                MorningPeriodCount = ClassSettingConst.DEFAULT_MORNING_PERIOD_COUNT,
+                AfternoonPeriodCount = ClassSettingConst.DEFAULT_AFTERNOON_PERIOD_COUNT
+            };
             await unitOfWork.ScheduleRepository.AddNewScheduleSettingAsync(newScheduleSetting);
 
             var saveCount = await unitOfWork.SaveChangesAsync();

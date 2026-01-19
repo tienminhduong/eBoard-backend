@@ -1,4 +1,5 @@
 using eBoardAPI.Common;
+using eBoardAPI.Consts;
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
@@ -75,19 +76,42 @@ public class ScheduleRepository(AppDbContext dbContext) : IScheduleRepository
     public async Task<ScheduleSetting> AddNewScheduleSettingAsync(ScheduleSetting scheduleSetting)
     {
         await dbContext.ScheduleSettings.AddAsync(scheduleSetting);
+        await GenerateNewScheduleSettingDetailsAsync(scheduleSetting);
         
-        for (var i = 0; i < scheduleSetting.MorningPeriodCount + scheduleSetting.AfternoonPeriodCount; i++)
+        return scheduleSetting;
+    }
+
+    private async Task GenerateNewScheduleSettingDetailsAsync(ScheduleSetting scheduleSetting)
+    {
+        var startTime = ClassSettingConst.MorningStateTime;
+        for (var i = 0; i < scheduleSetting.MorningPeriodCount; i++)
         {
             var detail = new ScheduleSettingDetail
             {
                 ScheduleSettingId = scheduleSetting.Id,
                 PeriodNumber = i + 1,
-                StartTime = TimeOnly.Parse("08:00"),
-                EndTime = TimeOnly.Parse("08:45")
+                StartTime = startTime,
+                EndTime = startTime.AddMinutes(ClassSettingConst.PERIOD_DURATION_MINUTES),
+                IsMorningPeriod = true
             };
             await dbContext.ScheduleSettingDetails.AddAsync(detail);
+            startTime = detail.EndTime.AddMinutes(ClassSettingConst.BREAK_DURATION_MINUTES);
         }
-        return scheduleSetting;
+        
+        startTime = ClassSettingConst.AfternoonStartTime;
+        for (var i = 0; i < scheduleSetting.AfternoonPeriodCount; i++)
+        {
+            var detail = new ScheduleSettingDetail
+            {
+                ScheduleSettingId = scheduleSetting.Id,
+                PeriodNumber = i + 1,
+                StartTime = startTime,
+                EndTime = startTime.AddMinutes(ClassSettingConst.PERIOD_DURATION_MINUTES),
+                IsMorningPeriod = false
+            };
+            await dbContext.ScheduleSettingDetails.AddAsync(detail);
+            startTime = detail.EndTime.AddMinutes(ClassSettingConst.BREAK_DURATION_MINUTES);
+        }
     }
 
     public Result<ScheduleSetting> UpdateScheduleSetting(ScheduleSetting scheduleSetting, IEnumerable<ScheduleSettingDetail> details)
@@ -112,7 +136,7 @@ public class ScheduleRepository(AppDbContext dbContext) : IScheduleRepository
 
         var scheduleSetting = await query
             .AsNoTracking()
-            .Include(s => s.Details)
+            .Include(s => s.Details.OrderBy(d => d.StartTime))
             .FirstOrDefaultAsync();
 
         return scheduleSetting == null
