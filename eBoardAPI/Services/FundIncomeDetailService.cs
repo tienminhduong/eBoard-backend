@@ -28,7 +28,14 @@ namespace eBoardAPI.Services
                 {
                     return Result<FundIncomeDetailDto>.Failure("Fund income not found.");
                 }
-
+                // add collected amount to fund income
+                fundIncomeEntity.CollectedAmount += contributeFund.ContributedAmount;
+                var updateFundIncomeResult = await unitOfWork.FundIncomeRepository.UpdateAsync(fundIncomeEntity);
+                if(updateFundIncomeResult.IsSuccess == false)
+                {
+                    unitOfWork.Dispose();
+                    return Result<FundIncomeDetailDto>.Failure("Failed to update fund income collected amount.");
+                }
                 // get class fund entity
                 var classFundId = fundIncomeEntity.ClassFundId;
                 var classFundResult = await unitOfWork.ClassFundRepository.GetClassFundByIdAsync(classFundId);

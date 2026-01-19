@@ -4,6 +4,7 @@ using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Violation;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace eBoardAPI.Services
 {
@@ -54,9 +55,20 @@ namespace eBoardAPI.Services
             throw new NotImplementedException();
         }
 
-        public Task<Result<IEnumerable<ViolationDto>>> UpdateViolation(Guid violationId, UpdateViolationDto updateViolationDto)
+        public async Task<Result<IEnumerable<ViolationDto>>> UpdateViolation(Guid violationId, UpdateViolationDto updateViolationDto)
         {
-            throw new NotImplementedException();
+            return Result<IEnumerable<ViolationDto>>.Failure("Not implemented yet");
+            var violationEntityResult = await violationRepository.GetRangeByIdsAsync(updateViolationDto.StudentId);
+            if(!violationEntityResult.IsSuccess)
+            {
+                return Result<IEnumerable<ViolationDto>>.Failure(violationEntityResult.ErrorMessage ?? "Failed to retrieve violations.");
+            }
+            var violationEntities = violationEntityResult.Value;
+            if(violationEntities == null || !violationEntities.Any())
+            {
+                return Result<IEnumerable<ViolationDto>>.Failure("Không tìm thấy học sinh");
+            }
+            
         }
     }
 }

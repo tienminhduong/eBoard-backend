@@ -20,7 +20,7 @@ namespace eBoardAPI.Controllers
             return Ok(result.Value);
         }
 
-        [HttpPut("/violations/{violationId}")]
+        [HttpPut("violations/{violationId}")]
         public async Task<ActionResult> UpdateViolation(Guid violationId, UpdateViolationDto updateViolationDto)
         {
             // Implementation for updating a violation
