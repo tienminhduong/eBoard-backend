@@ -8,8 +8,8 @@ namespace eBoardAPI.Controllers
     [Route("api")]
     public class ViolationController(IViolationService violationService) : ControllerBase
     {
-        [HttpPost("/violations")]
-        public async Task<ActionResult> CreateViolation(CreateViolationDto createViolationDto)
+        [HttpPost("violations")]
+        public async Task<ActionResult> CreateViolation([FromBody] CreateViolationDto createViolationDto)
         {
             // Implementation for creating a violation
             var result = await violationService.CreateNewViolation(createViolationDto);

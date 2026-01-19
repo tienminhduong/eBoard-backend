@@ -16,6 +16,7 @@ using eBoardAPI.Models.ScoreSheet;
 using eBoardAPI.Models.Student;
 using eBoardAPI.Models.Subject;
 using eBoardAPI.Models.Teacher;
+using eBoardAPI.Models.Violation;
 using eBoardAPI.Repositories;
 using eBoardAPI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -63,6 +64,8 @@ public static class ServiceCollectionExtension
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
             services.AddScoped<IScoreRepository, ScoreRepository>();
+
+            services.AddScoped<IViolationRepository, ViolationRepository>();
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
@@ -81,6 +84,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IFundExpenseService, FundExpenseService>();
             services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<IScoreService, ScoreService>();
+            services.AddScoped<IViolationService, ViolationService>();
             return services;
         }
         
@@ -104,10 +108,12 @@ public static class ServiceCollectionExtension
                 AddFundDtoMappings(cfg);
                 AddClassPeriodDtoMappings(cfg);
                 AddScoreSheetDtoMappings(cfg);
+                AddViolationDtoMapping(cfg);
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
         }
-        
+
+
         public IServiceCollection AddCorsPolicy()
         {
             services.AddCors(options =>
@@ -194,5 +200,9 @@ public static class ServiceCollectionExtension
 
         cfg.CreateMap<ScoreSheetDetail, SubjectScoreDto>()
             .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.Subject.Name));
+    }
+    static private void AddViolationDtoMapping(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<Violation, ViolationDto>();
     }
 }
