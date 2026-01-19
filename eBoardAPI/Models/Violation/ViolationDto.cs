@@ -1,18 +1,12 @@
-﻿namespace eBoardAPI.Entities
+﻿using eBoardAPI.Entities;
+
+namespace eBoardAPI.Models.Violation
 {
-    public enum ViolationLevel
-    {
-        LOW,
-        MEDIUM,
-        HIGH
-    }
-    public class Violation
+    public class ViolationDto
     {
         public Guid Id { get; set; }
         public Guid StudentId { get; set; }
-        public Student Student { get; set; } = null!;
         public Guid ClassId { get; set; }
-        public Class Class { get; set; } = null!;
         public required string InChargeTeacherName { get; set; }
         public DateOnly ViolateDate { get; set; }
         public string ViolationType { get; set; } = string.Empty;
