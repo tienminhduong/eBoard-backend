@@ -41,26 +41,6 @@ public class ScoreService(
         return scoreSheet == null
             ? Result<StudentScoreSheetDto>.Failure("Bảng điểm không tồn tại")
             : Result<StudentScoreSheetDto>.Success(mapper.Map<StudentScoreSheetDto>(scoreSheet));
-        
-        // if (scoreSheet == null)
-        // {
-        //     var validate = await unitOfWork.ClassRepository.ClassExistsAsync(classId);
-        //     if (!validate)
-        //         return Result<StudentScoreSheetDto>.Failure("Lớp học không tồn tại");
-        //     
-        //     validate = await unitOfWork.StudentRepository.StudentExistsAsync(studentId);
-        //     if (!validate)
-        //         return Result<StudentScoreSheetDto>.Failure("Học sinh không tồn tại");
-        //     
-        //     scoreSheet = new ScoreSheet
-        //     {
-        //         StudentId = studentId,
-        //         ClassId = classId,
-        //         Semester = semester
-        //     };
-        //     scoreSheet = await unitOfWork.ScoreRepository.AddScoreSheetAsync(scoreSheet);
-        //     await unitOfWork.SaveChangesAsync();
-        // }
     }
 
     public async Task<(Result<StudentScoreSheetDto>, bool isCreated)> AddOrUpdateStudentScoreSheetAsync(Guid classId,
