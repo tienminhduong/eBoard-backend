@@ -6,6 +6,7 @@ using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.Student;
+using eBoardAPI.Models.Subject;
 
 namespace eBoardAPI.Services;
 
@@ -94,5 +95,11 @@ public class ClassService(
         {
             return Result<ClassInfoDto>.Failure($"Đã xảy ra lỗi khi tạo lớp học: {ex.Message}");
         }
+    }
+
+    public async Task<IEnumerable<SubjectDto>> GetSubjectInClassAsync(Guid classId)
+    {
+        var subjects = await unitOfWork.SubjectRepository.GetAllSubjectsByClassAsync(classId);
+        return mapper.Map<IEnumerable<SubjectDto>>(subjects);
     }
 }

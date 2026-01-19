@@ -1,10 +1,8 @@
+using eBoardAPI.Consts;
+
 namespace eBoardAPI.Entities;
 
-public enum PaymentStatus
-{
-    FULL,
-    PARTIAL
-}
+
 public class FundIncomeDetail
 {
     public Guid Id { get; set; }
@@ -20,9 +18,4 @@ public class FundIncomeDetail
     public DateOnly ContributedAt { get; set; }
     public string ContributionStatus { get; set; } = string.Empty;
     public string Notes { get; set; } = string.Empty;
-
-    public void UpdateStatus(int expectAmount)
-    {
-        ContributionStatus = ContributedAmount >= expectAmount ? PaymentStatus.FULL.ToString() : PaymentStatus.PARTIAL.ToString();
-    }
 }

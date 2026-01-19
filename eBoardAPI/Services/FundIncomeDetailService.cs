@@ -5,6 +5,7 @@ using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.FundIncome;
 using System.Net.WebSockets;
+using eBoardAPI.Extensions;
 
 namespace eBoardAPI.Services
 {

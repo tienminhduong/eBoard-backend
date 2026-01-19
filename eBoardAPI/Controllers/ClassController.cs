@@ -2,6 +2,7 @@ using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.Student;
+using eBoardAPI.Models.Subject;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBoardAPI.Controllers;
@@ -57,5 +58,12 @@ public class ClassController(IClassService classService) : ControllerBase
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetClassById), new { classId = result.Value!.Id }, null)
             : BadRequest(result.ErrorMessage!);
+    }
+
+    [HttpGet("{classId}/subjects")]
+    public async Task<ActionResult<IEnumerable<SubjectDto>>> GetSubjectsInClass(Guid classId)
+    {
+        var subjectDtos = await classService.GetSubjectInClassAsync(classId);
+        return Ok(subjectDtos);
     }
 }
