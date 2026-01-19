@@ -7,6 +7,8 @@ using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
+using eBoardAPI.Models.FundExpense;
+using eBoardAPI.Models.FundIncome;
 using eBoardAPI.Models.Parent;
 using eBoardAPI.Models.Schedule;
 using eBoardAPI.Models.ScoreSheet;
@@ -53,6 +55,10 @@ public static class ServiceCollectionExtension
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IClassRepository, ClassRepository>();
             services.AddScoped<IClassFundRepository, ClassFundRepository>();
+            services.AddScoped<IFundIncomeRepository, FundIncomeRepository>();
+            services.AddScoped<IFundIncomeDetailRepository, FundIncomeDetailRepository>();
+            services.AddScoped<IFundExpenseRepository, FundExpenseRepository>();
+
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
             services.AddScoped<IScoreRepository, ScoreRepository>();
@@ -69,6 +75,9 @@ public static class ServiceCollectionExtension
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IClassService, ClassService>();
             services.AddScoped<IClassFundService, ClassFundService>();
+            services.AddScoped<IFundIncomeService, FundIncomeService>();
+            services.AddScoped<IFundIncomeDetailService, FundIncomeDetailService>();
+            services.AddScoped<IFundExpenseService, FundExpenseService>();
             services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<IScoreService, ScoreService>();
             return services;
@@ -99,6 +108,21 @@ public static class ServiceCollectionExtension
                     .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
                     .ForMember(dest => dest.AcademicYear,
                         opt => opt.MapFrom(src => StringHelper.ParseAcademicYear(src.Class)));
+
+                cfg.CreateMap<CreateFundIncomeDto, FundIncome>()
+                    .ForMember(dest => dest.StartDate,
+                    opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
+                cfg.CreateMap<FundIncome, FundIncomeDto>();
+
+                cfg.CreateMap<CreateFundIncomeDetailDto, FundIncomeDetail>()
+                    .ForMember(dest => dest.ContributedAt, opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
+                cfg.CreateMap<FundIncomeDetail, FundIncomeDetailDto>()
+                    .ForMember(dest => dest.Deadline, opt => opt.MapFrom(src => src.FundIncome.EndDate));
+                cfg.CreateMap<ContributeFundIncomeDto, FundIncomeDetail>()
+                    .ForMember(dest => dest.ContributedAt, opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
+
+                cfg.CreateMap<FundExpenseCreateDto, FundExpense>();
+                cfg.CreateMap<FundExpense, FundExpenseDto>();
 
                 cfg.CreateMap<CreateClassPeriodDto, ClassPeriod>()
                     .ForSourceMember(src => src.Subject, opt => opt.DoNotValidate())

@@ -9,6 +9,26 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
     IClassRepository? _classRepository;
     IParentRepository? _parentRepository;
     IClassFundRepository? _classFundRepository;
+    IFundExpenseRepository? _fundExpenseRepository;
+    IFundIncomeRepository? _fundIncomeRepository;
+
+    public IFundIncomeRepository FundIncomeRepository
+    {
+        get
+        {
+            _fundIncomeRepository ??= new FundIncomeRepository(dbContext);
+            return _fundIncomeRepository;
+        }
+    }
+
+    public IFundExpenseRepository FundExpenseRepository
+    {
+        get
+        {
+            _fundExpenseRepository ??= new FundExpenseRepository(dbContext);
+            return _fundExpenseRepository;
+        }
+    }
     IScheduleRepository? _scheduleRepository;
     ISubjectRepository? _subjectRepository;
     IScoreRepository? _scoreRepository;
