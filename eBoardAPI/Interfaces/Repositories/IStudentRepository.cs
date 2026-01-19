@@ -9,4 +9,5 @@ public interface IStudentRepository
     Task<Student> AddAsync(Student student);
     Task<bool> StudentExistsAsync(Guid studentId);
     Task<IEnumerable<Tuple<Guid, string>>> GetStudentsOptionInClassAsync(Guid classId);
+    void UpdateStudent(Student student);
 }

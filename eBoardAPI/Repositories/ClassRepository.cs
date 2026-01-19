@@ -142,4 +142,24 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
         var studentsInClass = await query.ToListAsync();
         return studentIds.Intersect(studentsInClass);
     }
+
+    public async Task<Result> RemoveStudentFromClassAsync(Guid classId, Guid studentId)
+    {
+        var inClassEntity = await dbContext.InClasses
+            .FirstOrDefaultAsync(ic => ic.ClassId == classId && ic.StudentId == studentId);
+        
+        if (inClassEntity == null)
+            return Result.Failure("Học sinh không thuộc lớp học.");
+        
+        dbContext.InClasses.Remove(inClassEntity);
+        
+        var classResult = await GetClassByIdAsync(classId);
+        if (!classResult.IsSuccess)
+            return Result.Failure(classResult.ErrorMessage!);
+        
+        classResult.Value!.CurrentStudentCount -= 1;
+        UpdateClass(classResult.Value!);
+        
+        return Result.Success();
+    }
 }
