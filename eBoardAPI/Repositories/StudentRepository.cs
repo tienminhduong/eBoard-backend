@@ -30,6 +30,11 @@ public class StudentRepository(AppDbContext db) : IStudentRepository
         return result;
     }
 
+    public void UpdateStudent(Student student)
+    {
+        db.Students.Update(student);
+    }
+
     public async Task<Result<Student>> GetByIdAsync(Guid id)
     {
         if(id == Guid.Empty)

@@ -1,3 +1,4 @@
+using AutoMapper;
 using eBoardAPI.Consts;
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
@@ -90,72 +91,19 @@ public static class ServiceCollectionExtension
             {
                 cfg.LicenseKey = licenseKey;
                 
-                cfg.CreateMap<Parent, ParentInfoDto>();
-
-                cfg.CreateMap<Student, StudentInfoDto>()
-                    .ForMember(dest => dest.FullAddress, opt => opt.MapFrom(src => StringHelper.ParseFullAddress(src)));
-                cfg.CreateMap<CreateStudentDto, Student>();
-
-                cfg.CreateMap<Class, ClassInfoDto>()
-                    .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher.FullName))
-                    .ForMember(dest => dest.Grade, opt => opt.MapFrom(src => src.Grade.Name));
-                cfg.CreateMap<CreateClassDto, Class>();
-
-                cfg.CreateMap<UpdateTeacherInfoDto, Teacher>();
-
-                cfg.CreateMap<Teacher, TeacherInfoDto>();
-                cfg.CreateMap<ClassFund, ClassFundDto>()
-                    .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
-                    .ForMember(dest => dest.AcademicYear,
-                        opt => opt.MapFrom(src => StringHelper.ParseAcademicYear(src.Class)));
-
-                cfg.CreateMap<CreateFundIncomeDto, FundIncome>()
-                    .ForMember(dest => dest.StartDate,
-                    opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
-                cfg.CreateMap<FundIncome, FundIncomeDto>();
-
-                cfg.CreateMap<CreateFundIncomeDetailDto, FundIncomeDetail>()
-                    .ForMember(dest => dest.ContributedAt, opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
-                cfg.CreateMap<FundIncomeDetail, FundIncomeDetailDto>()
-                    .ForMember(dest => dest.Deadline, opt => opt.MapFrom(src => src.FundIncome.EndDate));
-                cfg.CreateMap<ContributeFundIncomeDto, FundIncomeDetail>()
-                    .ForMember(dest => dest.ContributedAt, opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
-
-                cfg.CreateMap<FundExpenseCreateDto, FundExpense>();
-                cfg.CreateMap<FundExpense, FundExpenseDto>();
-
-                cfg.CreateMap<CreateClassPeriodDto, ClassPeriod>()
-                    .ForSourceMember(src => src.Subject, opt => opt.DoNotValidate())
-                    .ForMember(dest => dest.Subject, opt => opt.Ignore());
-                
-                cfg.CreateMap<UpdateClassPeriodDto, ClassPeriod>()
-                    .ForSourceMember(src => src.Subject, opt => opt.DoNotValidate())
-                    .ForMember(dest => dest.Subject, opt => opt.Ignore());
-                
-                cfg.CreateMap<ClassPeriod, ClassPeriodDto>();
                 cfg.CreateMap<Subject, SubjectDto>();
+                cfg.CreateMap<Parent, ParentInfoDto>();
+                cfg.CreateMap<UpdateTeacherInfoDto, Teacher>();
+                cfg.CreateMap<Teacher, TeacherInfoDto>();
                 
                 cfg.CreateMap<ScheduleSetting, ScheduleSettingDto>();
                 cfg.CreateMap<ScheduleSettingDetail, ScheduleSettingDetailDto>();
-
-                cfg.CreateMap<ScoreSheet, StudentScoreSummaryDto>()
-                    .ForMember(dest => dest.StudentName,
-                        opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"));
-
-                cfg.CreateMap<ScoreSheet, StudentScoreSheetDto>()
-                    .ForMember(dest => dest.StudentName,
-                        opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"))
-                    .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
-                    .ForMember(dest => dest.AcademicYear,
-                        opt => opt.MapFrom(src => $"{src.Class.StartDate.Year}-{src.Class.EndDate.Year}"))
-                    .ForMember(dest => dest.SubjectScores, opt => opt.MapFrom(src => src.Details))
-                    .ForMember(dest => dest.RankInClass,
-                        opt => opt.MapFrom(src => $"{src.Rank}/{src.Class.CurrentStudentCount}"));
-
-                cfg.CreateMap<ScoreSheetDetail, SubjectScoreDto>()
-                    .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.Subject.Name));
                 
-
+                AddStudentDtoMappings(cfg);
+                AddClassDtoMappings(cfg);
+                AddFundDtoMappings(cfg);
+                AddClassPeriodDtoMappings(cfg);
+                AddScoreSheetDtoMappings(cfg);
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
         }
@@ -173,5 +121,78 @@ public static class ServiceCollectionExtension
             });
             return services;
         }
+
+        
+    }
+
+    private static void AddStudentDtoMappings(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<Student, StudentInfoDto>()
+            .ForMember(dest => dest.FullAddress, opt => opt.MapFrom(src => StringHelper.ParseFullAddress(src)));
+        cfg.CreateMap<CreateStudentDto, Student>();
+    }
+    
+    private static void AddClassDtoMappings(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<Class, ClassInfoDto>()
+            .ForMember(dest => dest.TeacherName, opt => opt.MapFrom(src => src.Teacher.FullName))
+            .ForMember(dest => dest.Grade, opt => opt.MapFrom(src => src.Grade.Name));
+        cfg.CreateMap<CreateClassDto, Class>();
+    }
+
+    private static void AddFundDtoMappings(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<ClassFund, ClassFundDto>()
+            .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
+            .ForMember(dest => dest.AcademicYear,
+                opt => opt.MapFrom(src => StringHelper.ParseAcademicYear(src.Class)));
+
+        cfg.CreateMap<CreateFundIncomeDto, FundIncome>()
+            .ForMember(dest => dest.StartDate,
+                opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
+        cfg.CreateMap<FundIncome, FundIncomeDto>();
+
+        cfg.CreateMap<CreateFundIncomeDetailDto, FundIncomeDetail>()
+            .ForMember(dest => dest.ContributedAt, opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
+        cfg.CreateMap<FundIncomeDetail, FundIncomeDetailDto>()
+            .ForMember(dest => dest.Deadline, opt => opt.MapFrom(src => src.FundIncome.EndDate));
+        cfg.CreateMap<ContributeFundIncomeDto, FundIncomeDetail>()
+            .ForMember(dest => dest.ContributedAt, opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
+
+        cfg.CreateMap<FundExpenseCreateDto, FundExpense>();
+        cfg.CreateMap<FundExpense, FundExpenseDto>();
+    }
+
+    private static void AddClassPeriodDtoMappings(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<CreateClassPeriodDto, ClassPeriod>()
+            .ForSourceMember(src => src.Subject, opt => opt.DoNotValidate())
+            .ForMember(dest => dest.Subject, opt => opt.Ignore());
+                
+        cfg.CreateMap<UpdateClassPeriodDto, ClassPeriod>()
+            .ForSourceMember(src => src.Subject, opt => opt.DoNotValidate())
+            .ForMember(dest => dest.Subject, opt => opt.Ignore());
+                
+        cfg.CreateMap<ClassPeriod, ClassPeriodDto>();
+    }
+    
+    private static void AddScoreSheetDtoMappings(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<ScoreSheet, StudentScoreSummaryDto>()
+            .ForMember(dest => dest.StudentName,
+                opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"));
+
+        cfg.CreateMap<ScoreSheet, StudentScoreSheetDto>()
+            .ForMember(dest => dest.StudentName,
+                opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"))
+            .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
+            .ForMember(dest => dest.AcademicYear,
+                opt => opt.MapFrom(src => $"{src.Class.StartDate.Year}-{src.Class.EndDate.Year}"))
+            .ForMember(dest => dest.SubjectScores, opt => opt.MapFrom(src => src.Details))
+            .ForMember(dest => dest.RankInClass,
+                opt => opt.MapFrom(src => $"{src.Rank}/{src.Class.CurrentStudentCount}"));
+
+        cfg.CreateMap<ScoreSheetDetail, SubjectScoreDto>()
+            .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.Subject.Name));
     }
 }

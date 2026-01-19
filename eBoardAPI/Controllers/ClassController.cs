@@ -66,4 +66,11 @@ public class ClassController(IClassService classService) : ControllerBase
         var subjectDtos = await classService.GetSubjectInClassAsync(classId);
         return Ok(subjectDtos);
     }
+
+    [HttpDelete("{classId}/students/{studentId}")]
+    public async Task<ActionResult> RemoveStudentFromClass(Guid classId, Guid studentId)
+    {
+        var result = await classService.RemoveStudentFromClassAsync(classId, studentId);
+        return result.IsSuccess ? NoContent() : BadRequest(result.ErrorMessage!);
+    }
 }

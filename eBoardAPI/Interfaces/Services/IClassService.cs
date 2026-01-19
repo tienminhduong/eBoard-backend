@@ -17,4 +17,5 @@ public interface IClassService
     
     Task<Result<ClassInfoDto>> AddNewClassAsync(CreateClassDto createClassDto, Guid teacherId);
     Task<IEnumerable<SubjectDto>> GetSubjectInClassAsync(Guid classId);
+    Task<Result> RemoveStudentFromClassAsync(Guid classId, Guid studentId);
 }

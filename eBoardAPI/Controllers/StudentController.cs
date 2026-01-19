@@ -35,4 +35,11 @@ public class StudentController(IStudentService studentService) : ControllerBase
         var options = result.Select(item => new { id = item.Item1, fullName = item.Item2 });
         return Ok(options);
     }
+    
+    [HttpPatch("{id}")]
+    public async Task<ActionResult<StudentInfoDto>> UpdateStudentInfo([FromRoute] Guid id, [FromBody] UpdateStudentInfoDto updateStudentInfoDto)
+    {
+        var result = await studentService.UpdateStudentInfoAsync(id, updateStudentInfoDto);
+        return result.IsSuccess ? NoContent() : NotFound(result.ErrorMessage);
+    }
 }

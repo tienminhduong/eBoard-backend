@@ -70,6 +70,44 @@ public class StudentService(
         return studentRepository.GetStudentsOptionInClassAsync(classId);
     }
 
+    public async Task<Result> UpdateStudentInfoAsync(Guid id, UpdateStudentInfoDto updateStudentInfoDto)
+    {
+        var studentResult = await unitOfWork.StudentRepository.GetByIdAsync(id);
+        if (!studentResult.IsSuccess)
+            return Result.Failure("Không tìm thấy học sinh với ID đã cho.");
+        
+        var student = studentResult.Value!;
+        
+        if (updateStudentInfoDto.FirstName is not null)
+            student.FirstName = updateStudentInfoDto.FirstName;
+        if (updateStudentInfoDto.LastName is not null)
+            student.LastName = updateStudentInfoDto.LastName;
+        if (updateStudentInfoDto.DateOfBirth is not null)
+            student.DateOfBirth = updateStudentInfoDto.DateOfBirth.Value;
+        if (updateStudentInfoDto.Gender is not null)
+            student.Gender = updateStudentInfoDto.Gender;
+        if (updateStudentInfoDto.Address is not null)
+            student.Address = updateStudentInfoDto.Address;
+        if (updateStudentInfoDto.Province is not null)
+            student.Province = updateStudentInfoDto.Province;
+        if (updateStudentInfoDto.District is not null)
+            student.District = updateStudentInfoDto.District;
+        if (updateStudentInfoDto.Ward is not null)
+            student.Ward = updateStudentInfoDto.Ward;
+        
+        unitOfWork.StudentRepository.UpdateStudent(student);
+        try
+        {
+            await unitOfWork.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure($"Lỗi khi cập nhật thông tin học sinh: {ex.Message}");
+        }
+
+    }
+
     public async Task<Result<StudentInfoDto>> GetByIdAsync(Guid id)
     {
         var studentResult = await studentRepository.GetByIdAsync(id);

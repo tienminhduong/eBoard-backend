@@ -108,4 +108,13 @@ public class ClassService(
         var subjects = await unitOfWork.SubjectRepository.GetAllSubjectsByClassAsync(classId);
         return mapper.Map<IEnumerable<SubjectDto>>(subjects);
     }
+
+    public async Task<Result> RemoveStudentFromClassAsync(Guid classId, Guid studentId)
+    {
+        var result = await unitOfWork.ClassRepository.RemoveStudentFromClassAsync(classId, studentId);
+        if (!result.IsSuccess)
+            return Result.Failure(result.ErrorMessage!);
+        await unitOfWork.SaveChangesAsync();
+        return Result.Success();
+    }
 }
