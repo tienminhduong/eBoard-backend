@@ -69,7 +69,6 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
         var classEntity = await query
             .Include(c => c.Teacher)
             .Include(c => c.Grade)
-            .AsNoTracking()
             .FirstOrDefaultAsync();
         
         return classEntity == null ? Result<Class>.Failure("Lớp không tồn tại") : Result<Class>.Success(classEntity);
@@ -78,6 +77,11 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
     public async Task<bool> ClassExistsAsync(Guid classId)
     {
         return await dbContext.Classes.AnyAsync(c => c.Id == classId);
+    }
+
+    public void UpdateClass(Class @class)
+    {
+        dbContext.Classes.Update(@class);
     }
 
     public async Task<Class> AddNewClassAsync(Class newClass)
@@ -120,6 +124,7 @@ public class ClassRepository(AppDbContext dbContext) : IClassRepository
             });
             classResult.Value!.CurrentStudentCount += 1;
         }
+        UpdateClass(classResult.Value!);
         return Result.Success();
     }
 

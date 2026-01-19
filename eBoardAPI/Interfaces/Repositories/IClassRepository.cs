@@ -11,6 +11,7 @@ public interface IClassRepository
     Task<IEnumerable<Student>> GetStudentsByClassAsync(Guid classId, int pageNumber, int pageSize);
     Task<Result<Class>> GetClassByIdAsync(Guid classId);
     Task<bool> ClassExistsAsync(Guid classId);
+    void UpdateClass(Class @class);
     
     Task<Class> AddNewClassAsync(Class newClass);
     Task<Result> AddNewStudentsToClassAsync(Guid classId, List<Guid> studentIds);
