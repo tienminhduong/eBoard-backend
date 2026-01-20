@@ -59,10 +59,10 @@ public static class ServiceCollectionExtension
             services.AddScoped<IFundIncomeRepository, FundIncomeRepository>();
             services.AddScoped<IFundIncomeDetailRepository, FundIncomeDetailRepository>();
             services.AddScoped<IFundExpenseRepository, FundExpenseRepository>();
-
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
             services.AddScoped<IScoreRepository, ScoreRepository>();
+            services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
@@ -80,6 +80,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IFundExpenseService, FundExpenseService>();
             services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<IScoreService, ScoreService>();
+            services.AddScoped<IAttendanceService, AttendanceService>();
             return services;
         }
         
