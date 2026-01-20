@@ -169,4 +169,15 @@ public class ClassFundController(IClassFundService classFundService,
         }
         return (result.Value != null) ? Ok(result.Value) : NotFound();
     }
+
+    [HttpPut("incomes/{fundIncomeId}")]
+    public async Task<ActionResult> UpdateFundIncomeById(Guid fundIncomeId, [FromBody] UpdateFundIncomeDto updateFundIncome)
+    {
+        var result = await fundIncomeService.UpdateFundIncomeAsync(fundIncomeId, updateFundIncome);
+        if(!result.IsSuccess)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        return NoContent();
+    }
 }

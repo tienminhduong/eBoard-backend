@@ -157,6 +157,10 @@ public static class ServiceCollectionExtension
             .ForMember(dest => dest.StartDate,
                 opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
         cfg.CreateMap<FundIncome, FundIncomeDto>();
+        cfg.CreateMap<UpdateFundIncomeDto, FundIncome>()
+            .ForMember(dest => dest.StartDate, opt => opt.MapFrom((src, dest) => src.StartDate == DateOnly.MinValue ? dest.StartDate : src.StartDate))
+            .ForMember(dest => dest.EndDate, opt => opt.MapFrom((src, dest) => src.EndDate == DateOnly.MinValue ? dest.EndDate : src.EndDate))
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
         cfg.CreateMap<CreateFundIncomeDetailDto, FundIncomeDetail>()
             .ForMember(dest => dest.ContributedAt, opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));

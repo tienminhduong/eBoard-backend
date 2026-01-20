@@ -81,5 +81,27 @@ namespace eBoardAPI.Services
             var fundIncomeDetailDtos = mapper.Map<IEnumerable<FundIncomeDetailDto>>(fundIncomeDetailsResult.Value);
             return Result<IEnumerable<FundIncomeDetailDto>>.Success(fundIncomeDetailDtos);
         }
+
+        public async Task<Result<FundIncomeDto>> UpdateFundIncomeAsync(Guid id, UpdateFundIncomeDto updatedFundIncome)
+        {
+            var existingFundIncomeResult = await fundIncomeRepository.GetByIdAsync(id);
+            if(!existingFundIncomeResult.IsSuccess)
+            {
+                return Result<FundIncomeDto>.Failure(existingFundIncomeResult.ErrorMessage!);
+            }
+            if(existingFundIncomeResult.Value == null)
+            {
+                return Result<FundIncomeDto>.Failure("Không tồn tại quỹ thu này");
+            }
+            var existingFundIncome = existingFundIncomeResult.Value;
+            mapper.Map(updatedFundIncome, existingFundIncome);
+            var updateResult = await fundIncomeRepository.UpdateAsync(existingFundIncome);
+            if(!updateResult.IsSuccess)
+            {
+                return Result<FundIncomeDto>.Failure(updateResult.ErrorMessage!);
+            }
+            var fundIncomeDto = mapper.Map<FundIncomeDto>(existingFundIncome);
+            return Result<FundIncomeDto>.Success(fundIncomeDto);
+        }
     }
 }
