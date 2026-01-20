@@ -17,7 +17,20 @@ namespace eBoardAPI.Controllers
             {
                 return BadRequest(result.ErrorMessage);
             }    
-            return Ok(result.Value);
+            return Created();
+        }
+
+        [HttpGet("violations/{violationId}")]
+        public async Task<ActionResult> GetViolationById(Guid violationId)
+        {
+            // Implementation for retrieving a violation by ID
+            var result = await violationService.GetViolationById(violationId);
+            if(!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }    
+            var violation = result.Value;
+            return violation is null ? NotFound() : Ok(violation);
         }
 
         [HttpPut("violations/{violationId}")]
@@ -29,7 +42,7 @@ namespace eBoardAPI.Controllers
             {
                 return BadRequest(result.ErrorMessage);
             }    
-            return Ok(result.Value);
+            return NoContent();
         }
 
         [HttpGet("/classes/{classId}/violations")]
@@ -66,6 +79,28 @@ namespace eBoardAPI.Controllers
             }
             var violations = result.Value!;
             return violations.Any() ? Ok(violations) : NotFound();
+        }
+
+        [HttpPost("violations/{violationId}/students/{studentId}/confirm")]
+        public async Task<ActionResult> ConfirmViolation(Guid violationId, Guid studentId)
+        {
+            var result = await violationService.ConfirmViolation(violationId, studentId);
+            if(!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            return NoContent();
+        }
+
+        [HttpGet("classes/{classId}/students/{studentId}/violations/summary")]
+        public async Task<ActionResult> GetSummaryViolation(Guid classId, Guid studentId)
+        {
+            var result = await violationService.GetSummaryViolation(classId, studentId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            return Ok(result.Value);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace eBoardAPI.Models.Violation
     public class ViolationDto
     {
         public Guid Id { get; set; }
-        public Guid StudentId { get; set; }
+        public IEnumerable<IdStudentPair> InvolvedStudents { get; set; } = new List<IdStudentPair>();
         public Guid ClassId { get; set; }
         public required string InChargeTeacherName { get; set; }
         public DateOnly ViolateDate { get; set; }
@@ -13,6 +13,10 @@ namespace eBoardAPI.Models.Violation
         public ViolationLevel ViolationLevel { get; set; }
         public string ViolationInfo { get; set; } = string.Empty;
         public string Penalty { get; set; } = string.Empty;
-        public bool SeenByParent { get; set; } = false;
+    }
+    public class IdStudentPair
+    {
+        public Guid StudentId { get; set; }
+        public string StudentName { get; set; } = string.Empty;
     }
 }

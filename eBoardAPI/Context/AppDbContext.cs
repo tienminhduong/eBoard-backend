@@ -25,6 +25,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ExamSchedule> ExamSchedules { get; set; }
     public DbSet<Attendance> Attendances { get; set; }
     public DbSet<AbsentRequest> AbsentRequests { get; set; }
+    public DbSet<ViolationStudent> ViolationStudents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
