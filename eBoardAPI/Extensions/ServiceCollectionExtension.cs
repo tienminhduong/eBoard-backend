@@ -6,6 +6,7 @@ using eBoardAPI.Helpers;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
+using eBoardAPI.Models.AbsentRequest;
 using eBoardAPI.Models.Attendance;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
@@ -64,9 +65,9 @@ public static class ServiceCollectionExtension
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
             services.AddScoped<IScoreRepository, ScoreRepository>();
-
             services.AddScoped<IViolationRepository, ViolationRepository>();
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+            services.AddScoped<IAbsentRequestRepository, AbsentRequestRepository>();
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
@@ -223,9 +224,16 @@ public static class ServiceCollectionExtension
         cfg.CreateMap<Attendance, AttendanceDto>()
             .ForMember(dest => dest.StudentName,
                 opt => opt.MapFrom(src => src.Student.LastName + " " + src.Student.FirstName));
+
+        cfg.CreateMap<CreateAbsentRequestDto, AbsentRequest>();
+        cfg.CreateMap<AbsentRequest, AbsentRequestDto>()
+            .ForMember(dest => dest.StudentName,
+                opt => opt.MapFrom(src => src.Student.LastName + " " + src.Student.FirstName))
+            .ForMember(dest => dest.ClassName,
+                opt => opt.MapFrom(src => src.Class.Name));
     }
   
-    static private void AddViolationDtoMapping(IMapperConfigurationExpression cfg)
+    private static void AddViolationDtoMapping(IMapperConfigurationExpression cfg)
     {
         cfg.CreateMap<Violation, ViolationDto>();
     }

@@ -1,17 +1,13 @@
 using eBoardAPI.Consts;
 
-namespace eBoardAPI.Entities;
+namespace eBoardAPI.Models.AbsentRequest;
 
-public class AbsentRequest
+public class CreateAbsentRequestDto
 {
-    public Guid Id { get; init; } = Guid.NewGuid();
     public Guid StudentId { get; set; }
-    public Student Student { get; set; } = null!;
     public Guid ClassId { get; set; }
-    public Class Class { get; set; } = null!;
     public DateOnly FromDate { get; set; }
     public DateOnly ToDate { get; set; }
     public string Reason { get; set; } = string.Empty;
     public string Notes { get; set; } = string.Empty;
-    public string Status { get; set; } = EAbsentRequestStatus.PENDING;
 }
