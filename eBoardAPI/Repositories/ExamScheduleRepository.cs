@@ -37,9 +37,17 @@ namespace eBoardAPI.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Result<ExamSchedule>> GetExamScheduleByIdAsync(Guid id)
+        public async Task<Result<ExamSchedule?>> GetExamScheduleByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var examSchedule = await dbContext.ExamSchedules.FindAsync(id);
+                return Result<ExamSchedule?>.Success(examSchedule);
+            }
+            catch(Exception ex)
+            {
+                return Result<ExamSchedule?>.Failure(ex.Message);
+            }
         }
 
         public Task<Result> UpdateAsync(ExamSchedule examSchedule)

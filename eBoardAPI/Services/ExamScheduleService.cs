@@ -28,9 +28,15 @@ namespace eBoardAPI.Services
             throw new NotImplementedException();
         }
 
-        public Task<Result<ExamScheduleDto>> GetExamScheduleById(Guid examScheduleId)
+        public async Task<Result<ExamScheduleDto>> GetExamScheduleById(Guid examScheduleId)
         {
-            throw new NotImplementedException();
+            var result = await examScheduleRepository.GetExamScheduleByIdAsync(examScheduleId);
+            if (!result.IsSuccess)
+            {
+                return Result<ExamScheduleDto>.Failure(result.ErrorMessage ?? "Exam schedule not found.");
+            }
+            var examScheduleDto = result.Value != null ? mapper.Map<ExamScheduleDto>(result.Value) : null;
+            return Result<ExamScheduleDto>.Success(examScheduleDto!);
         }
 
         public Task<Result<IEnumerable<ExamScheduleDto>>> GetExamSchedules(Guid classId, ExamScheduleFilter filter)

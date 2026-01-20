@@ -26,9 +26,13 @@ namespace eBoardAPI.Controllers
             var result = await examScheduleService.GetExamScheduleById(examScheduleId);
             if (result.IsSuccess)
             {
+                if(result.Value == null)
+                {
+                    return NotFound();
+                }
                 return Ok(result.Value);
             }
-            return NotFound();
+            return BadRequest(result.ErrorMessage);
         }
 
         [HttpGet("exams-schedule/classes/{classId}")]
