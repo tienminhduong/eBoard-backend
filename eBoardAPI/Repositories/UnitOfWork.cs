@@ -17,6 +17,7 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
     IAttendanceRepository? _attendanceRepository;
     IFundIncomeDetailRepository? _fundIncomeDetailRepository;
     IViolationRepository? _violationRepository;
+    IActivityRepository? _activityRepository;
 
     public IViolationRepository ViolationRepository
     {
@@ -133,6 +134,15 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
         {
             _absentRequestRepository ??= new AbsentRequestRepository(dbContext);
             return _absentRequestRepository;
+        }
+    }
+    
+    public IActivityRepository ActivityRepository
+    {
+        get
+        {
+            _activityRepository ??= new ActivityRepository(dbContext);
+            return _activityRepository;
         }
     }
 

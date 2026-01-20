@@ -1,12 +1,10 @@
-namespace eBoardAPI.Entities;
+namespace eBoardAPI.Models.Activity;
 
-public class ExtracurricularActivity
+public class CreateActivityDto
 {
-    public Guid Id { get; init; } = Guid.NewGuid();
     public Guid ClassId { get; set; }
-    public Class Class { get; set; } = null!;
-    public string Name { get; set; } = null!;
-    public string Location { get; set; } = null!;
+    public required string Name { get; set; }
+    public required string Location { get; set; }
     public int MaxParticipants { get; set; }
     public string InChargeTeacher { get; set; } = string.Empty;
     public DateTime StartTime { get; set; }
@@ -14,6 +12,4 @@ public class ExtracurricularActivity
     public int Cost { get; set; }
     public DateTime AssignDeadline { get; set; }
     public string Description { get; set; } = string.Empty;
-    
-    public ICollection<ActivityParticipant> Participants { get; set; } = [];
 }
