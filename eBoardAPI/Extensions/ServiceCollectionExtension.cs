@@ -70,6 +70,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IViolationRepository, ViolationRepository>();
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             services.AddScoped<IAbsentRequestRepository, AbsentRequestRepository>();
+            services.AddScoped<IActivityRepository, ActivityRepository>();
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
@@ -89,6 +90,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IScoreService, ScoreService>();
             services.AddScoped<IViolationService, ViolationService>();
             services.AddScoped<IAttendanceService, AttendanceService>();
+            services.AddScoped<IActivityService, ActivityService>();
             return services;
         }
         
