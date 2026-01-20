@@ -4,13 +4,13 @@ namespace eBoardAPI.Models.Violation
 {
     public class UpdateViolationDto
     {
-        public List<Guid> StudentId { get; set; } = null!;
-        public Guid ClassId { get; set; }
-        public string InChargeTeacherName { get; set; } = null!;
-        public DateOnly? ViolateDate { get; set; } = null!;
-        public string ViolationType { get; set; } = null!;
-        public ViolationLevel? ViolationLevel { get; set; } = null!;
-        public string ViolationInfo { get; set; } = null!;
-        public string Penalty { get; set; } = null!;
+        public required List<Guid> StudentIds { get; set; }
+        public required Guid ClassId { get; set; }
+        public required string InChargeTeacherName { get; set; }
+        public required DateOnly ViolateDate { get; set; }
+        public required string ViolationType { get; set; }
+        public required ViolationLevel ViolationLevel { get; set; }
+        public required string ViolationInfo { get; set; } = string.Empty;
+        public required string Penalty { get; set; } = string.Empty;
     }
 }

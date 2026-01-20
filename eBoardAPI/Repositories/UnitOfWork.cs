@@ -16,6 +16,16 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
     IScoreRepository? _scoreRepository;
     IAttendanceRepository? _attendanceRepository;
     IFundIncomeDetailRepository? _fundIncomeDetailRepository;
+    IViolationRepository? _violationRepository;
+
+    public IViolationRepository ViolationRepository
+    {
+        get
+        {
+            _violationRepository ??= new ViolationRepository(dbContext);
+            return _violationRepository;
+        }
+    }
     IAbsentRequestRepository? _absentRequestRepository;
 
     public IFundIncomeDetailRepository FundIncomeDetailRepository

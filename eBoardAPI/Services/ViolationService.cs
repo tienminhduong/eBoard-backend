@@ -5,22 +5,22 @@ using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Violation;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Net.WebSockets;
 
 namespace eBoardAPI.Services
 {
     public class ViolationService(IViolationRepository violationRepository,
+                                  IUnitOfWork unitOfWork,
                                   IMapper mapper) : IViolationService
     {
-        public async Task<Result<IEnumerable<ViolationDto>>> CreateNewViolation(CreateViolationDto createViolationDto)
+        public async Task<Result> CreateNewViolation(CreateViolationDto createViolationDto)
         {
-            // Create Violation entities for each student
-            // Cannot use AutoMapper here due to the list of StudentIds
-            var violationEntities = new List<Violation>();
-            foreach (var studentId in createViolationDto.StudentIds)
+            try
             {
+                // Create Violation entities and ViolationStudent for each student
+                // Cannot use AutoMapper here due to the list of StudentIds
                 var violationEntity = new Violation
                 {
-                    StudentId = studentId,
                     ClassId = createViolationDto.ClassId,
                     InChargeTeacherName = createViolationDto.InChargeTeacherName,
                     ViolateDate = createViolationDto.ViolateDate,
@@ -28,16 +28,67 @@ namespace eBoardAPI.Services
                     ViolationLevel = createViolationDto.ViolationLevel,
                     ViolationInfo = createViolationDto.ViolationInfo,
                     Penalty = createViolationDto.Penalty,
+                    SeenByParent = false,
                 };
-                violationEntities.Add(violationEntity);
+                var result = await violationRepository.AddAsync(violationEntity);
+                if(!result.IsSuccess)
+                {
+                    unitOfWork.Dispose();
+                    return Result.Failure(result.ErrorMessage ?? "Failed to create violation.");
+                }
+                var violationEntityCreated = result.Value;
+                var violationStudentEntities = createViolationDto.StudentIds.Select(studentId => new ViolationStudent
+                {
+                    StudentId = studentId,
+                    ViolationId = violationEntityCreated!.Id
+                }).ToList();
+                var addViolationStudentResult = await violationRepository.AddRangeViolationStudentsAsync(violationStudentEntities);
+                if(!addViolationStudentResult.IsSuccess)
+                {
+                    unitOfWork.Dispose();
+                    return Result.Failure(addViolationStudentResult.ErrorMessage ?? "Failed to create violation-student associations.");
+                }
+                await unitOfWork.SaveChangesAsync();
+                return Result.Success();
             }
-            var result = await violationRepository.AddRangeAsync(violationEntities);
-            if (!result.IsSuccess)
+            catch (Exception ex)
             {
-                return Result<IEnumerable<ViolationDto>>.Failure(result.ErrorMessage ?? "Failed to create violations.");
+                unitOfWork.Dispose();
+                return Result.Failure($"An error occurred while creating violations: {ex.Message}");
             }
-            var violationDtos = mapper.Map<IEnumerable<ViolationDto>>(result.Value);
-            return Result<IEnumerable<ViolationDto>>.Success(violationDtos);
+        }
+
+        public async Task<Result<ViolationDto>> GetViolationById(Guid violationId)
+        {
+            var result = await violationRepository.GetByIdAsync(violationId);
+            if(!result.IsSuccess)
+            {
+                return Result<ViolationDto>.Failure(result.ErrorMessage ?? "Failed to retrieve violation.");
+            }
+            var violationEntity = result.Value;
+            if(violationEntity == null)
+            {
+                return Result<ViolationDto>.Failure("Không tìm thấy vi phạm");
+            }
+            // Map to DTO
+            var violationDto = new ViolationDto
+            {
+                Id = violationEntity.Id,
+                ClassId = violationEntity.ClassId,
+                InChargeTeacherName = violationEntity.InChargeTeacherName,
+                ViolateDate = violationEntity.ViolateDate,
+                ViolationType = violationEntity.ViolationType,
+                ViolationLevel = violationEntity.ViolationLevel,
+                ViolationInfo = violationEntity.ViolationInfo,
+                Penalty = violationEntity.Penalty,
+                SeenByParent = violationEntity.SeenByParent,
+                InvolvedStudents = violationEntity.Students.Select(s => new IdStudentPair
+                {
+                    StudentId = s.Student.Id,
+                    StudentName = s.Student.FirstName + " " + s.Student.LastName
+                }).ToList()
+            };
+            return Result<ViolationDto>.Success(violationDto);
         }
 
         public Task<Result<IEnumerable<ViolationDto>>> GetViolationsByClassId(Guid classId)
@@ -55,20 +106,98 @@ namespace eBoardAPI.Services
             throw new NotImplementedException();
         }
 
-        public async Task<Result<IEnumerable<ViolationDto>>> UpdateViolation(Guid violationId, UpdateViolationDto updateViolationDto)
+        public async Task<Result> UpdateViolation(Guid violationId, UpdateViolationDto updateViolationDto)
         {
-            return Result<IEnumerable<ViolationDto>>.Failure("Not implemented yet");
-            var violationEntityResult = await violationRepository.GetRangeByIdsAsync(updateViolationDto.StudentId);
-            if(!violationEntityResult.IsSuccess)
+            try
             {
-                return Result<IEnumerable<ViolationDto>>.Failure(violationEntityResult.ErrorMessage ?? "Failed to retrieve violations.");
+                var violationResult = await violationRepository.GetByIdAsync(violationId);
+                if (!violationResult.IsSuccess)
+                {
+                    unitOfWork.Dispose();
+                    return Result.Failure(violationResult.ErrorMessage ?? "Failed to retrieve violation.");
+                }
+
+                var violationEntity = violationResult.Value;
+                if (violationEntity == null)
+                {
+                    unitOfWork.Dispose();
+                    return Result.Failure("Violation not found.");
+                }
+
+                var violationStudentsResult = await violationRepository.GetViolationStudentByViolationIdAsync(violationId);
+                if (!violationStudentsResult.IsSuccess)
+                {
+                    unitOfWork.Dispose();
+                    return Result.Failure(violationStudentsResult.ErrorMessage ?? "Failed to retrieve violation-student associations.");
+                }
+
+                var studentIdsToUpdate = updateViolationDto.StudentIds;
+                var studentIdsExisting = violationStudentsResult.Value?.Select(vs => vs.StudentId).ToList();
+
+                var violationStudentsToRemove = new List<Guid>();
+                var violationStudentsToAdd = new List<Guid>();
+                // Determine which students to remove
+                foreach (var vs in studentIdsExisting)
+                {
+                    var isExist = studentIdsToUpdate.Contains(vs);
+                    if (!isExist)
+                    {
+                        violationStudentsToRemove.Add(vs);
+                    }
+                }
+                // Determine which students to add
+                foreach (var su in studentIdsToUpdate)
+                {
+                    var isExist = studentIdsExisting!.Contains(su);
+                    if (!isExist)
+                    {
+                        violationStudentsToAdd.Add(su);
+                    }
+                }
+                // Remove old ViolationStudent associations
+                var removeViolationStudents = violationStudentsToRemove.Select(studentId => new ViolationStudent
+                {
+                    StudentId = studentId,
+                    ViolationId = violationId
+                }).ToList();
+                var addViolationStudents = violationStudentsToAdd.Select(studentId => new ViolationStudent
+                {
+                    StudentId = studentId,
+                    ViolationId = violationId
+                }).ToList();
+                var removeResult = await violationRepository.RemoveRangeViolationStudentsAsync(removeViolationStudents);
+                if (!removeResult.IsSuccess)
+                {
+                    unitOfWork.Dispose();
+                    return Result.Failure(removeResult.ErrorMessage ?? "Failed to remove old violation-student associations.");
+                }
+                var addResult = await violationRepository.AddRangeViolationStudentsAsync(addViolationStudents);
+                if (!addResult.IsSuccess)
+                {
+                    unitOfWork.Dispose();
+                    return Result.Failure(addResult.ErrorMessage ?? "Failed to add new violation-student associations.");
+                }
+                // Update Violation entity
+                violationEntity.InChargeTeacherName = updateViolationDto.InChargeTeacherName;
+                violationEntity.ViolateDate = updateViolationDto.ViolateDate;
+                violationEntity.ViolationType = updateViolationDto.ViolationType;
+                violationEntity.ViolationLevel = updateViolationDto.ViolationLevel;
+                violationEntity.ViolationInfo = updateViolationDto.ViolationInfo;
+                violationEntity.Penalty = updateViolationDto.Penalty;
+                var updateResult = await violationRepository.UpdateAsync(violationEntity);
+                await unitOfWork.SaveChangesAsync();
+                if (!updateResult.IsSuccess)
+                {
+                    unitOfWork.Dispose();
+                    return Result.Failure(updateResult.ErrorMessage ?? "Failed to update violation.");
+                }
+                return Result.Success();
             }
-            var violationEntities = violationEntityResult.Value;
-            if(violationEntities == null || !violationEntities.Any())
+            catch (Exception ex)
             {
-                return Result<IEnumerable<ViolationDto>>.Failure("Không tìm thấy học sinh");
+                unitOfWork.Dispose();
+                return Result.Failure($"An error occurred while updating violation: {ex.Message}");
             }
-            
         }
     }
 }
