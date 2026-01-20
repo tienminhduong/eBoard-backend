@@ -67,7 +67,7 @@ namespace eBoardAPI.Repositories
 
         public async Task<Result> UpdateAsync(FundIncome fundIncome)
         {
-            dbContext.FundIncomes.Update(fundIncome);
+            //dbContext.FundIncomes.Update(fundIncome);
             await dbContext.SaveChangesAsync();
             return Result.Success();
         }

@@ -1,0 +1,40 @@
+﻿using eBoardAPI.Common;
+using eBoardAPI.Context;
+using eBoardAPI.Entities;
+using eBoardAPI.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
+
+namespace eBoardAPI.Repositories
+{
+    public class ViolationRepository(AppDbContext dbContext) : IViolationRepository
+    {
+        public async Task<Result<IEnumerable<Violation>>> AddRangeAsync(IEnumerable<Violation> violations)
+        {
+            try
+            {
+                await dbContext.Violations.AddRangeAsync(violations);
+                await dbContext.SaveChangesAsync();
+                return Result<IEnumerable<Violation>>.Success(violations);
+            }
+            catch
+            {
+                return Result<IEnumerable<Violation>>.Failure("Lỗi trong quá trình thêm vi phạm");
+            }
+        }
+
+        public async Task<Result<IEnumerable<Violation>>> GetRangeByIdsAsync(IEnumerable<Guid> ids)
+        {
+            try
+            {
+                var result = await dbContext.Violations
+                    .Where(v => ids.Contains(v.Id))
+                    .ToListAsync();
+                return Result<IEnumerable<Violation>>.Success(result);
+            }
+            catch
+            {
+                return Result<IEnumerable<Violation>>.Failure("Lỗi trong quá trình lấy dữ liệu");
+            }
+        }
+    }
+}

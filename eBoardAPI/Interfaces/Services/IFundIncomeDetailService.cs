@@ -10,5 +10,6 @@ namespace eBoardAPI.Interfaces.Services
         Task<Result<IEnumerable<FundIncomeDetailDto>>> GetFundIncomeDetailsByIncomeIdAndStudentIdAsync(Guid incomeId, Guid studentId);
         Task<Result<IEnumerable<StudentFundIncomeSummary>>> GetAllFundIncomeDetailsByIdFundIncomeAsync(Guid fundIncomeId);
         Task<Result<FundIncomeDetailDto>> CreateContributeFundIncome(Guid fundIncomeId, ContributeFundIncomeDto contributeFund);
+        Task<Result> UpdateFundIncomeDetailAsync(Guid incomeDetailId, UpdateFundIncomeDetailDto updateFundIncomeDetail);
     }
 }
