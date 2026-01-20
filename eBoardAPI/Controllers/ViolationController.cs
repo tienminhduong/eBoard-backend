@@ -42,7 +42,7 @@ namespace eBoardAPI.Controllers
             {
                 return BadRequest(result.ErrorMessage);
             }    
-            return Ok(result.Value);
+            return NoContent();
         }
 
         [HttpGet("/classes/{classId}/violations")]

@@ -69,6 +69,7 @@ namespace eBoardAPI.Repositories
             {
                 var violation = await dbContext.Violations
                     .AsNoTracking()
+                    .Where(v => v.Id == id)
                     .Include(v => v.Students)
                     .ThenInclude(vs => vs.Student)
                     .FirstOrDefaultAsync();
@@ -81,6 +82,48 @@ namespace eBoardAPI.Repositories
             catch
             {
                 return Result<Violation>.Failure("Lỗi trong quá trình lấy dữ liệu");
+            }
+        }
+
+        public async Task<Result<IEnumerable<ViolationStudent>>> GetViolationStudentByViolationIdAsync(Guid id)
+        {
+            try
+            {
+                var violationStudents = await dbContext.ViolationStudents
+                    .AsNoTracking()
+                    .Where(vs => vs.ViolationId == id)
+                    .ToListAsync();
+                return Result<IEnumerable<ViolationStudent>>.Success(violationStudents);
+            }
+            catch
+            {
+                return Result<IEnumerable<ViolationStudent>>.Failure("Lỗi trong quá trình lấy dữ liệu");
+            }
+        }
+
+        public async Task<Result> RemoveRangeViolationStudentsAsync(IEnumerable<ViolationStudent> violationStudent)
+        {
+            try
+            {
+                dbContext.ViolationStudents.RemoveRange(violationStudent);
+                return Result.Success();
+            }
+            catch
+            {
+                return Result.Failure("Lỗi trong quá trình xóa vi phạm cho học sinh");
+            }
+        }
+
+        public async Task<Result> UpdateAsync(Violation violation)
+        {
+            try
+            {
+                dbContext.Violations.Update(violation);
+                return Result.Success();
+            }
+            catch
+            {
+                return Result.Failure("Lỗi trong quá trình cập nhật vi phạm");
             }
         }
     }

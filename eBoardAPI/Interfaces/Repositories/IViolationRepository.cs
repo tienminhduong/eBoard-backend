@@ -10,5 +10,8 @@ namespace eBoardAPI.Interfaces.Repositories
         Task<Result<Violation>> AddAsync(Violation violation);
         Task<Result> AddRangeViolationStudentsAsync(IEnumerable<ViolationStudent> violationStudents);
         Task<Result<Violation>> GetByIdAsync(Guid id);
+        Task<Result<IEnumerable<ViolationStudent>>> GetViolationStudentByViolationIdAsync(Guid violationId);
+        Task<Result> RemoveRangeViolationStudentsAsync(IEnumerable<ViolationStudent> violationStudents);
+        Task<Result> UpdateAsync(Violation violation);
     }
 }
