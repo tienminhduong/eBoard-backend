@@ -13,6 +13,29 @@ namespace eBoardAPI.Services
                                   IUnitOfWork unitOfWork,
                                   IMapper mapper) : IViolationService
     {
+        public async Task<Result> ConfirmViolation(Guid violationId, Guid studentId)
+        {
+            var result = await violationRepository.GetViolationStudentByIds(violationId, studentId);
+            if(!result.IsSuccess)
+            {
+                return Result.Failure(result.ErrorMessage ?? "Failed to retrieve violation.");
+            }
+            var violationStudentEntity = result.Value;
+            if(violationStudentEntity == null)
+            {
+                return Result.Failure("Không tìm thấy vi phạm");
+            }
+
+            violationStudentEntity.SeenByParent = true;
+            var updateResult = await violationRepository.UpdateAsync(violationStudentEntity);
+
+            if(!updateResult.IsSuccess)
+            {
+                return Result.Failure(updateResult.ErrorMessage ?? "Failed to update violation.");
+            }
+            return Result.Success();
+        }
+
         public async Task<Result> CreateNewViolation(CreateViolationDto createViolationDto)
         {
             try
@@ -27,8 +50,7 @@ namespace eBoardAPI.Services
                     ViolationType = createViolationDto.ViolationType,
                     ViolationLevel = createViolationDto.ViolationLevel,
                     ViolationInfo = createViolationDto.ViolationInfo,
-                    Penalty = createViolationDto.Penalty,
-                    SeenByParent = false,
+                    Penalty = createViolationDto.Penalty
                 };
                 var result = await violationRepository.AddAsync(violationEntity);
                 if(!result.IsSuccess)
@@ -58,6 +80,16 @@ namespace eBoardAPI.Services
             }
         }
 
+        public async Task<Result<SummaryViolation>> GetSummaryViolation(Guid classId, Guid studentId)
+        {
+            var result = await violationRepository.GetSummaryViolationAsync(classId, studentId);
+            if(!result.IsSuccess)
+            {
+                return Result<SummaryViolation>.Failure(result.ErrorMessage ?? "Failed to retrieve summary violation.");
+            }
+            return Result<SummaryViolation>.Success(result.Value!);
+        }
+
         public async Task<Result<ViolationDto>> GetViolationById(Guid violationId)
         {
             var result = await violationRepository.GetByIdAsync(violationId);
@@ -81,7 +113,6 @@ namespace eBoardAPI.Services
                 ViolationLevel = violationEntity.ViolationLevel,
                 ViolationInfo = violationEntity.ViolationInfo,
                 Penalty = violationEntity.Penalty,
-                SeenByParent = violationEntity.SeenByParent,
                 InvolvedStudents = violationEntity.Students.Select(s => new IdStudentPair
                 {
                     StudentId = s.Student.Id,

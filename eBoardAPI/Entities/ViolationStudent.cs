@@ -9,5 +9,6 @@ namespace eBoardAPI.Entities
         public Violation Violation { get; set; } = null!;
         public Guid StudentId { get; set; }
         public Student Student { get; set; } = null!;
+        public bool SeenByParent { get; set; } = false;
     }
 }

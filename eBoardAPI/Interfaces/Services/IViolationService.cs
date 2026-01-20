@@ -11,5 +11,7 @@ namespace eBoardAPI.Interfaces.Services
         Task<Result<ViolationsStatsDto>> GetViolationStatsByClassId(Guid classId);
         Task<Result<IEnumerable<ViolationDto>>> GetViolationsByClassIdAndStudentId(Guid classId, Guid studentId);
         Task<Result<ViolationDto>> GetViolationById(Guid violationId);
+        Task<Result> ConfirmViolation(Guid violationId, Guid studentId);
+        Task<Result<SummaryViolation>> GetSummaryViolation(Guid classId, Guid studentId);
     }
 }
