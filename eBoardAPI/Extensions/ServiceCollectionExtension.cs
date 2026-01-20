@@ -6,6 +6,7 @@ using eBoardAPI.Helpers;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
+using eBoardAPI.Models.Attendance;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
 using eBoardAPI.Models.FundExpense;
@@ -104,6 +105,8 @@ public static class ServiceCollectionExtension
                 AddFundDtoMappings(cfg);
                 AddClassPeriodDtoMappings(cfg);
                 AddScoreSheetDtoMappings(cfg);
+                AddAttendanceDtoMappings(cfg);
+                
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
         }
@@ -203,5 +206,12 @@ public static class ServiceCollectionExtension
 
         cfg.CreateMap<ScoreSheetDetail, SubjectScoreDto>()
             .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.Subject.Name));
+    }
+    
+    private static void AddAttendanceDtoMappings(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<Attendance, AttendanceDto>()
+            .ForMember(dest => dest.StudentName,
+                opt => opt.MapFrom(src => src.Student.LastName + " " + src.Student.FirstName));
     }
 }

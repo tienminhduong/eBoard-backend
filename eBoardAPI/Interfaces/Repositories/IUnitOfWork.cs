@@ -11,6 +11,7 @@ public interface IUnitOfWork : IDisposable
     IScheduleRepository ScheduleRepository { get; }
     ISubjectRepository SubjectRepository { get; }
     IScoreRepository ScoreRepository { get; }
+    IAttendanceRepository AttendanceRepository { get; }
     
     Task<int> SaveChangesAsync();
 }

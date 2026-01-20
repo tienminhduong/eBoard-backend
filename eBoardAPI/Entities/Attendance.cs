@@ -6,7 +6,9 @@ public class Attendance
 {
     public Guid Id { get; init; } = Guid.NewGuid();
     public Guid StudentId { get; set; }
+    public Student Student { get; set; } = null!;
     public Guid ClassId { get; set; }
+    public Class Class { get; set; } = null!;
     public DateOnly Date { get; set; }
     public string Status { get; set; } = EAttendanceStatus.PRESENT;
     public string AbsenceReason { get; set; } = string.Empty;
