@@ -16,6 +16,7 @@ namespace eBoardAPI.Repositories
             {
                 var incomeDetail = await dbContext.FundIncomeDetails
                     .AsNoTracking()
+                    .Include(fid => fid.FundIncome)
                     .FirstOrDefaultAsync(fid => fid.Id == incomeDetailId);
                 return Result<FundIncomeDetail?>.Success(incomeDetail);
             }
@@ -194,6 +195,12 @@ namespace eBoardAPI.Repositories
             {
                 return Result<FundIncomeDetail>.Failure($"Error adding FundIncomeDetail: {ex.Message}");
             }
+        }
+
+        public async Task<Result> UpdateAsync(FundIncomeDetail fundIncomeDetail)
+        {
+            dbContext.FundIncomeDetails.Update(fundIncomeDetail);
+            return Result.Success();
         }
     }
 }
