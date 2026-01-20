@@ -23,6 +23,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ScoreSheetDetail> ScoreSheetDetails { get; set; }
     public DbSet<Violation> Violations { get; set; }
     public DbSet<ExamSchedule> ExamSchedules { get; set; }
+    public DbSet<Attendance> Attendances { get; set; }
+    public DbSet<AbsentRequest> AbsentRequests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,5 +32,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.Entity<ClassPeriod>()
             .HasIndex(e => new { e.IsMorningPeriod, e.PeriodNumber, e.DayOfWeek, e.ClassId }).IsUnique();
+        
+        modelBuilder.Entity<Attendance>()
+            .HasIndex(e => new { e.StudentId, e.ClassId, e.Date }).IsUnique();
     }
 }
