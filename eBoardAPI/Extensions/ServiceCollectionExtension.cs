@@ -20,6 +20,7 @@ using eBoardAPI.Repositories;
 using eBoardAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using Refit;
 
 namespace eBoardAPI.Extensions;
 
@@ -53,7 +54,6 @@ public static class ServiceCollectionExtension
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<ITeacherRepository, TeacherRepository>();
             services.AddScoped<IParentRepository, ParentRepository>();
-            services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IClassRepository, ClassRepository>();
             services.AddScoped<IClassFundRepository, ClassFundRepository>();
             services.AddScoped<IFundIncomeRepository, FundIncomeRepository>();
@@ -73,7 +73,6 @@ public static class ServiceCollectionExtension
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<ITeacherService, TeacherService>();
             services.AddScoped<IParentService, ParentService>();
-            services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IClassService, ClassService>();
             services.AddScoped<IClassFundService, ClassFundService>();
             services.AddScoped<IFundIncomeService, FundIncomeService>();
@@ -122,7 +121,16 @@ public static class ServiceCollectionExtension
             return services;
         }
 
-        
+        public IServiceCollection AddProvinceApiClient()
+        {
+            var baseUrl = Environment.GetEnvironmentVariable(EnvKey.VIETNAM_PROVINCE_API_URL);
+            services.AddRefitClient<IAddressService>()
+                .ConfigureHttpClient(c =>
+                {
+                    c.BaseAddress = new Uri(baseUrl ?? "");
+                });
+            return services;
+        }
     }
 
     private static void AddStudentDtoMappings(IMapperConfigurationExpression cfg)

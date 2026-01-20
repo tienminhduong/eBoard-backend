@@ -14,7 +14,8 @@ builder.Services
     .AddRepositories()
     .AddServices()
     .AddAutoMapper()
-    .AddCorsPolicy();
+    .AddCorsPolicy()
+    .AddProvinceApiClient();
 
 var app = builder.Build();
 
