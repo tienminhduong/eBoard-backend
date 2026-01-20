@@ -10,6 +10,7 @@ using eBoardAPI.Models.AbsentRequest;
 using eBoardAPI.Models.Attendance;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
+using eBoardAPI.Models.ExamSchedule;
 using eBoardAPI.Models.FundExpense;
 using eBoardAPI.Models.FundIncome;
 using eBoardAPI.Models.Parent;
@@ -70,7 +71,8 @@ public static class ServiceCollectionExtension
             services.AddScoped<IViolationRepository, ViolationRepository>();
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             services.AddScoped<IAbsentRequestRepository, AbsentRequestRepository>();
-            
+            services.AddScoped<IExamScheduleRepository, ExamScheduleRepository>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
@@ -89,6 +91,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IScoreService, ScoreService>();
             services.AddScoped<IViolationService, ViolationService>();
             services.AddScoped<IAttendanceService, AttendanceService>();
+            services.AddScoped<IExamScheduleService, ExamScheduleService>();
             return services;
         }
         
@@ -115,6 +118,7 @@ public static class ServiceCollectionExtension
                 AddAttendanceDtoMappings(cfg);
                 
                 AddViolationDtoMapping(cfg);
+                AddExamScheduleDtoMappings(cfg);
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
         }
@@ -238,5 +242,11 @@ public static class ServiceCollectionExtension
     private static void AddViolationDtoMapping(IMapperConfigurationExpression cfg)
     {
         cfg.CreateMap<Violation, ViolationDto>();
+    }
+
+    private static void AddExamScheduleDtoMappings(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<CreateExamScheduleDto, ExamSchedule>();
+        cfg.CreateMap<ExamSchedule, ExamScheduleDto>();
     }
 }
