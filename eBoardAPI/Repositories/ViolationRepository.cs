@@ -62,5 +62,26 @@ namespace eBoardAPI.Repositories
                 return Result<IEnumerable<Violation>>.Failure("Lỗi trong quá trình lấy dữ liệu");
             }
         }
+
+        public async Task<Result<Violation>> GetByIdAsync(Guid id)
+        {
+            try
+            {
+                var violation = await dbContext.Violations
+                    .AsNoTracking()
+                    .Include(v => v.Students)
+                    .ThenInclude(vs => vs.Student)
+                    .FirstOrDefaultAsync();
+                if (violation == null)
+                {
+                    return Result<Violation>.Failure("Vi phạm không tồn tại");
+                }
+                return Result<Violation>.Success(violation);
+            }
+            catch
+            {
+                return Result<Violation>.Failure("Lỗi trong quá trình lấy dữ liệu");
+            }
+        }
     }
 }

@@ -18,6 +18,6 @@
         public string ViolationInfo { get; set; } = string.Empty;
         public string Penalty { get; set; } = string.Empty;
         public bool SeenByParent { get; set; } = false;
-        public ICollection<ViolationStudent> ViolationStudents { get; set; } = new List<ViolationStudent>();
+        public ICollection<ViolationStudent> Students { get; set; } = new List<ViolationStudent>();
     }
 }

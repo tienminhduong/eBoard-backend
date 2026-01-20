@@ -57,6 +57,39 @@ namespace eBoardAPI.Services
             }
         }
 
+        public async Task<Result<ViolationDto>> GetViolationById(Guid violationId)
+        {
+            var result = await violationRepository.GetByIdAsync(violationId);
+            if(!result.IsSuccess)
+            {
+                return Result<ViolationDto>.Failure(result.ErrorMessage ?? "Failed to retrieve violation.");
+            }
+            var violationEntity = result.Value;
+            if(violationEntity == null)
+            {
+                return Result<ViolationDto>.Failure("Không tìm thấy vi phạm");
+            }
+            // Map to DTO
+            var violationDto = new ViolationDto
+            {
+                Id = violationEntity.Id,
+                ClassId = violationEntity.ClassId,
+                InChargeTeacherName = violationEntity.InChargeTeacherName,
+                ViolateDate = violationEntity.ViolateDate,
+                ViolationType = violationEntity.ViolationType,
+                ViolationLevel = violationEntity.ViolationLevel,
+                ViolationInfo = violationEntity.ViolationInfo,
+                Penalty = violationEntity.Penalty,
+                SeenByParent = violationEntity.SeenByParent,
+                InvolvedStudents = violationEntity.Students.Select(s => new IdStudentPair
+                {
+                    StudentId = s.Student.Id,
+                    StudentName = s.Student.FirstName + " " + s.Student.LastName
+                }).ToList()
+            };
+            return Result<ViolationDto>.Success(violationDto);
+        }
+
         public Task<Result<IEnumerable<ViolationDto>>> GetViolationsByClassId(Guid classId)
         {
             throw new NotImplementedException();

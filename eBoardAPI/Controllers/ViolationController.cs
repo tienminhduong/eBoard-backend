@@ -20,6 +20,19 @@ namespace eBoardAPI.Controllers
             return Created();
         }
 
+        [HttpGet("violations/{violationId}")]
+        public async Task<ActionResult> GetViolationById(Guid violationId)
+        {
+            // Implementation for retrieving a violation by ID
+            var result = await violationService.GetViolationById(violationId);
+            if(!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }    
+            var violation = result.Value;
+            return violation is null ? NotFound() : Ok(violation);
+        }
+
         [HttpPut("violations/{violationId}")]
         public async Task<ActionResult> UpdateViolation(Guid violationId, UpdateViolationDto updateViolationDto)
         {
