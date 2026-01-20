@@ -22,14 +22,18 @@ namespace eBoardAPI.Repositories
             }
         }
 
-        public Task<Result> DeleteAsync(ExamSchedule examSchedule)
+        public async Task<Result> DeteleAsync(ExamSchedule examSchedule)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result> DeteleAsync(ExamSchedule examSchedule)
-        {
-            throw new NotImplementedException();
+            try
+            {
+                dbContext.ExamSchedules.Remove(examSchedule);
+                await dbContext.SaveChangesAsync();
+                return Result.Success();
+            }
+            catch(Exception ex)
+            {
+                return Result.Failure(ex.Message);
+            }
         }
 
         public Task<Result<IEnumerable<ExamSchedule>>> GetExamScheduleByClassIdAndQuery(Guid classId, ExamScheduleFilter filter)

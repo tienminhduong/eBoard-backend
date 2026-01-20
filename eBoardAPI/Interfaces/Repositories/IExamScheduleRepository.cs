@@ -11,6 +11,5 @@ namespace eBoardAPI.Interfaces.Repositories
         Task<Result<ExamSchedule?>> GetExamScheduleByIdAsync(Guid id);
         Task<Result<IEnumerable<ExamSchedule>>> GetExamScheduleByClassIdAndQuery(Guid classId, ExamScheduleFilter filter);
         Task<Result> UpdateAsync(ExamSchedule examSchedule);
-        Task<Result> DeleteAsync(ExamSchedule examSchedule);
     }
 }

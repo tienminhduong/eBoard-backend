@@ -23,9 +23,19 @@ namespace eBoardAPI.Services
             return Result<ExamScheduleDto>.Success(examScheduleDto);
         }
 
-        public Task<Result> DeleteExamSchedule(Guid id)
+        public async Task<Result> DeleteExamSchedule(Guid id)
         {
-            throw new NotImplementedException();
+            var examScheduleResult = await examScheduleRepository.GetExamScheduleByIdAsync(id);
+            if(!examScheduleResult.IsSuccess || examScheduleResult.Value == null)
+            {
+                return Result.Failure(examScheduleResult.ErrorMessage ?? "Exam schedule not found.");
+            }
+            var deleteResult = await examScheduleRepository.DeteleAsync(examScheduleResult.Value);
+            if(!deleteResult.IsSuccess)
+            {
+                return Result.Failure(deleteResult.ErrorMessage ?? "Failed to delete exam schedule.");
+            }
+            return Result.Success();
         }
 
         public async Task<Result<ExamScheduleDto>> GetExamScheduleById(Guid examScheduleId)
