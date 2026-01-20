@@ -49,13 +49,21 @@ public class AttendanceService(
             return Result<AttendanceInfoByClassDto>.Failure("Lớp học không tồn tại.");
         
         var students = await unitOfWork.ClassRepository.GetStudentsByClassAsync(dto.ClassId, 1, 200);
+        
         // check from absent request, if accepted, create with status absent
+        var absentRequests = await unitOfWork
+            .AbsentRequestRepository
+            .GetAcceptedAbsentRequestsByDateAsync(dto.ClassId, dto.Date);
+        var absentRequestMap = absentRequests.ToDictionary(ar => ar.StudentId);
         
         var attendances = students.Select(student => new Attendance
         {
             ClassId = dto.ClassId,
             StudentId = student.Id,
             Date = dto.Date,
+            Status = absentRequestMap.ContainsKey(student.Id) ? EAttendanceStatus.ABSENT : EAttendanceStatus.PRESENT,
+            AbsenceReason = absentRequestMap.TryGetValue(student.Id, out var reasonValue) ? reasonValue.Reason : string.Empty,
+            Notes = absentRequestMap.TryGetValue(student.Id, out var notesValue) ? notesValue.Notes : string.Empty,
         }).ToList();
         
         await unitOfWork.AttendanceRepository.CreateAttendancesAsync(attendances);

@@ -1,4 +1,5 @@
 using eBoardAPI.Common;
+using eBoardAPI.Consts;
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
@@ -28,6 +29,18 @@ public class AbsentRequestRepository(AppDbContext dbContext) : IAbsentRequestRep
             .Include(a => a.Student)
             .Include(a => a.Class)
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<AbsentRequest>> GetAcceptedAbsentRequestsByDateAsync(Guid classId, DateOnly date)
+    {
+        var query = from request in dbContext.AbsentRequests
+                    where request.ClassId == classId
+                          && request.FromDate <= date
+                          && request.ToDate >= date
+                            && request.Status == EAbsentRequestStatus.APPROVED
+                    select request;
+
+        return await query.ToListAsync();
     }
 
     public async Task CreateAbsentRequestAsync(AbsentRequest absentRequest)
