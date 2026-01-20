@@ -126,5 +126,52 @@ namespace eBoardAPI.Repositories
                 return Result.Failure("Lỗi trong quá trình cập nhật vi phạm");
             }
         }
+
+        public async Task<Result> UpdateAndSaveAsync(Violation violation)
+        {
+            try
+            {
+                dbContext.Violations.Update(violation);
+                await dbContext.SaveChangesAsync();
+                return Result.Success();
+            }
+            catch
+            {
+                return Result.Failure("Lỗi trong quá trình cập nhật vi phạm");
+            }
+        }
+
+        public async Task<Result<ViolationStudent>>GetViolationStudentByIds(Guid violationId, Guid studentId)
+        {
+            try
+            {
+                var violationStudent = await dbContext.ViolationStudents
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(vs => vs.ViolationId == violationId && vs.StudentId == studentId);
+                if (violationStudent == null)
+                {
+                    return Result<ViolationStudent>.Failure("Vi phạm cho học sinh không tồn tại");
+                }
+                return Result<ViolationStudent>.Success(violationStudent);
+            }
+            catch
+            {
+                return Result<ViolationStudent>.Failure("Lỗi trong quá trình lấy dữ liệu");
+            }
+        }
+
+        public async Task<Result> UpdateAsync(ViolationStudent violationStudent)
+        {
+            try
+            {
+                dbContext.ViolationStudents.Update(violationStudent);
+                await dbContext.SaveChangesAsync();
+                return Result.Success();
+            }
+            catch
+            {
+                return Result.Failure("Lỗi trong quá trình cập nhật vi phạm cho học sinh");
+            }
+        }
     }
 }

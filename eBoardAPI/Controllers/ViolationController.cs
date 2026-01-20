@@ -80,5 +80,16 @@ namespace eBoardAPI.Controllers
             var violations = result.Value!;
             return violations.Any() ? Ok(violations) : NotFound();
         }
+
+        [HttpPost("violations/{violationId}/students/{studentId}/confirm")]
+        public async Task<ActionResult> ConfirmViolation(Guid violationId, Guid studentId)
+        {
+            var result = await violationService.ConfirmViolation(violationId, studentId);
+            if(!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            return NoContent();
+        }
     }
 }
