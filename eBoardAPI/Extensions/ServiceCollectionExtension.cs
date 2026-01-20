@@ -7,6 +7,7 @@ using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.AbsentRequest;
+using eBoardAPI.Models.Activity;
 using eBoardAPI.Models.Attendance;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
@@ -115,6 +116,7 @@ public static class ServiceCollectionExtension
                 AddClassPeriodDtoMappings(cfg);
                 AddScoreSheetDtoMappings(cfg);
                 AddAttendanceDtoMappings(cfg);
+                AddActivityDtoMapping(cfg);
                 
                 AddViolationDtoMapping(cfg);
             }, AppDomain.CurrentDomain.GetAssemblies());
@@ -240,5 +242,28 @@ public static class ServiceCollectionExtension
     private static void AddViolationDtoMapping(IMapperConfigurationExpression cfg)
     {
         cfg.CreateMap<Violation, ViolationDto>();
+    }
+    
+    private static void AddActivityDtoMapping(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<ExtracurricularActivity, ExtracurricularActivityDto>();
+        cfg.CreateMap<ExtracurricularActivity, ParentViewActivityDto>()
+            .ForMember(dest => dest.AssignStatus, opt => opt.Ignore());
+        cfg.CreateMap<CreateActivityDto, ExtracurricularActivity>();
+        cfg.CreateMap<UpdateActivityDto, ExtracurricularActivity>();
+        
+        cfg.CreateMap<ActivityParticipant, ActivityParticipantDto>()
+            .ForMember(dest => dest.StudentName,
+                opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"));
+        
+        cfg.CreateMap<AddActivityParticipantDto, ActivityParticipant>();
+        cfg.CreateMap<UpdateActivityParticipantDto, ActivityParticipant>();
+        
+        cfg.CreateMap<ActivitySignIn, ActivitySignInDto>()
+            .ForMember(dest => dest.StudentName,
+                opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"));
+        cfg.CreateMap<AddActivitySignInDto, ActivitySignIn>()
+            .ForMember(dest => dest.SignInTime,
+                opt => opt.MapFrom(_ => DateTime.UtcNow));
     }
 }
