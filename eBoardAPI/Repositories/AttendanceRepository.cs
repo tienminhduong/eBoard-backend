@@ -2,7 +2,7 @@ using eBoardAPI.Interfaces.Repositories;
 
 namespace eBoardAPI.Repositories;
 
-public class AddressRepository : IAddressRepository
+public class AttendanceRepository : IAttendanceRepository
 {
     
 }

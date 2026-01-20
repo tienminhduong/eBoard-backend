@@ -17,7 +17,13 @@
     </PackageReference>
     <PackageReference Include="Npgsql" Version="10.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="Refit" Version="9.0.2" />
+    <PackageReference Include="Refit.HttpClientFactory" Version="9.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Attendance\" />
   </ItemGroup>
 
 </Project>

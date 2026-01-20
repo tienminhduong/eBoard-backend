@@ -1,6 +1,6 @@
 namespace eBoardAPI.Interfaces.Repositories;
 
-public interface IAddressRepository
+public interface IAttendanceRepository
 {
     
 }

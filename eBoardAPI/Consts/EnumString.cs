@@ -20,6 +20,20 @@ public static class EContributionStatus
     public const string NOT_CONTRIBUTED = "Chưa đóng";
 }
 
+public static class EAttendanceStatus
+{
+    public const string PRESENT = "Có mặt";
+    public const string ABSENT = "Vắng không phép";
+    public const string EXCUSED = "Vắng có phép";
+}
+
+public static class EAbsentRequestStatus
+{
+    public const string PENDING = "Chờ duyệt";
+    public const string APPROVED = "Đã duyệt";
+    public const string REJECTED = "Từ chối";
+}
+
 public static class EDayOfWeek
 {
     public const string MONDAY = "Thứ Hai";
