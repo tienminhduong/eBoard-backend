@@ -54,9 +54,22 @@ namespace eBoardAPI.Services
             throw new NotImplementedException();
         }
 
-        public Task<Result> UpdateExamSchedule(UpdateExamScheduleDto updateExamScheduleDto)
+        public async Task<Result> UpdateExamSchedule(Guid examScheduleId, UpdateExamScheduleDto updateExamScheduleDto)
         {
-            throw new NotImplementedException();
+            var existingExamScheduleResult = await examScheduleRepository.GetExamScheduleByIdAsync(examScheduleId);
+            if (!existingExamScheduleResult.IsSuccess || existingExamScheduleResult.Value == null)
+            {
+                return Result.Failure(existingExamScheduleResult.ErrorMessage ?? "Exam schedule not found.");
+            }
+
+            var examScheduleEntity = existingExamScheduleResult.Value;
+            mapper.Map(updateExamScheduleDto, examScheduleEntity);
+            var updateResult = await examScheduleRepository.UpdateAsync(examScheduleEntity);
+            if (!updateResult.IsSuccess)
+            {
+                return Result.Failure(updateResult.ErrorMessage ?? "Failed to update exam schedule.");
+            }
+            return Result.Success();
         }
     }
 }

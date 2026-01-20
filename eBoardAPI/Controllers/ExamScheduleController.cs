@@ -46,10 +46,10 @@ namespace eBoardAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPut("exams-schedule")]
-        public async Task<ActionResult> UpdateExamSchedule([FromBody] UpdateExamScheduleDto updateExamScheduleDto)
+        [HttpPut("exams-schedule/{examScheduleId}")]
+        public async Task<ActionResult> UpdateExamSchedule(Guid examScheduleId, [FromBody] UpdateExamScheduleDto updateExamScheduleDto)
         {
-            var result = await examScheduleService.UpdateExamSchedule(updateExamScheduleDto);
+            var result = await examScheduleService.UpdateExamSchedule(examScheduleId, updateExamScheduleDto);
             if (result.IsSuccess)
             {
                 return Ok();

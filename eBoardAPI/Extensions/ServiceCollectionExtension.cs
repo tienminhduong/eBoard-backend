@@ -248,5 +248,7 @@ public static class ServiceCollectionExtension
     {
         cfg.CreateMap<CreateExamScheduleDto, ExamSchedule>();
         cfg.CreateMap<ExamSchedule, ExamScheduleDto>();
+        cfg.CreateMap<UpdateExamScheduleDto, ExamSchedule>()
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
     }
 }

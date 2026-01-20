@@ -54,9 +54,18 @@ namespace eBoardAPI.Repositories
             }
         }
 
-        public Task<Result> UpdateAsync(ExamSchedule examSchedule)
+        public async Task<Result> UpdateAsync(ExamSchedule examSchedule)
         {
-            throw new NotImplementedException();
+            try
+            {
+                dbContext.ExamSchedules.Update(examSchedule);
+                await dbContext.SaveChangesAsync();
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure(ex.Message);
+            }
         }
     }
 }
