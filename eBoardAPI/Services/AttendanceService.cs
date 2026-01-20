@@ -50,7 +50,6 @@ public class AttendanceService(
         
         var students = await unitOfWork.ClassRepository.GetStudentsByClassAsync(dto.ClassId, 1, 200);
         
-        // check from absent request, if accepted, create with status absent
         var absentRequests = await unitOfWork
             .AbsentRequestRepository
             .GetAcceptedAbsentRequestsByDateAsync(dto.ClassId, dto.Date);

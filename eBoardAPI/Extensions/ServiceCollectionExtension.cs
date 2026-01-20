@@ -21,6 +21,7 @@ using eBoardAPI.Models.Teacher;
 using eBoardAPI.Models.Violation;
 using eBoardAPI.Repositories;
 using eBoardAPI.Services;
+using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Refit;
@@ -48,6 +49,7 @@ public static class ServiceCollectionExtension
             {
                 var connectionString = Environment.GetEnvironmentVariable(EnvKey.DATABASE_CONNECTION_STRING);
                 options.UseNpgsql(connectionString);
+                options.UseExceptionProcessor();
             });
             return services;
         }
