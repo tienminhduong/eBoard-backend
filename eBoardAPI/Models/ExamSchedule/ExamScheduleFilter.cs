@@ -3,14 +3,14 @@
     public class ExamScheduleFilter
     {
         // filter time
-        public DateTime? From;
-        public DateTime? To;
+        public DateTime? From { get; set; }
+        public DateTime? To { get; set; }
 
         // filter by Id
-        public Guid? SubjectId;
+        public Guid? SubjectId { get; set; }
 
         // filter by exam format
-        public string? ExamFormat;
+        public string? ExamFormat { get; set; }
 
         // filter by pagination
         public int PageNumber = 1;
