@@ -200,5 +200,28 @@ namespace eBoardAPI.Repositories
                 return Result<SummaryViolation>.Failure("Lỗi trong quá trình lấy tóm tắt vi phạm");
             }
         }
+
+        public async Task<Result<IEnumerable<ViolationStudent>>> GetViolationsByClassIdAndStudentId(Guid classId, Guid studentId, int pageNumber = 1, int pageSize = 20)
+        {
+            try
+            {
+                // get violations by classId and studentId with pagination and order by violate date and seenbyparent
+                var violationStudents = await dbContext.ViolationStudents
+                                .Where(vs =>
+                                    vs.StudentId == studentId &&
+                                    vs.Violation.ClassId == classId)
+                                .Include(vs => vs.Violation)
+                                .OrderBy(vs => vs.SeenByParent)                  // chưa xem trước
+                                .ThenByDescending(vs => vs.Violation.ViolateDate)
+                                .Skip((pageNumber - 1) * pageSize)
+                                .ToListAsync();
+
+                return Result<IEnumerable<ViolationStudent>>.Success(violationStudents);
+            }
+            catch
+            {
+                return Result<IEnumerable<ViolationStudent>>.Failure("Lỗi trong quá trình lấy vi phạm cho học sinh");
+            }
+        }
     }
 }

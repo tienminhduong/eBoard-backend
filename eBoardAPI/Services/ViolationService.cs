@@ -127,9 +127,30 @@ namespace eBoardAPI.Services
             throw new NotImplementedException();
         }
 
-        public Task<Result<IEnumerable<ViolationDto>>> GetViolationsByClassIdAndStudentId(Guid classId, Guid studentId)
+        public async Task<Result<IEnumerable<ViolationForStudentDto>>> GetViolationsByClassIdAndStudentId(Guid classId, Guid studentId, int pageNumber = 1, int pageSize = 20)
         {
-            throw new NotImplementedException();
+            var result = await violationRepository.GetViolationsByClassIdAndStudentId(classId, studentId, pageNumber, pageSize);
+            if(!result.IsSuccess)
+            {
+                return Result<IEnumerable<ViolationForStudentDto>>.Failure(result.ErrorMessage ?? "Failed to retrieve violations.");
+            }
+            var violationDtos = new List<ViolationForStudentDto>();
+            foreach(var violationEntity in result.Value!)
+            {
+                var violationDto = new ViolationForStudentDto
+                {
+                    Id = violationEntity.Violation.Id,
+                    InChargeTeacherName = violationEntity.Violation.InChargeTeacherName,
+                    ViolateDate = violationEntity.Violation.ViolateDate,
+                    ViolationType = violationEntity.Violation.ViolationType,
+                    ViolationLevel = violationEntity.Violation.ViolationLevel,
+                    ViolationInfo = violationEntity.Violation.ViolationInfo,
+                    Penalty = violationEntity.Violation.Penalty,
+                    SeenByParent = violationEntity.SeenByParent
+                };
+                violationDtos.Add(violationDto);
+            }
+            return Result<IEnumerable<ViolationForStudentDto>>.Success(violationDtos);
         }
 
         public Task<Result<ViolationsStatsDto>> GetViolationStatsByClassId(Guid classId)

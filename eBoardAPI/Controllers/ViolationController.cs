@@ -70,9 +70,9 @@ namespace eBoardAPI.Controllers
         }
 
         [HttpGet("classes/{classId}/students/{studentId}/violations")]
-        public async Task<ActionResult>GetViolationsByClassIdAndStudentId(Guid classId, Guid studentId)
+        public async Task<ActionResult> GetViolationsByClassIdAndStudentId(Guid classId, Guid studentId, int numPage = 1, int pageSize = 20)
         {
-            var result = await violationService.GetViolationsByClassIdAndStudentId(classId, studentId);
+            var result = await violationService.GetViolationsByClassIdAndStudentId(classId, studentId, numPage, pageSize);
             if(!result.IsSuccess)
             {
                 return BadRequest(result.ErrorMessage);
