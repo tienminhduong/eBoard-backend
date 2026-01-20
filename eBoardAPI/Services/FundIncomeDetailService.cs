@@ -28,7 +28,14 @@ namespace eBoardAPI.Services
                 {
                     return Result<FundIncomeDetailDto>.Failure("Fund income not found.");
                 }
-
+                // add collected amount to fund income
+                fundIncomeEntity.CollectedAmount += contributeFund.ContributedAmount;
+                var updateFundIncomeResult = await unitOfWork.FundIncomeRepository.UpdateAsync(fundIncomeEntity);
+                if(updateFundIncomeResult.IsSuccess == false)
+                {
+                    unitOfWork.Dispose();
+                    return Result<FundIncomeDetailDto>.Failure("Failed to update fund income collected amount.");
+                }
                 // get class fund entity
                 var classFundId = fundIncomeEntity.ClassFundId;
                 var classFundResult = await unitOfWork.ClassFundRepository.GetClassFundByIdAsync(classFundId);
@@ -119,6 +126,60 @@ namespace eBoardAPI.Services
             var incomeDetails = result.Value;
             var incomeDetailsDto = mapper.Map<IEnumerable<FundIncomeDetailDto>>(incomeDetails);  
             return Result<IEnumerable<FundIncomeDetailDto>>.Success(incomeDetailsDto);
+        }
+
+        public async Task<Result> UpdateFundIncomeDetailAsync(Guid incomeDetailId, UpdateFundIncomeDetailDto updateFundIncomeDetail)
+        {
+            try
+            {
+                var result = await unitOfWork.FundIncomeDetailRepository.GetFundIncomeDetailByIdAsync(incomeDetailId);
+                if (result.IsSuccess == false)
+                {
+                    return Result.Failure(result.ErrorMessage!);
+                }
+                var incomeDetailEntity = result.Value;
+                if (incomeDetailEntity == null)
+                {
+                    return Result.Failure("Không tồn tại chi tiết đóng tiền");
+                }
+
+                if(incomeDetailEntity.FundIncome == null)
+                {
+                    return Result.Failure("Không tồn tại thu quỹ");
+                }    
+                // map fromt dto to entity
+                incomeDetailEntity.ContributedInfo = updateFundIncomeDetail.ContributedInfo ?? incomeDetailEntity.ContributedInfo;
+                incomeDetailEntity.ContributedAt = updateFundIncomeDetail.ContributedAt ?? incomeDetailEntity.ContributedAt;
+                incomeDetailEntity.Notes = updateFundIncomeDetail.Notes ?? incomeDetailEntity.Notes;
+                // update amount
+                if(updateFundIncomeDetail.ContributedAmount != null)
+                {
+                    var fundIncomeEntity = incomeDetailEntity.FundIncome;
+                    var classFundEntityResult = await unitOfWork.ClassFundRepository.GetClassFundByIdAsync(fundIncomeEntity.ClassFundId);
+                    if (!classFundEntityResult.IsSuccess || classFundEntityResult.Value == null)
+                        return Result.Failure("Không tồn tại lớp có chi tiết đóng tiền này");
+                    var classFundEntity = classFundEntityResult.Value;
+
+                    var difference = (int)updateFundIncomeDetail.ContributedAmount - incomeDetailEntity.ContributedAmount;
+                    incomeDetailEntity.ContributedAmount += difference;
+                    fundIncomeEntity.CollectedAmount += difference;
+                    classFundEntity.CurrentBalance += difference;
+                }
+
+                incomeDetailEntity.UpdateStatus(incomeDetailEntity.FundIncome.AmountPerStudent);
+                var updateResult = await fundIncomeDetailRepository.UpdateAsync(incomeDetailEntity);
+                if (updateResult.IsSuccess == false)
+                {
+                    unitOfWork.Dispose();
+                    return Result.Failure(updateResult.ErrorMessage!);
+                }
+                await unitOfWork.SaveChangesAsync();
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure($"An error occurred while updating the fund income detail: {ex.Message}");
+            }
         }
     }
 }

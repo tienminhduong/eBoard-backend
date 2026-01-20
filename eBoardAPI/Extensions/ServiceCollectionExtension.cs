@@ -17,6 +17,7 @@ using eBoardAPI.Models.ScoreSheet;
 using eBoardAPI.Models.Student;
 using eBoardAPI.Models.Subject;
 using eBoardAPI.Models.Teacher;
+using eBoardAPI.Models.Violation;
 using eBoardAPI.Repositories;
 using eBoardAPI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -63,6 +64,8 @@ public static class ServiceCollectionExtension
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
             services.AddScoped<IScoreRepository, ScoreRepository>();
+
+            services.AddScoped<IViolationRepository, ViolationRepository>();
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -81,6 +84,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IFundExpenseService, FundExpenseService>();
             services.AddScoped<IScheduleService, ScheduleService>();
             services.AddScoped<IScoreService, ScoreService>();
+            services.AddScoped<IViolationService, ViolationService>();
             services.AddScoped<IAttendanceService, AttendanceService>();
             return services;
         }
@@ -107,10 +111,12 @@ public static class ServiceCollectionExtension
                 AddScoreSheetDtoMappings(cfg);
                 AddAttendanceDtoMappings(cfg);
                 
+                AddViolationDtoMapping(cfg);
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
         }
-        
+
+
         public IServiceCollection AddCorsPolicy()
         {
             services.AddCors(options =>
@@ -163,6 +169,10 @@ public static class ServiceCollectionExtension
             .ForMember(dest => dest.StartDate,
                 opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
         cfg.CreateMap<FundIncome, FundIncomeDto>();
+        cfg.CreateMap<UpdateFundIncomeDto, FundIncome>()
+            .ForMember(dest => dest.StartDate, opt => opt.MapFrom((src, dest) => src.StartDate == DateOnly.MinValue ? dest.StartDate : src.StartDate))
+            .ForMember(dest => dest.EndDate, opt => opt.MapFrom((src, dest) => src.EndDate == DateOnly.MinValue ? dest.EndDate : src.EndDate))
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
         cfg.CreateMap<CreateFundIncomeDetailDto, FundIncomeDetail>()
             .ForMember(dest => dest.ContributedAt, opt => opt.MapFrom(_ => DateOnly.FromDateTime(DateTime.UtcNow)));
@@ -213,5 +223,10 @@ public static class ServiceCollectionExtension
         cfg.CreateMap<Attendance, AttendanceDto>()
             .ForMember(dest => dest.StudentName,
                 opt => opt.MapFrom(src => src.Student.LastName + " " + src.Student.FirstName));
+    }
+  
+    static private void AddViolationDtoMapping(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<Violation, ViolationDto>();
     }
 }

@@ -48,7 +48,13 @@ namespace eBoardAPI.Services
 
         public async Task<Result<FundIncomeDto>> GetFundIncomeByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var result = await fundIncomeRepository.GetByIdAsync(id);
+            if(!result.IsSuccess)
+            {
+                return Result<FundIncomeDto>.Failure(result.ErrorMessage!);
+            }
+            var fundIncomeDto = mapper.Map<FundIncomeDto>(result.Value);
+            return Result<FundIncomeDto>.Success(fundIncomeDto);
         }
 
         public async Task<Result<IEnumerable<FundIncomeDto>>> GetFundIncomesByClassIdAsync(Guid classId, int pageNumber, int pageSize)
@@ -74,6 +80,28 @@ namespace eBoardAPI.Services
 
             var fundIncomeDetailDtos = mapper.Map<IEnumerable<FundIncomeDetailDto>>(fundIncomeDetailsResult.Value);
             return Result<IEnumerable<FundIncomeDetailDto>>.Success(fundIncomeDetailDtos);
+        }
+
+        public async Task<Result<FundIncomeDto>> UpdateFundIncomeAsync(Guid id, UpdateFundIncomeDto updatedFundIncome)
+        {
+            var existingFundIncomeResult = await fundIncomeRepository.GetByIdAsync(id);
+            if(!existingFundIncomeResult.IsSuccess)
+            {
+                return Result<FundIncomeDto>.Failure(existingFundIncomeResult.ErrorMessage!);
+            }
+            if(existingFundIncomeResult.Value == null)
+            {
+                return Result<FundIncomeDto>.Failure("Không tồn tại quỹ thu này");
+            }
+            var existingFundIncome = existingFundIncomeResult.Value;
+            mapper.Map(updatedFundIncome, existingFundIncome);
+            var updateResult = await fundIncomeRepository.UpdateAsync(existingFundIncome);
+            if(!updateResult.IsSuccess)
+            {
+                return Result<FundIncomeDto>.Failure(updateResult.ErrorMessage!);
+            }
+            var fundIncomeDto = mapper.Map<FundIncomeDto>(existingFundIncome);
+            return Result<FundIncomeDto>.Success(fundIncomeDto);
         }
     }
 }
