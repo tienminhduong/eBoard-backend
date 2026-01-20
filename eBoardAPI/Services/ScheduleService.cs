@@ -7,6 +7,7 @@ using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.Schedule;
+using EntityFramework.Exceptions.Common;
 
 namespace eBoardAPI.Services;
 
@@ -32,6 +33,10 @@ public class ScheduleService(
             classPeriod.Subject = subject;
             return Result<ClassPeriodDto>.Success(mapper.Map<ClassPeriodDto>(classPeriod));
         }
+        catch (UniqueConstraintException ex)
+        {
+            return Result<ClassPeriodDto>.Failure($"Tiết học đã tồn tại.");
+        }
         catch (Exception ex)
         {
             return Result<ClassPeriodDto>.Failure($"Lỗi khi thêm tiết học: {ex.Message}");
@@ -56,13 +61,23 @@ public class ScheduleService(
         
         ApplyUpdateClassPeriodDto(updateClassPeriodDto, existingClassPeriod);
         
-        var result = unitOfWork.ScheduleRepository.UpdateClassPeriod(existingClassPeriod);
+        var result = await unitOfWork.ScheduleRepository.UpdateClassPeriod(existingClassPeriod);
         if (!result.IsSuccess)
             return Result<ClassPeriodDto>.Failure(result.ErrorMessage!);
-        
-        await unitOfWork.SaveChangesAsync();
-        
-        return Result<ClassPeriodDto>.Success(mapper.Map<ClassPeriodDto>(existingClassPeriod));
+
+        try
+        {
+            await unitOfWork.SaveChangesAsync();
+            return Result<ClassPeriodDto>.Success(mapper.Map<ClassPeriodDto>(existingClassPeriod));
+        }
+        catch (UniqueConstraintException ex)
+        {
+            return Result<ClassPeriodDto>.Failure("Tiết học đã tồn tại.");
+        }
+        catch (Exception ex)
+        {
+            return Result<ClassPeriodDto>.Failure($"Lỗi khi cập nhật tiết học: {ex.Message}");
+        }
     }
 
     public async Task<bool> DeleteClassPeriodAsync(Guid classPeriodId)
