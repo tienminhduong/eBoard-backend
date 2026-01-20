@@ -91,5 +91,16 @@ namespace eBoardAPI.Controllers
             }
             return NoContent();
         }
+
+        [HttpGet("classes/{classId}/students/{studentId}/violations/summary")]
+        public async Task<ActionResult> GetSummaryViolation(Guid classId, Guid studentId)
+        {
+            var result = await violationService.GetSummaryViolation(classId, studentId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+            return Ok(result.Value);
+        }
     }
 }

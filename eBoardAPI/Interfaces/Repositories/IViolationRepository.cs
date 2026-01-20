@@ -1,5 +1,6 @@
 ﻿using eBoardAPI.Common;
 using eBoardAPI.Entities;
+using eBoardAPI.Models.Violation;
 
 namespace eBoardAPI.Interfaces.Repositories
 {
@@ -16,5 +17,6 @@ namespace eBoardAPI.Interfaces.Repositories
         Task<Result> UpdateAndSaveAsync(Violation violation);
         Task<Result<ViolationStudent>> GetViolationStudentByIds(Guid violationId, Guid studentId);
         Task<Result> UpdateAsync(ViolationStudent violationStudent);
+        Task<Result<SummaryViolation>> GetSummaryViolationAsync(Guid classId, Guid studentId);
     }
 }

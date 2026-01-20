@@ -80,6 +80,16 @@ namespace eBoardAPI.Services
             }
         }
 
+        public async Task<Result<SummaryViolation>> GetSummaryViolation(Guid classId, Guid studentId)
+        {
+            var result = await violationRepository.GetSummaryViolationAsync(classId, studentId);
+            if(!result.IsSuccess)
+            {
+                return Result<SummaryViolation>.Failure(result.ErrorMessage ?? "Failed to retrieve summary violation.");
+            }
+            return Result<SummaryViolation>.Success(result.Value!);
+        }
+
         public async Task<Result<ViolationDto>> GetViolationById(Guid violationId)
         {
             var result = await violationRepository.GetByIdAsync(violationId);
