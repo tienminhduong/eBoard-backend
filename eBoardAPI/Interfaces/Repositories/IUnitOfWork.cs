@@ -13,5 +13,6 @@ public interface IUnitOfWork : IDisposable
     IScoreRepository ScoreRepository { get; }
     IAttendanceRepository AttendanceRepository { get; }
     IFundIncomeDetailRepository FundIncomeDetailRepository { get; }
+    IAbsentRequestRepository AbsentRequestRepository { get; }
     Task<int> SaveChangesAsync();
 }

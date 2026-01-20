@@ -1,9 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using eBoardAPI.Common;
+using eBoardAPI.Consts;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
+using eBoardAPI.Models.AbsentRequest;
 using eBoardAPI.Models.Attendance;
 
 namespace eBoardAPI.Services;
@@ -11,6 +13,7 @@ namespace eBoardAPI.Services;
 [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public class AttendanceService(
     IAttendanceRepository attendanceRepository,
+    IAbsentRequestRepository absentRequestRepository,
     IUnitOfWork unitOfWork,
     IMapper mapper
     ) : IAttendanceService
@@ -100,5 +103,49 @@ public class AttendanceService(
         attendanceRepository.UpdateAttendanceAsync(attendance);
         await unitOfWork.SaveChangesAsync();
         return Result.Success();
+    }
+
+    public async Task<Result> RegisterAbsencesForStudentInClassAsync(CreateAbsentRequestDto requestDto)
+    {
+        var result = await unitOfWork.ClassRepository.ValidateStudentsInClassAsync(requestDto.ClassId, [requestDto.StudentId]);
+        if (!result.Any())
+            return Result.Failure("Học sinh không thuộc lớp học đã cho.");
+        
+        var absentRequest = mapper.Map<AbsentRequest>(requestDto);
+        await unitOfWork.AbsentRequestRepository.CreateAbsentRequestAsync(absentRequest);
+        await unitOfWork.SaveChangesAsync();
+        return Result.Success();
+    }
+
+    public async Task<Result> ApproveAbsenceRequestAsync(Guid requestId)
+    {
+        var absentRequestResult = await absentRequestRepository.GetAbsentRequestById(requestId);
+        if (!absentRequestResult.IsSuccess)
+            return Result.Failure(absentRequestResult.ErrorMessage!);
+        
+        var absentRequest = absentRequestResult.Value!;
+        absentRequest.Status = EAbsentRequestStatus.APPROVED;
+        absentRequestRepository.UpdateAbsentRequest(absentRequest);
+        await unitOfWork.SaveChangesAsync();
+        return Result.Success();
+    }
+
+    public async Task<Result> RejectAbsenceRequestAsync(Guid requestId)
+    {
+        var absentRequestResult = await absentRequestRepository.GetAbsentRequestById(requestId);
+        if (!absentRequestResult.IsSuccess)
+            return Result.Failure(absentRequestResult.ErrorMessage!);
+        
+        var absentRequest = absentRequestResult.Value!;
+        absentRequest.Status = EAbsentRequestStatus.REJECTED;
+        absentRequestRepository.UpdateAbsentRequest(absentRequest);
+        await unitOfWork.SaveChangesAsync();
+        return Result.Success();
+    }
+
+    public async Task<IEnumerable<AbsentRequestDto>> GetAbsentRequestsForClassAsync(Guid classId, string status, int pageNumber, int pageSize)
+    {
+        var absentRequests = await absentRequestRepository.GetAbsentRequestsByClassIdAsync(classId, status, pageNumber, pageSize);
+        return mapper.Map<List<AbsentRequestDto>>(absentRequests);
     }
 }

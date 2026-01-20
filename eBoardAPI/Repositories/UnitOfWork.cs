@@ -16,6 +16,7 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
     IScoreRepository? _scoreRepository;
     IAttendanceRepository? _attendanceRepository;
     IFundIncomeDetailRepository? _fundIncomeDetailRepository;
+    IAbsentRequestRepository? _absentRequestRepository;
 
     public IFundIncomeDetailRepository FundIncomeDetailRepository
     {
@@ -113,6 +114,15 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
         {
             _attendanceRepository ??= new AttendanceRepository(dbContext);
             return _attendanceRepository;
+        }
+    }
+    
+    public IAbsentRequestRepository AbsentRequestRepository
+    {
+        get
+        {
+            _absentRequestRepository ??= new AbsentRequestRepository(dbContext);
+            return _absentRequestRepository;
         }
     }
 

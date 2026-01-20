@@ -1,4 +1,6 @@
+using eBoardAPI.Consts;
 using eBoardAPI.Interfaces.Services;
+using eBoardAPI.Models.AbsentRequest;
 using eBoardAPI.Models.Attendance;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,5 +34,67 @@ public class AttendanceController(IAttendanceService attendanceService) : Contro
     {
         var result = await attendanceService.PatchAttendanceRecordAsync(attendanceId, dto);
         return result.IsSuccess ? NoContent() : BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("absent-request")]
+    public async Task<ActionResult> RegisterAbsencesForStudentInClassAsync([FromBody] CreateAbsentRequestDto requestDto)
+    {
+        var result = await attendanceService.RegisterAbsencesForStudentInClassAsync(requestDto);
+        if (!result.IsSuccess)
+            return BadRequest($"Thất bại khi đăng ký đơn xin nghỉ: {result.ErrorMessage}");
+        return Ok();
+    }
+
+    [HttpPost("absent-request/{requestId}/approve")]
+    public async Task<ActionResult> ApproveAbsenceRequestAsync(Guid requestId)
+    {
+        var result = await attendanceService.ApproveAbsenceRequestAsync(requestId);
+        return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("absent-request/{requestId}/reject")]
+    public async Task<ActionResult> RejectAbsenceRequestAsync(Guid requestId)
+    {
+        var result = await attendanceService.RejectAbsenceRequestAsync(requestId);
+        return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("absent-requests/class/{classId}/pending")]
+    public async Task<ActionResult<IEnumerable<AbsentRequestDto>>> GetPendingAbsentRequestsForClassAsync(Guid classId,
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        var absentRequests =
+            await attendanceService.GetAbsentRequestsForClassAsync(classId, EAbsentRequestStatus.PENDING, pageNumber, pageSize);
+        return Ok(absentRequests);
+    }
+
+    [HttpGet("absent-requests/class/{classId}/approved")]
+    public async Task<ActionResult<IEnumerable<AbsentRequestDto>>> GetApprovedAbsentRequestsForClassAsync(Guid classId,
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        var absentRequests =
+            await attendanceService.GetAbsentRequestsForClassAsync(classId, EAbsentRequestStatus.APPROVED, pageNumber,
+                pageSize);
+        return Ok(absentRequests);
+    }
+
+    [HttpGet("absent-requests/class/{classId}/rejected")]
+    public async Task<ActionResult<IEnumerable<AbsentRequestDto>>> GetRejectedAbsentRequestsForClassAsync(Guid classId,
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        var absentRequests =
+            await attendanceService.GetAbsentRequestsForClassAsync(classId, EAbsentRequestStatus.REJECTED, pageNumber,
+                pageSize);
+        return Ok(absentRequests);
+    }
+
+    [HttpGet("absent-requests/class/{classId}/all")]
+    public async Task<ActionResult<IEnumerable<AbsentRequestDto>>> GetAllAbsentRequestsForClassAsync(Guid classId,
+        [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        var absentRequests =
+            await attendanceService.GetAbsentRequestsForClassAsync(classId, string.Empty, pageNumber,
+                pageSize);
+        return Ok(absentRequests);
     }
 }
