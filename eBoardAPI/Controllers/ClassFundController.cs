@@ -158,4 +158,15 @@ public class ClassFundController(IClassFundService classFundService,
         }
         return CreatedAtAction(nameof(GetFundIncomeDetailsById), new { incomeDetailId = fundIncomeId }, result.Value);
     }
+
+    [HttpGet("incomes/{fundIncomeId}")]
+    public async Task<ActionResult> GetFundIncomeById(Guid fundIncomeId)
+    {
+        var result = await fundIncomeService.GetFundIncomeByIdAsync(fundIncomeId);
+        if(!result.IsSuccess)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        return (result.Value != null) ? Ok(result.Value) : NotFound();
+    }
 }

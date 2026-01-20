@@ -48,7 +48,13 @@ namespace eBoardAPI.Services
 
         public async Task<Result<FundIncomeDto>> GetFundIncomeByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var result = await fundIncomeRepository.GetByIdAsync(id);
+            if(!result.IsSuccess)
+            {
+                return Result<FundIncomeDto>.Failure(result.ErrorMessage!);
+            }
+            var fundIncomeDto = mapper.Map<FundIncomeDto>(result.Value);
+            return Result<FundIncomeDto>.Success(fundIncomeDto);
         }
 
         public async Task<Result<IEnumerable<FundIncomeDto>>> GetFundIncomesByClassIdAsync(Guid classId, int pageNumber, int pageSize)
