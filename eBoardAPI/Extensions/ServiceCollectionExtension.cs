@@ -6,6 +6,8 @@ using eBoardAPI.Helpers;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
+using eBoardAPI.Models.AbsentRequest;
+using eBoardAPI.Models.Attendance;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
 using eBoardAPI.Models.FundExpense;
@@ -19,6 +21,7 @@ using eBoardAPI.Models.Teacher;
 using eBoardAPI.Models.Violation;
 using eBoardAPI.Repositories;
 using eBoardAPI.Services;
+using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Refit;
@@ -46,6 +49,7 @@ public static class ServiceCollectionExtension
             {
                 var connectionString = Environment.GetEnvironmentVariable(EnvKey.DATABASE_CONNECTION_STRING);
                 options.UseNpgsql(connectionString);
+                options.UseExceptionProcessor();
             });
             return services;
         }
@@ -63,9 +67,9 @@ public static class ServiceCollectionExtension
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();
             services.AddScoped<IScoreRepository, ScoreRepository>();
-
             services.AddScoped<IViolationRepository, ViolationRepository>();
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+            services.AddScoped<IAbsentRequestRepository, AbsentRequestRepository>();
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
@@ -108,6 +112,8 @@ public static class ServiceCollectionExtension
                 AddFundDtoMappings(cfg);
                 AddClassPeriodDtoMappings(cfg);
                 AddScoreSheetDtoMappings(cfg);
+                AddAttendanceDtoMappings(cfg);
+                
                 AddViolationDtoMapping(cfg);
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
@@ -214,7 +220,22 @@ public static class ServiceCollectionExtension
         cfg.CreateMap<ScoreSheetDetail, SubjectScoreDto>()
             .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.Subject.Name));
     }
-    static private void AddViolationDtoMapping(IMapperConfigurationExpression cfg)
+    
+    private static void AddAttendanceDtoMappings(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<Attendance, AttendanceDto>()
+            .ForMember(dest => dest.StudentName,
+                opt => opt.MapFrom(src => src.Student.LastName + " " + src.Student.FirstName));
+
+        cfg.CreateMap<CreateAbsentRequestDto, AbsentRequest>();
+        cfg.CreateMap<AbsentRequest, AbsentRequestDto>()
+            .ForMember(dest => dest.StudentName,
+                opt => opt.MapFrom(src => src.Student.LastName + " " + src.Student.FirstName))
+            .ForMember(dest => dest.ClassName,
+                opt => opt.MapFrom(src => src.Class.Name));
+    }
+  
+    private static void AddViolationDtoMapping(IMapperConfigurationExpression cfg)
     {
         cfg.CreateMap<Violation, ViolationDto>();
     }
