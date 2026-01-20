@@ -53,7 +53,6 @@ public static class ServiceCollectionExtension
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<ITeacherRepository, TeacherRepository>();
             services.AddScoped<IParentRepository, ParentRepository>();
-            services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IClassRepository, ClassRepository>();
             services.AddScoped<IClassFundRepository, ClassFundRepository>();
             services.AddScoped<IFundIncomeRepository, FundIncomeRepository>();
