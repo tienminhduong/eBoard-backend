@@ -8,6 +8,32 @@ namespace eBoardAPI.Repositories
 {
     public class ViolationRepository(AppDbContext dbContext) : IViolationRepository
     {
+        public async Task<Result<Violation>> AddAsync(Violation violation)
+        {
+            try
+            {
+                await dbContext.Violations.AddAsync(violation);
+                return Result<Violation>.Success(violation);
+            }
+            catch
+            {
+                return Result<Violation>.Failure("Lỗi trong quá trình thêm vi phạm");
+            }
+        }
+        
+        public async Task<Result> AddRangeViolationStudentsAsync(IEnumerable<ViolationStudent> violationStudents)
+        {
+            try
+            {
+                await dbContext.ViolationStudents.AddRangeAsync(violationStudents);
+                return Result.Success();
+            }
+            catch
+            {
+                return Result.Failure("Lỗi trong quá trình thêm vi phạm cho học sinh");
+            }
+        }
+
         public async Task<Result<IEnumerable<Violation>>> AddRangeAsync(IEnumerable<Violation> violations)
         {
             try

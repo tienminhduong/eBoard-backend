@@ -17,7 +17,7 @@ namespace eBoardAPI.Controllers
             {
                 return BadRequest(result.ErrorMessage);
             }    
-            return Ok(result.Value);
+            return Created();
         }
 
         [HttpPut("violations/{violationId}")]

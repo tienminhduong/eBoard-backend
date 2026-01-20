@@ -9,18 +9,17 @@ using Microsoft.AspNetCore.Http.HttpResults;
 namespace eBoardAPI.Services
 {
     public class ViolationService(IViolationRepository violationRepository,
+                                  IUnitOfWork unitOfWork,
                                   IMapper mapper) : IViolationService
     {
-        public async Task<Result<IEnumerable<ViolationDto>>> CreateNewViolation(CreateViolationDto createViolationDto)
+        public async Task<Result> CreateNewViolation(CreateViolationDto createViolationDto)
         {
-            // Create Violation entities for each student
-            // Cannot use AutoMapper here due to the list of StudentIds
-            var violationEntities = new List<Violation>();
-            foreach (var studentId in createViolationDto.StudentIds)
+            try
             {
+                // Create Violation entities and ViolationStudent for each student
+                // Cannot use AutoMapper here due to the list of StudentIds
                 var violationEntity = new Violation
                 {
-                    StudentId = studentId,
                     ClassId = createViolationDto.ClassId,
                     InChargeTeacherName = createViolationDto.InChargeTeacherName,
                     ViolateDate = createViolationDto.ViolateDate,
@@ -28,16 +27,34 @@ namespace eBoardAPI.Services
                     ViolationLevel = createViolationDto.ViolationLevel,
                     ViolationInfo = createViolationDto.ViolationInfo,
                     Penalty = createViolationDto.Penalty,
+                    SeenByParent = false,
                 };
-                violationEntities.Add(violationEntity);
+                var result = await violationRepository.AddAsync(violationEntity);
+                if(!result.IsSuccess)
+                {
+                    unitOfWork.Dispose();
+                    return Result.Failure(result.ErrorMessage ?? "Failed to create violation.");
+                }
+                var violationEntityCreated = result.Value;
+                var violationStudentEntities = createViolationDto.StudentIds.Select(studentId => new ViolationStudent
+                {
+                    StudentId = studentId,
+                    ViolationId = violationEntityCreated!.Id
+                }).ToList();
+                var addViolationStudentResult = await violationRepository.AddRangeViolationStudentsAsync(violationStudentEntities);
+                if(!addViolationStudentResult.IsSuccess)
+                {
+                    unitOfWork.Dispose();
+                    return Result.Failure(addViolationStudentResult.ErrorMessage ?? "Failed to create violation-student associations.");
+                }
+                await unitOfWork.SaveChangesAsync();
+                return Result.Success();
             }
-            var result = await violationRepository.AddRangeAsync(violationEntities);
-            if (!result.IsSuccess)
+            catch (Exception ex)
             {
-                return Result<IEnumerable<ViolationDto>>.Failure(result.ErrorMessage ?? "Failed to create violations.");
+                unitOfWork.Dispose();
+                return Result.Failure($"An error occurred while creating violations: {ex.Message}");
             }
-            var violationDtos = mapper.Map<IEnumerable<ViolationDto>>(result.Value);
-            return Result<IEnumerable<ViolationDto>>.Success(violationDtos);
         }
 
         public Task<Result<IEnumerable<ViolationDto>>> GetViolationsByClassId(Guid classId)
