@@ -6,6 +6,7 @@ namespace eBoardAPI.Interfaces.Services
     {
         string GenerateAccessToken(Teacher teacher);
         string GenerateRefreshToken();
+        string GenerateResetPasswordToken(Teacher teacher);
     }
 
 }

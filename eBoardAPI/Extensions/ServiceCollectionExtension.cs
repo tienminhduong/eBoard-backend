@@ -100,6 +100,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IActivityService, ActivityService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddSingleton<IEmailService, EmailService>();
 
             return services;
         }
