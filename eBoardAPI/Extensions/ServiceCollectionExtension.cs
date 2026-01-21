@@ -73,7 +73,6 @@ public static class ServiceCollectionExtension
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             services.AddScoped<IAbsentRequestRepository, AbsentRequestRepository>();
             services.AddScoped<IExamScheduleRepository, ExamScheduleRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             services.AddScoped<IActivityRepository, ActivityRepository>();
