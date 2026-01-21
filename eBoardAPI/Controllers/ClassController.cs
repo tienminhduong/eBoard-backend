@@ -36,6 +36,14 @@ public class ClassController(IClassService classService) : ControllerBase
         return Ok(classDtos);
     }
     
+    [HttpGet("teaching/lists")]
+    public async Task<ActionResult<ClassInfoDto>> GetAllClassesOptionTeachingByTeacher(Guid teacherId /*later replaced by id from access token*/)
+    {
+        var classDtos = await classService.GetAllTeachingClassesByTeacherAsync(teacherId);
+        var options = classDtos.Select(c => new { id = c.Id, name = c.Name });
+        return Ok(options);
+    }
+    
     [HttpGet("{classId}")]
     public async Task<ActionResult<ClassInfoDto>> GetClassById(Guid classId)
     {
