@@ -7,4 +7,8 @@ public interface ITeacherRepository
 {
     Task<Result<Teacher>> GetByIdAsync(Guid id);
     Task<Result<Teacher>> UpdateAsync(Teacher teacher);
+    Task<bool> EmailExistsAsync(string email);
+    Task<bool> PhoneExistsAsync(string phone);
+    Task<Result> AddAsync(Teacher teacher);
+    Task<Teacher?> GetByEmailAsync(string email);
 }

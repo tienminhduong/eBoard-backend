@@ -223,5 +223,64 @@ namespace eBoardAPI.Repositories
                 return Result<IEnumerable<ViolationStudent>>.Failure("Lỗi trong quá trình lấy vi phạm cho học sinh");
             }
         }
+
+        public async Task<Result<IEnumerable<Violation>>> GetViolationsByClassIdAsync(Guid classId, int pageNumber = 1, int pageSize = 20)
+        {
+            try
+            {
+                var violations = await dbContext.Violations
+                    .AsNoTracking()
+                    .Include(v => v.Students)
+                    .ThenInclude(vs => vs.Student)
+                    .Where(v => v.ClassId == classId)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .OrderByDescending(v => v.ViolateDate)
+                    .ToListAsync();
+                return Result<IEnumerable<Violation>>.Success(violations);
+            }
+            catch
+            {
+                return Result<IEnumerable<Violation>>.Failure("Lỗi trong quá trình lấy vi phạm");
+            }
+        }
+
+        public async Task<Result<ViolationsStatsDto>> GetViolationStatByClassId(Guid classId, DateOnly? from = null, DateOnly? to = null)
+        {
+            try
+            {
+                var idsQuery = dbContext.Violations
+                    .AsNoTracking()
+                    .Where(v => v.ClassId == classId)
+                    .Select(v => v.Id);
+
+                var totalViolationStudentsQuery = dbContext.ViolationStudents
+                    .AsNoTracking()
+                    .Include(vs => vs.Violation)
+                    .Where(vs => idsQuery.Contains(vs.ViolationId));
+
+                var violationStudents = await totalViolationStudentsQuery.ToListAsync();
+                var totalViolations = violationStudents.Count;
+                var unreadViolations = violationStudents.Count(vs => !vs.SeenByParent);
+                var servereViolations = violationStudents.Count(vs => vs.Violation.ViolationLevel == ViolationLevel.HIGH);
+                var thisWeekViolations = (from != null && to != null) ? violationStudents.Count(vs =>
+                {
+                    var violateDate = vs.Violation.ViolateDate;
+                    return violateDate >= from && violateDate <= to;
+                }) : totalViolations;
+                var stats = new ViolationsStatsDto
+                {
+                    TotalViolations = totalViolations,
+                    UnreadViolations = unreadViolations,
+                    ServereViolations = servereViolations,
+                    ThisWeekViolations = thisWeekViolations
+                };
+                return Result<ViolationsStatsDto>.Success(stats);
+            }
+            catch
+            {
+                return Result<ViolationsStatsDto>.Failure("Lỗi trong quá trình lấy thống kê vi phạm");
+            }
+        }
     }
 }
