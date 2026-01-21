@@ -255,6 +255,7 @@ public static class ServiceCollectionExtension
         cfg.CreateMap<ExamSchedule, ExamScheduleDto>();
         cfg.CreateMap<UpdateExamScheduleDto, ExamSchedule>()
             .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+    }
     
     private static void AddActivityDtoMapping(IMapperConfigurationExpression cfg)
     {
