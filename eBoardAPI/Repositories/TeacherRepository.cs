@@ -42,4 +42,7 @@ public class TeacherRepository(AppDbContext db) : ITeacherRepository
             return Result.Failure("Failed to add teacher.");
         }
     }
+
+    public async Task<Teacher?> GetByEmailAsync(string email)
+        => await db.Teachers.FirstOrDefaultAsync(x => x.Email == email);
 }

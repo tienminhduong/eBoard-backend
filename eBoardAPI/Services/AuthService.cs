@@ -3,11 +3,14 @@ using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Auth;
+using Microsoft.AspNetCore.Identity.Data;
 using System.Net.WebSockets;
 
 namespace eBoardAPI.Services
 {
-    public class AuthService(ITeacherRepository teacherRepository) : IAuthService
+    public class AuthService(ITeacherRepository teacherRepository,
+        IRefreshTokenRepository refreshTokenRepository,
+        ITokenService tokenService) : IAuthService
     {
         public async Task<Result> RegisterTeacherAsync(RegisterTeacherDto dto)
         {
@@ -39,6 +42,36 @@ namespace eBoardAPI.Services
             if (!result.IsSuccess)
                 throw new Exception("Đăng ký thất bại, vui lòng thử lại");
             return Result.Success();
+        }
+
+        public async Task<LoginResponseDto> LoginAsync(TeacherLoginDto dto)
+        {
+            var user = await teacherRepository.GetByEmailAsync(dto.Email);
+            if (user == null)
+                throw new Exception("Email hoặc mật khẩu không đúng");
+
+            var validPassword = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+            if (!validPassword)
+                throw new Exception("Email hoặc mật khẩu không đúng");
+
+            var accessToken = tokenService.GenerateAccessToken(user);
+            var refreshTokenValue = tokenService.GenerateRefreshToken();
+
+            var refreshToken = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                TeacherId = user.Id,
+                Token = refreshTokenValue,
+                ExpiresAt = DateTime.UtcNow.AddDays(7)
+            };
+
+            await refreshTokenRepository.AddAsync(refreshToken);
+
+            return new LoginResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshTokenValue
+            };
         }
     }
 }

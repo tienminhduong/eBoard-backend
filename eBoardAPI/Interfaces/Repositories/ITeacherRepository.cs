@@ -10,4 +10,5 @@ public interface ITeacherRepository
     Task<bool> EmailExistsAsync(string email);
     Task<bool> PhoneExistsAsync(string phone);
     Task<Result> AddAsync(Teacher teacher);
+    Task<Teacher?> GetByEmailAsync(string email);
 }
