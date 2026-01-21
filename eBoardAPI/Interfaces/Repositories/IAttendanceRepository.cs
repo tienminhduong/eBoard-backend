@@ -1,3 +1,4 @@
+using System.Collections;
 using eBoardAPI.Entities;
 
 namespace eBoardAPI.Interfaces.Repositories;
@@ -10,4 +11,5 @@ public interface IAttendanceRepository
     Task<Attendance?> GetAttendanceByIdAsync(Guid attendanceId);
     void UpdateAttendanceAsync(Attendance attendance);
     Task<Tuple<int, int>> GetAttendanceCountsByClassAndDateAsync(Guid classId, DateOnly date);
+    Task<IEnumerable<Student>> GetStudentsWithAbsenceWithoutExcuseAsync(Guid classId, DateOnly date);
 }

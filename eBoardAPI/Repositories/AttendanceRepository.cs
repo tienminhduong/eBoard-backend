@@ -1,3 +1,4 @@
+using System.Collections;
 using eBoardAPI.Consts;
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
@@ -56,5 +57,15 @@ public class AttendanceRepository(AppDbContext dbContext) : IAttendanceRepositor
         return result != null 
             ? Tuple.Create(result.AbsentWithExcuseCount, result.AbsentWithoutExcuseCount) 
             : Tuple.Create(0, 0);
+    }
+
+    public async Task<IEnumerable<Student>> GetStudentsWithAbsenceWithoutExcuseAsync(Guid classId, DateOnly date)
+    {
+        var query = from attendance in dbContext.Attendances
+            where attendance.ClassId == classId
+                  && attendance.Status == EAttendanceStatus.ABSENT
+                  && attendance.Date == date
+            select attendance.Student;
+        return await query.Distinct().ToListAsync();
     }
 }
