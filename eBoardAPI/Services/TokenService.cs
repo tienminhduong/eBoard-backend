@@ -49,6 +49,33 @@ namespace eBoardAPI.Services
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
+
+        public string GenerateResetPasswordToken(Teacher teacher)
+        {
+            var claims = new[]
+            {
+        new Claim("id", teacher.Id.ToString()),
+        new Claim(ClaimTypes.Email, teacher.Email),
+        new Claim("type", "reset-password")
+    };
+
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
+            );
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(15),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
     }
 
 }
