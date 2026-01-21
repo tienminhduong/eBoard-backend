@@ -1,3 +1,4 @@
+using eBoardAPI.Consts;
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
@@ -37,5 +38,22 @@ public class AttendanceRepository(AppDbContext dbContext) : IAttendanceRepositor
     public void UpdateAttendanceAsync(Attendance attendance)
     {
         dbContext.Attendances.Update(attendance);
+    }
+
+    public async Task<Tuple<int, int>> GetAttendanceCountsByClassAndDateAsync(Guid classId, DateOnly date)
+    {
+        var query = from a in dbContext.Attendances
+                    where a.ClassId == classId && a.Date == date
+                    group a by 1 into g
+                    select new
+                    {
+                        AbsentWithExcuseCount = g.Count(a => a.Status == EAttendanceStatus.EXCUSED),
+                        AbsentWithoutExcuseCount = g.Count(a => a.Status == EAttendanceStatus.ABSENT)
+                    };
+        
+        var result = await query.FirstOrDefaultAsync();
+        return result != null 
+            ? Tuple.Create(result.AbsentWithExcuseCount, result.AbsentWithoutExcuseCount) 
+            : Tuple.Create(0, 0);
     }
 }

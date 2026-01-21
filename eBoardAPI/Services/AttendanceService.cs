@@ -155,4 +155,22 @@ public class AttendanceService(
         var absentRequests = await absentRequestRepository.GetAbsentRequestsByClassIdAsync(classId, status, pageNumber, pageSize);
         return mapper.Map<List<AbsentRequestDto>>(absentRequests);
     }
+
+    public async Task<Result<ClassAttendanceSummary>> GetClassAttendanceSummaryAsync(Guid classId, DateOnly date)
+    {
+        var (absentWithExcuseCount, absentWithoutExcuseCount) = await attendanceRepository.GetAttendanceCountsByClassAndDateAsync(classId, date);
+        var studentCountResult = await unitOfWork.ClassRepository.GetClassByIdAsync(classId);
+        
+        if (!studentCountResult.IsSuccess)
+            return Result<ClassAttendanceSummary>.Failure("Lớp học không tồn tại.");
+        
+        var summary = new ClassAttendanceSummary
+        {
+            AbsentWithExcuse = absentWithExcuseCount,
+            AbsentWithoutExcuse = absentWithoutExcuseCount,
+            StudentCount = studentCountResult.Value!.CurrentStudentCount,
+            CurrentAttendance = studentCountResult.Value!.CurrentStudentCount - absentWithExcuseCount - absentWithoutExcuseCount
+        };
+        return Result<ClassAttendanceSummary>.Success(summary);
+    }
 }

@@ -9,4 +9,5 @@ public interface IAttendanceRepository
     Task CreateAttendancesAsync(IEnumerable<Attendance> attendances);
     Task<Attendance?> GetAttendanceByIdAsync(Guid attendanceId);
     void UpdateAttendanceAsync(Attendance attendance);
+    Task<Tuple<int, int>> GetAttendanceCountsByClassAndDateAsync(Guid classId, DateOnly date);
 }

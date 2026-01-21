@@ -19,6 +19,15 @@ public class AttendanceController(IAttendanceService attendanceService) : Contro
         return Ok(attendanceInfoResult.Value);
     }
     
+    [HttpGet("class/{classId}/date/{date}/summary")]
+    public async Task<ActionResult<ClassAttendanceSummary>> GetClassAttendanceSummaryAsync(Guid classId, DateOnly date)
+    {
+        var summaryResult = await attendanceService.GetClassAttendanceSummaryAsync(classId, date);
+        if (!summaryResult.IsSuccess)
+            return NotFound(summaryResult.ErrorMessage);
+        return Ok(summaryResult.Value);
+    }
+    
     [HttpPost]
     public async Task<ActionResult<AttendanceInfoByClassDto>> CreateAttendaceForDateAsync([FromBody] CreateAttendaceForDateDto dto)
     {
