@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using eBoardAPI.Common;
 using eBoardAPI.Consts;
@@ -8,6 +9,7 @@ using eBoardAPI.Models.Activity;
 
 namespace eBoardAPI.Services;
 
+[SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public class ActivityService(
     IActivityRepository activityRepository,
     IUnitOfWork unitOfWork,
@@ -117,6 +119,36 @@ public class ActivityService(
         
         var participant = mapper.Map<ActivityParticipant>(addParticipantDto);
         await unitOfWork.ActivityRepository.AddActivityParticipantAsync(participant);
+        try
+        {
+            await unitOfWork.SaveChangesAsync();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure("Đã xảy ra lỗi khi thêm học sinh tham gia hoạt động.");
+        }
+    }
+
+    public async Task<Result> AddParticipantsAsync(IEnumerable<AddActivityParticipantDto> addParticipantDtos)
+    {
+        var activityId = addParticipantDtos.FirstOrDefault()?.ActivityId;
+        if (activityId == null)
+            return Result.Failure("Không có học sinh");
+        
+        var existingParticipantResult = await unitOfWork.ActivityRepository.GetActivityByIdAsync(activityId.Value);
+        if (!existingParticipantResult.IsSuccess)
+            return Result.Failure("Hoạt động ngoại khóa không tồn tại.");
+
+        foreach (var addParticipantDto in addParticipantDtos)
+        {
+            if (existingParticipantResult.Value!.Participants.Any(p => p.StudentId == addParticipantDto.StudentId))
+                return Result.Failure("Học sinh đã tham gia hoạt động này.");
+            
+            var participant = mapper.Map<ActivityParticipant>(addParticipantDto);
+            await unitOfWork.ActivityRepository.AddActivityParticipantAsync(participant);
+        }
+        
         try
         {
             await unitOfWork.SaveChangesAsync();

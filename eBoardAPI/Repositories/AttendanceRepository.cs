@@ -12,6 +12,7 @@ public class AttendanceRepository(AppDbContext dbContext) : IAttendanceRepositor
     {
         var query = from attendance in dbContext.Attendances
                     where attendance.ClassId == classId && attendance.Date == date
+                    orderby attendance.Status
                     select attendance;
         
         return await query

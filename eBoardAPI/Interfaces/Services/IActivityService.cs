@@ -13,6 +13,7 @@ public interface IActivityService
     Task<Result<ExtracurricularActivityDto>> GetActivityByIdAsync(Guid activityId);
     
     Task<Result> AddParticipantAsync(AddActivityParticipantDto addParticipantDto);
+    Task<Result> AddParticipantsAsync(IEnumerable<AddActivityParticipantDto> addParticipantDtos);
     Task<Result> UpdateParticipantAsync(Guid id, UpdateActivityParticipantDto updateParticipantDto);
     Task<Result> RemoveParticipantAsync(Guid id);
     
