@@ -14,4 +14,5 @@ public interface IAttendanceService
     Task <Result> ApproveAbsenceRequestAsync(Guid requestId);
     Task <Result> RejectAbsenceRequestAsync(Guid requestId);
     Task<IEnumerable<AbsentRequestDto>> GetAbsentRequestsForClassAsync(Guid classId, string status, int pageNumber, int pageSize);
+    Task<Result<ClassAttendanceSummary>> GetClassAttendanceSummaryAsync(Guid classId, DateOnly date);
 }

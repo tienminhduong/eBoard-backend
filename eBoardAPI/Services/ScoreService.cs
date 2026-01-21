@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using eBoardAPI.Common;
 using eBoardAPI.Entities;
+using eBoardAPI.Helpers;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.ScoreSheet;
@@ -85,6 +86,13 @@ public class ScoreService(
             }
         }
         
+        scoreSheet.AverageScore = scoreSheet.Details.Any()
+            ? scoreSheet.Details.Average(d => d.AverageScore)
+            : 0;
+        
+        scoreSheet.Grade = StringHelper.ScoreToGrade(scoreSheet.AverageScore);
+        await unitOfWork.ScoreRepository.EvaluateClassRankAsync(classId, semester);
+        
         await unitOfWork.SaveChangesAsync();
 
         var resultDto = mapper.Map<StudentScoreSheetDto>(scoreSheet);
@@ -129,6 +137,8 @@ public class ScoreService(
                 await unitOfWork.ScoreRepository.AddScoreSheetDetailAsync(newDetail);
             }
         }
+        
+        await unitOfWork.ScoreRepository.EvaluateClassRankAsync(classId, semester);
 
         try
         {
