@@ -7,6 +7,7 @@ using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.AbsentRequest;
+using eBoardAPI.Models.Activity;
 using eBoardAPI.Models.Attendance;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
@@ -73,6 +74,8 @@ public static class ServiceCollectionExtension
             services.AddScoped<IAbsentRequestRepository, AbsentRequestRepository>();
             services.AddScoped<IExamScheduleRepository, ExamScheduleRepository>();
 
+            services.AddScoped<IActivityRepository, ActivityRepository>();
+            
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
@@ -92,6 +95,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IViolationService, ViolationService>();
             services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<IExamScheduleService, ExamScheduleService>();
+            services.AddScoped<IActivityService, ActivityService>();
             return services;
         }
         
@@ -116,6 +120,7 @@ public static class ServiceCollectionExtension
                 AddClassPeriodDtoMappings(cfg);
                 AddScoreSheetDtoMappings(cfg);
                 AddAttendanceDtoMappings(cfg);
+                AddActivityDtoMapping(cfg);
                 
                 AddViolationDtoMapping(cfg);
                 AddExamScheduleDtoMappings(cfg);
@@ -250,5 +255,27 @@ public static class ServiceCollectionExtension
         cfg.CreateMap<ExamSchedule, ExamScheduleDto>();
         cfg.CreateMap<UpdateExamScheduleDto, ExamSchedule>()
             .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+    
+    private static void AddActivityDtoMapping(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<ExtracurricularActivity, ExtracurricularActivityDto>();
+        cfg.CreateMap<ExtracurricularActivity, ParentViewActivityDto>()
+            .ForMember(dest => dest.AssignStatus, opt => opt.Ignore());
+        cfg.CreateMap<CreateActivityDto, ExtracurricularActivity>();
+        cfg.CreateMap<UpdateActivityDto, ExtracurricularActivity>();
+        
+        cfg.CreateMap<ActivityParticipant, ActivityParticipantDto>()
+            .ForMember(dest => dest.StudentName,
+                opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"));
+        
+        cfg.CreateMap<AddActivityParticipantDto, ActivityParticipant>();
+        cfg.CreateMap<UpdateActivityParticipantDto, ActivityParticipant>();
+        
+        cfg.CreateMap<ActivitySignIn, ActivitySignInDto>()
+            .ForMember(dest => dest.StudentName,
+                opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"));
+        cfg.CreateMap<AddActivitySignInDto, ActivitySignIn>()
+            .ForMember(dest => dest.SignInTime,
+                opt => opt.MapFrom(_ => DateTime.UtcNow));
     }
 }

@@ -34,6 +34,16 @@ public static class EAbsentRequestStatus
     public const string REJECTED = "Từ chối";
 }
 
+public static class EActivitySignInStatus
+{
+    public const string NOT_SIGNED_IN = "Chưa đăng kí";
+    public const string PENDING = "Chờ xác nhận";
+    public const string ACCEPTED = "Đã xác nhận";
+    public const string REJECTED = "Bị từ chối";
+    public const string PAID = "Đã đóng tiền";
+    public const string PARTICIPATED = "Đã tham gia";
+}
+
 public static class EDayOfWeek
 {
     public const string MONDAY = "Thứ Hai";

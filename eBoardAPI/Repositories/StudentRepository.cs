@@ -35,6 +35,17 @@ public class StudentRepository(AppDbContext db) : IStudentRepository
         db.Students.Update(student);
     }
 
+    public async Task<Result<Parent>> GetParentByStudentIdAsync(Guid studentId)
+    {
+        var query = from p in db.Parents
+                    join s in db.Students on p.Id equals s.ParentId
+                    where s.Id == studentId
+                    select p;
+        var parent =  await query.FirstOrDefaultAsync();
+        return (parent != null) ? Result<Parent>.Success(parent)
+                                : Result<Parent>.Failure("Phụ huynh không tồn tại");
+    }
+
     public async Task<Result<Student>> GetByIdAsync(Guid id)
     {
         if(id == Guid.Empty)
