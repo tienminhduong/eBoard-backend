@@ -162,13 +162,13 @@ public class ScheduleService(
                     StartTime = detail.StartTime,
                     EndTime = detail.EndTime
                 };
-                scheduleSetting.Details.Add(newDetail);
+                await unitOfWork.ScheduleRepository.AddNewScheduleSettingDetailAsync(newDetail);
             }
         }
         
-        var updateResult = unitOfWork.ScheduleRepository.UpdateScheduleSetting(scheduleSetting, scheduleSetting.Details);
-        if (!updateResult.IsSuccess)
-            return Result.Failure(updateResult.ErrorMessage!);
+        // var updateResult = unitOfWork.ScheduleRepository.UpdateScheduleSetting(scheduleSetting, scheduleSetting.Details);
+        // if (!updateResult.IsSuccess)
+            // return Result.Failure(updateResult.ErrorMessage!);
         
         await unitOfWork.SaveChangesAsync();
         return Result.Success();

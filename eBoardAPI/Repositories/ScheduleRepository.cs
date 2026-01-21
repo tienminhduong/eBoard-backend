@@ -176,6 +176,11 @@ public class ScheduleRepository(AppDbContext dbContext) : IScheduleRepository
         return overflowDetails;
     }
 
+    public async Task AddNewScheduleSettingDetailAsync(ScheduleSettingDetail scheduleSettingDetails)
+    {
+        await dbContext.ScheduleSettingDetails.AddAsync(scheduleSettingDetails);
+    }
+
     public async Task<bool> ValidateEditableScheduleSettingAsync(Guid classId, int morningPeriodCount, int afternoonPeriodCount)
     {
         var query = from cp in dbContext.ClassPeriods
