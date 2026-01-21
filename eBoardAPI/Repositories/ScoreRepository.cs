@@ -59,6 +59,20 @@ public class ScoreRepository(AppDbContext dbContext) : IScoreRepository
         return await query.ToListAsync();
     }
 
+    public async Task EvaluateClassRankAsync(Guid classId, int semester)
+    {
+        var scoreSheets = await GetScoreSheetsByClassAndSemesterAsync(classId, semester);
+        var rankedSheets = scoreSheets
+            .OrderByDescending(s => s.AverageScore)
+            .ToList();
+        
+        for (var i = 0; i < rankedSheets.Count; i++)
+        {
+            rankedSheets[i].Rank = i + 1;
+            dbContext.ScoreSheets.Update(rankedSheets[i]);
+        }
+    }
+
     public async Task<IEnumerable<ScoreSheetDetail>> GetScoreSheetDetailsBySubjectInClassAsync(Guid classId, Guid subjectId, int semester)
     {
         var query = from scoreSheet in dbContext.ScoreSheets
