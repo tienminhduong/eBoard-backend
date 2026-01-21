@@ -1,8 +1,7 @@
 ﻿namespace eBoardAPI.Models.ExamSchedule
 {
-    public class CreateExamScheduleDto
+    public class UpdateExamScheduleDto
     {
-        public required Guid ClassId { get; set; }
         public required Guid SubjectId { get; set; }
         public required string ExamFormat { get; set; }
         public required string Location { get; set; }

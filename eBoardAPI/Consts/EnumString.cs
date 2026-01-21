@@ -54,3 +54,9 @@ public static class EDayOfWeek
     public const string SATURDAY = "Thứ Bảy";
     public const string SUNDAY = "Chủ Nhật";
 }
+
+public static class EExamFormat
+{
+    public const string MIDTERM = "Giữa kỳ";
+    public const string FINAL = "Cuối kỳ";
+}

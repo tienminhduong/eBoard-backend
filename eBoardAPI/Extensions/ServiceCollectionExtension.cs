@@ -11,6 +11,7 @@ using eBoardAPI.Models.Activity;
 using eBoardAPI.Models.Attendance;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.ClassFund;
+using eBoardAPI.Models.ExamSchedule;
 using eBoardAPI.Models.FundExpense;
 using eBoardAPI.Models.FundIncome;
 using eBoardAPI.Models.Parent;
@@ -71,6 +72,8 @@ public static class ServiceCollectionExtension
             services.AddScoped<IViolationRepository, ViolationRepository>();
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             services.AddScoped<IAbsentRequestRepository, AbsentRequestRepository>();
+            services.AddScoped<IExamScheduleRepository, ExamScheduleRepository>();
+
             services.AddScoped<IActivityRepository, ActivityRepository>();
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -91,6 +94,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IScoreService, ScoreService>();
             services.AddScoped<IViolationService, ViolationService>();
             services.AddScoped<IAttendanceService, AttendanceService>();
+            services.AddScoped<IExamScheduleService, ExamScheduleService>();
             services.AddScoped<IActivityService, ActivityService>();
             return services;
         }
@@ -119,6 +123,7 @@ public static class ServiceCollectionExtension
                 AddActivityDtoMapping(cfg);
                 
                 AddViolationDtoMapping(cfg);
+                AddExamScheduleDtoMappings(cfg);
             }, AppDomain.CurrentDomain.GetAssemblies());
             return services;
         }
@@ -243,6 +248,13 @@ public static class ServiceCollectionExtension
     {
         cfg.CreateMap<Violation, ViolationDto>();
     }
+
+    private static void AddExamScheduleDtoMappings(IMapperConfigurationExpression cfg)
+    {
+        cfg.CreateMap<CreateExamScheduleDto, ExamSchedule>();
+        cfg.CreateMap<ExamSchedule, ExamScheduleDto>();
+        cfg.CreateMap<UpdateExamScheduleDto, ExamSchedule>()
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
     
     private static void AddActivityDtoMapping(IMapperConfigurationExpression cfg)
     {
