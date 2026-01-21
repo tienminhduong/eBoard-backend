@@ -45,11 +45,11 @@ namespace eBoardAPI.Controllers
             return NoContent();
         }
 
-        [HttpGet("/classes/{classId}/violations")]
-        public async Task<ActionResult> GetViolationsByClass(Guid classId)
+        [HttpGet("classes/{classId}/violations")]
+        public async Task<ActionResult> GetViolationsByClass(Guid classId, int pageNumber=1, int pageSize=20)
         {
             // Implementation for retrieving violations by class
-            var result = await violationService.GetViolationsByClassId(classId);
+            var result = await violationService.GetViolationsByClassId(classId, pageNumber, pageSize);
             if(!result.IsSuccess)
             {
                 return BadRequest(result.ErrorMessage);
@@ -58,7 +58,7 @@ namespace eBoardAPI.Controllers
             return violations.Any() ? Ok(result.Value) : NotFound();
         }
 
-        [HttpGet("/classes/{classId}/violations/stats")]
+        [HttpGet("classes/{classId}/violations/stats")]
         public async Task<ActionResult> GetViolationStatsByClass(Guid classId)
         {
             var result = await violationService.GetViolationStatsByClassId(classId);

@@ -19,5 +19,6 @@ namespace eBoardAPI.Interfaces.Repositories
         Task<Result> UpdateAsync(ViolationStudent violationStudent);
         Task<Result<SummaryViolation>> GetSummaryViolationAsync(Guid classId, Guid studentId);
         Task<Result<IEnumerable<ViolationStudent>>> GetViolationsByClassIdAndStudentId(Guid classId, Guid studentId, int pageNumber = 1, int pageSize = 20);
+        Task<Result<IEnumerable<Violation>>> GetViolationsByClassIdAsync(Guid classId, int pageNumber, int pageSize);
     }
 }
