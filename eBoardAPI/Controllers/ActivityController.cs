@@ -60,6 +60,14 @@ public class ActivityController(IActivityService activityService) : ControllerBa
         return result.IsSuccess ? NoContent() : BadRequest(result.ErrorMessage!);
     }
 
+    [HttpPost("participants/batch")]
+    public async Task<ActionResult> AddParticipants(
+        [FromBody] IEnumerable<AddActivityParticipantDto> addParticipantDtos)
+    {
+        var result = await activityService.AddParticipantsAsync(addParticipantDtos);
+        return result.IsSuccess ? NoContent() : BadRequest(result.ErrorMessage!);
+    }
+
     [HttpPut("participants/{id}")]
     public async Task<ActionResult> UpdateParticipant(Guid id,
         [FromBody] UpdateActivityParticipantDto updateParticipantDto)

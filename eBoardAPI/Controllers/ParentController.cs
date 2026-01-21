@@ -14,8 +14,6 @@ public class ParentController(IParentService parentService) : ControllerBase
     [HttpGet("info/{id}")]
     public async Task<ActionResult<ParentInfoDto>> GetParentInfo([FromRoute] Guid id)
     {
-        if(ModelState.IsValid == false)
-            return BadRequest();
         var result = await parentService.GetByIdAsync(id);
         return result.IsSuccess ? Ok(result.Value) : NotFound(result.ErrorMessage);
     }
@@ -24,11 +22,7 @@ public class ParentController(IParentService parentService) : ControllerBase
     [HttpPut("info/{id}")]
     public async Task<ActionResult> UpdateParentInfo([FromRoute] Guid id, [FromBody] UpdateParentInfoDto updateParentInfoDto)
     {
-        if (ModelState.IsValid == false)
-        {
-            return BadRequest(ModelState);
-        }
-        var result = await parentService.GetByIdAsync(id);
+        var result = await parentService.UpdateAsync(id, updateParentInfoDto);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ErrorMessage);
     }
 }
