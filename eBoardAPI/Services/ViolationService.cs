@@ -174,9 +174,12 @@ namespace eBoardAPI.Services
             return Result<IEnumerable<ViolationForStudentDto>>.Success(violationDtos);
         }
 
-        public Task<Result<ViolationsStatsDto>> GetViolationStatsByClassId(Guid classId)
+        public async Task<Result<ViolationsStatsDto>> GetViolationStatsByClassId(Guid classId, DateOnly? from, DateOnly? to)
         {
-            throw new NotImplementedException();
+            var res = await violationRepository.GetViolationStatByClassId(classId, from, to);
+            if(!res.IsSuccess)
+                return Result<ViolationsStatsDto>.Failure(res.ErrorMessage ?? "Failed to retrieve violation stats.");
+            return Result<ViolationsStatsDto>.Success(res.Value!);
         }
 
         public async Task<Result> UpdateViolation(Guid violationId, UpdateViolationDto updateViolationDto)

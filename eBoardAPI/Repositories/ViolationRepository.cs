@@ -244,5 +244,43 @@ namespace eBoardAPI.Repositories
                 return Result<IEnumerable<Violation>>.Failure("Lỗi trong quá trình lấy vi phạm");
             }
         }
+
+        public async Task<Result<ViolationsStatsDto>> GetViolationStatByClassId(Guid classId, DateOnly? from = null, DateOnly? to = null)
+        {
+            try
+            {
+                var idsQuery = dbContext.Violations
+                    .AsNoTracking()
+                    .Where(v => v.ClassId == classId)
+                    .Select(v => v.Id);
+
+                var totalViolationStudentsQuery = dbContext.ViolationStudents
+                    .AsNoTracking()
+                    .Include(vs => vs.Violation)
+                    .Where(vs => idsQuery.Contains(vs.ViolationId));
+
+                var violationStudents = await totalViolationStudentsQuery.ToListAsync();
+                var totalViolations = violationStudents.Count;
+                var unreadViolations = violationStudents.Count(vs => !vs.SeenByParent);
+                var servereViolations = violationStudents.Count(vs => vs.Violation.ViolationLevel == ViolationLevel.HIGH);
+                var thisWeekViolations = (from != null && to != null) ? violationStudents.Count(vs =>
+                {
+                    var violateDate = vs.Violation.ViolateDate;
+                    return violateDate >= from && violateDate <= to;
+                }) : totalViolations;
+                var stats = new ViolationsStatsDto
+                {
+                    TotalViolations = totalViolations,
+                    UnreadViolations = unreadViolations,
+                    ServereViolations = servereViolations,
+                    ThisWeekViolations = thisWeekViolations
+                };
+                return Result<ViolationsStatsDto>.Success(stats);
+            }
+            catch
+            {
+                return Result<ViolationsStatsDto>.Failure("Lỗi trong quá trình lấy thống kê vi phạm");
+            }
+        }
     }
 }

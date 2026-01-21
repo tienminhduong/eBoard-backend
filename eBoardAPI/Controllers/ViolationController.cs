@@ -59,9 +59,9 @@ namespace eBoardAPI.Controllers
         }
 
         [HttpGet("classes/{classId}/violations/stats")]
-        public async Task<ActionResult> GetViolationStatsByClass(Guid classId)
+        public async Task<ActionResult> GetViolationStatsByClass(Guid classId, DateOnly? from = null, DateOnly? to = null)
         {
-            var result = await violationService.GetViolationStatsByClassId(classId);
+            var result = await violationService.GetViolationStatsByClassId(classId, from, to);
             if(!result.IsSuccess)
             {
                 return BadRequest(result.ErrorMessage);
