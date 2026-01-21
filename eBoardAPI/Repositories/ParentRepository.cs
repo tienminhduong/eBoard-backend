@@ -46,4 +46,18 @@ public class ParentRepository(AppDbContext dbContext) : IParentRepository
         await dbContext.Parents.AddAsync(parent);
         return parent;
     }
+
+    public async Task<IEnumerable<Parent>> GetParentsByIdsAsync(List<Guid> parentIds)
+    {
+        return await dbContext.Parents
+            .AsNoTracking()
+            .Where(p => parentIds.Contains(p.Id))
+            .ToListAsync();
+    }
+
+    public async Task UpdateRangeParentsAsync(IEnumerable<Parent> parents)
+    {
+        dbContext.Parents.UpdateRange(parents);
+        await dbContext.SaveChangesAsync();
+    }
 }

@@ -31,4 +31,15 @@ public class ParentController(IParentService parentService) : ControllerBase
         var result = await parentService.GetByIdAsync(id);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ErrorMessage);
     }
+
+    [HttpPost("create-accounts")]
+    public async Task<ActionResult> CreateAccountParents([FromBody] List<Guid> parentIds)
+    {
+        if (ModelState.IsValid == false)
+        {
+            return BadRequest(ModelState);
+        }
+        var result = await parentService.CreateAccountForParent(parentIds);
+        return Ok(result);
+    }
 }
