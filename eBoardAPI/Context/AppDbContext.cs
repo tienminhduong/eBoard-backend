@@ -29,6 +29,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ExtracurricularActivity> ExtracurricularActivities { get; set; }
     public DbSet<ActivitySignIn> ActivitySignIns { get; set; }
     public DbSet<ActivityParticipant> ActivityParticipants { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
