@@ -8,7 +8,9 @@ namespace eBoardAPI.Controllers;
 
 [ApiController]
 [Route("api/attendance")]
-public class AttendanceController(IAttendanceService attendanceService) : ControllerBase
+public class AttendanceController(
+    IAttendanceService attendanceService
+    ) : ControllerBase
 {
     [HttpGet("class/{classId}/date/{date}")]
     public async Task<ActionResult<AttendanceInfoByClassDto>> GetAttendanceInfoByClassAsync(Guid classId, DateOnly date)
@@ -105,5 +107,12 @@ public class AttendanceController(IAttendanceService attendanceService) : Contro
             await attendanceService.GetAbsentRequestsForClassAsync(classId, string.Empty, pageNumber,
                 pageSize);
         return Ok(absentRequests);
+    }
+    
+    [HttpPost("class/{classId}/notify-absence-without-excuse/{date}")]
+    public async Task<ActionResult> SendNotificationForAbsenceWithoutExcuseToParentsAsync(Guid classId, DateOnly date)
+    {
+        await attendanceService.SendNotificationForAbsenceWithoutExcuseToParentsAsync(classId, date);
+        return Ok();
     }
 }

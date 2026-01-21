@@ -15,6 +15,7 @@ public class AttendanceService(
     IAttendanceRepository attendanceRepository,
     IAbsentRequestRepository absentRequestRepository,
     IUnitOfWork unitOfWork,
+    IParentNotificationService parentNotificationService,
     IMapper mapper
     ) : IAttendanceService
 {
@@ -172,5 +173,15 @@ public class AttendanceService(
             CurrentAttendance = studentCountResult.Value!.CurrentStudentCount - absentWithExcuseCount - absentWithoutExcuseCount
         };
         return Result<ClassAttendanceSummary>.Success(summary);
+    }
+
+    public async Task SendNotificationForAbsenceWithoutExcuseToParentsAsync(Guid classId, DateOnly date)
+    {
+        var studentsWithAbsenceWithoutExcuse = await attendanceRepository.GetStudentsWithAbsenceWithoutExcuseAsync(classId, date);
+        foreach (var student in studentsWithAbsenceWithoutExcuse)
+        {
+            await parentNotificationService.SendNotificationToParentAsync(student.ParentId,
+                $"Học sinh {student.LastName} {student.FirstName} đã vắng mặt không lý do trong lớp ngày {date.ToString("dd/MM/yyyy")}.");
+        }
     }
 }

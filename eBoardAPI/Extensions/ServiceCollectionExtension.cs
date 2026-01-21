@@ -14,6 +14,7 @@ using eBoardAPI.Models.ClassFund;
 using eBoardAPI.Models.ExamSchedule;
 using eBoardAPI.Models.FundExpense;
 using eBoardAPI.Models.FundIncome;
+using eBoardAPI.Models.Notification;
 using eBoardAPI.Models.Parent;
 using eBoardAPI.Models.Schedule;
 using eBoardAPI.Models.ScoreSheet;
@@ -76,6 +77,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             services.AddScoped<IActivityRepository, ActivityRepository>();
+            services.AddScoped<IParentNotificationRepository, ParentNotificationRepository>();
             
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
@@ -100,7 +102,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddSingleton<IEmailService, EmailService>();
-
+            services.AddScoped<IParentNotificationService, ParentNotificationService>();
             return services;
         }
         
@@ -118,6 +120,7 @@ public static class ServiceCollectionExtension
                 
                 cfg.CreateMap<ScheduleSetting, ScheduleSettingDto>();
                 cfg.CreateMap<ScheduleSettingDetail, ScheduleSettingDetailDto>();
+                cfg.CreateMap<ParentNotification, ParentNotificationDto>();
                 
                 AddStudentDtoMappings(cfg);
                 AddClassDtoMappings(cfg);
