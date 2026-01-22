@@ -27,6 +27,19 @@ namespace eBoardAPI.Repositories
                 .FirstOrDefaultAsync(x => x.Token == token && !x.IsRevoked);
         }
 
+        public async Task<RefreshToken?> GetRefreshTokenByTokenAsync(string token)
+        {
+            var result = await _context.RefreshTokens
+                .FirstOrDefaultAsync(x => x.Token == token);
+            return result;
+        }
+
+        public async Task RevokeToken(RefreshToken token)
+        {
+            _context.RefreshTokens.Remove(token);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();

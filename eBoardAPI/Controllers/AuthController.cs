@@ -65,4 +65,15 @@ public class AuthController(IAuthService authService) : ControllerBase
         }
         return Ok("??i m?t kh?u thành công");
     }
+
+    [HttpPost("teacher/refresh-token")]
+    public async Task<ActionResult> RefreshTeacherToken([FromBody] RefreshTokenRequestDto dto)
+    {
+        var result = await authService.GetNewTokenByRefreshToken(dto);
+        if (!result.IsSuccess)
+        {
+            return Unauthorized(result.ErrorMessage);
+        }
+        return Ok(new { accessToken = result.Value });
+    }
 }

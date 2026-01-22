@@ -193,8 +193,9 @@ public static class ServiceCollectionExtension
                         ),
 
                         // ⚠️ QUAN TRỌNG
-                        RoleClaimType = ClaimTypes.Role
-                };
+                        RoleClaimType = ClaimTypes.Role,
+                        ClockSkew = TimeSpan.Zero
+                    };
             });
             return services;
         }

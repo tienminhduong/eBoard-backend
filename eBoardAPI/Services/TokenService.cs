@@ -38,7 +38,8 @@ namespace eBoardAPI.Services
                 issuer: Environment.GetEnvironmentVariable(EnvKey.JWT_ISSUER)!,
                 audience: Environment.GetEnvironmentVariable(EnvKey.JWT_AUDIENCE)!,
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(3),
+                //expires: DateTime.UtcNow.AddDays(3),
+                expires: DateTime.UtcNow.AddSeconds(3),
                 signingCredentials: creds
             );
 
