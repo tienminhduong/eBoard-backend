@@ -1,4 +1,4 @@
-using eBoardAPI.Interfaces.Services;
+﻿using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Auth;
 using eBoardAPI.Services;
@@ -38,13 +38,13 @@ public class AuthController(IAuthService authService) : ControllerBase
     public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
     {
         await authService.ForgotPasswordAsync(dto);
-        return Ok("N?u email t?n t?i, link reset ?� ???c g?i");
+        return Ok("Nếu email tồn tại, link reset đã được gửi");
     }
 
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
     {
         await authService.ResetPasswordAsync(dto);
-        return Ok("??i m?t kh?u th�nh c�ng");
+        return Ok("Đổi mật khẩu thành công");
     }
 }
