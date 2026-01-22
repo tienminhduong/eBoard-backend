@@ -14,13 +14,21 @@ public class AuthController(IAuthService authService) : ControllerBase
     public async Task<ActionResult<LoginResponseDto>> ParentLogin([FromBody] ParentLoginDto parentLoginDto)
     {
         var result = await authService.LoginAsync(parentLoginDto);
-        return Ok(result);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { Message = result.ErrorMessage });
+        }
+        return Ok(result.Value);
     }
 
     [HttpPost("teacher/login")]
     public async Task<ActionResult<LoginResponseDto>> TeacherLogin([FromBody] TeacherLoginDto teacherLoginDto)
     {
         var result = await authService.LoginAsync(teacherLoginDto);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { Message = result.ErrorMessage });
+        }
         return Ok(result);
     }
 
@@ -38,14 +46,21 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
     {
-        await authService.ForgotPasswordAsync(dto);
+        var result = await authService.ForgotPasswordAsync(dto);
+        if (!result.IsSuccess) {
+            return BadRequest(new { Message = result.ErrorMessage });
+        }
         return Ok("N?u email t?n t?i, link reset ?ã ???c g?i");
     }
 
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
     {
-        await authService.ResetPasswordAsync(dto);
+        var res = await authService.ResetPasswordAsync(dto);
+        if (!res.IsSuccess)
+        {
+            return BadRequest(new { Message = res.ErrorMessage });
+        }
         return Ok("??i m?t kh?u thành công");
     }
 }

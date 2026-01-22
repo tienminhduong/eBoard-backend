@@ -22,19 +22,21 @@ namespace eBoardAPI.Services
         IParentRepository parentRepository,
         ITokenService tokenService) : IAuthService
     {
+        const string LOGIN_FAILURE_MESSAGE = "Đăng nhập không thành công";
+        const string REGISTER_FAILURE_MESSAGE = "Đăng kí không thành công";
         public async Task<Result> RegisterTeacherAsync(RegisterTeacherDto dto)
         {
             // 1. Validate password confirm
             if (dto.Password != dto.ConfirmPassword)
-                throw new Exception("Mật khẩu xác nhận không khớp");
+                return Result.Failure(REGISTER_FAILURE_MESSAGE);
 
             // 2. Check email
             if (await teacherRepository.EmailExistsAsync(dto.Email))
-                throw new Exception("Email đã được sử dụng");
+                return Result.Failure(REGISTER_FAILURE_MESSAGE);
 
             // 3. Check phone
             if (await teacherRepository.PhoneExistsAsync(dto.PhoneNumber))
-                throw new Exception("Số điện thoại đã được sử dụng");
+                return Result.Failure(REGISTER_FAILURE_MESSAGE);
 
             // 4. Hash password
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
@@ -50,19 +52,19 @@ namespace eBoardAPI.Services
 
             var result = await teacherRepository.AddAsync(teacher);
             if (!result.IsSuccess)
-                throw new Exception("Đăng ký thất bại, vui lòng thử lại");
+                return Result.Failure(REGISTER_FAILURE_MESSAGE);
             return Result.Success();
         }
 
-        public async Task<LoginResponseDto> LoginAsync(TeacherLoginDto dto)
+        public async Task<Result<LoginResponseDto>> LoginAsync(TeacherLoginDto dto)
         {
             var user = await teacherRepository.GetByEmailAsync(dto.Email);
             if (user == null)
-                throw new Exception("Email hoặc mật khẩu không đúng");
+                return Result<LoginResponseDto>.Failure(LOGIN_FAILURE_MESSAGE);
 
             var validPassword = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
             if (!validPassword)
-                throw new Exception("Email hoặc mật khẩu không đúng");
+                return Result<LoginResponseDto>.Failure(LOGIN_FAILURE_MESSAGE);
 
             var accessToken = tokenService.GenerateAccessToken(user);
             var refreshTokenValue = tokenService.GenerateRefreshToken();
@@ -77,20 +79,20 @@ namespace eBoardAPI.Services
 
             await refreshTokenRepository.AddAsync(refreshToken);
 
-            return new LoginResponseDto
+            return Result<LoginResponseDto>.Success(new LoginResponseDto
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshTokenValue
-            };
+            });
         }
 
-        public async Task ForgotPasswordAsync(ForgotPasswordDto dto)
+        public async Task<Result> ForgotPasswordAsync(ForgotPasswordDto dto)
         {
             var user = await teacherRepository.GetByEmailAsync(dto.Email);
 
             // KHÔNG tiết lộ email tồn tại hay không
             if (user == null)
-                return;
+                return Result.Failure("");
 
             var token = tokenService.GenerateResetPasswordToken(user);
 
@@ -102,12 +104,13 @@ namespace eBoardAPI.Services
                 "Đặt lại mật khẩu",
                 $"Nhấn vào <a href='{resetLink}'>đây</a> để đặt lại mật khẩu. Link có hiệu lực 15 phút."
             );
+            return Result.Success();
         }
 
-        public async Task ResetPasswordAsync(ResetPasswordDto dto)
+        public async Task<Result> ResetPasswordAsync(ResetPasswordDto dto)
         {
             if (dto.NewPassword != dto.ConfirmPassword)
-                throw new Exception("Mật khẩu xác nhận không khớp");
+                return Result.Failure("Mật khẩu xác nhận không khớp");
 
             var handler = new JwtSecurityTokenHandler();
 
@@ -133,12 +136,12 @@ namespace eBoardAPI.Services
             }
             catch
             {
-                throw new Exception("Token không hợp lệ hoặc đã hết hạn");
+                return Result.Failure("Token không hợp lệ hoặc đã hết hạn");
             }
 
             // Check đúng loại token
             if (principal.FindFirst("type")?.Value != "reset-password")
-                throw new Exception("Token không hợp lệ");
+                return Result.Failure("Token không hợp lệ");
 
             var userId = Guid.Parse(
                 principal.FindFirst("id")!.Value
@@ -146,21 +149,22 @@ namespace eBoardAPI.Services
 
             var teacherResult = await teacherRepository.GetByIdAsync(userId);
             if (!teacherResult.IsSuccess || teacherResult.Value == null)
-                throw new Exception("User không tồn tại");
+                return Result.Failure("User không tồn tại");
             var teacher = teacherResult.Value;
             teacher.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
             await teacherRepository.UpdateAsync(teacher);
+            return Result.Success();
         }
 
-        public async Task<LoginResponseDto> LoginAsync(ParentLoginDto login)
+        public async Task<Result<LoginResponseDto>> LoginAsync(ParentLoginDto login)
         {
             var parentResult = await parentRepository.GetByPhoneNumberAsync(login.PhoneNumber);
             if (parentResult == null || !parentResult.IsSuccess)
-                throw new Exception("Số điện thoại hoặc mật khẩu không đúng");
+                return Result<LoginResponseDto>.Failure(LOGIN_FAILURE_MESSAGE);
             var parent = parentResult.Value!;
             var validPassword = BCrypt.Net.BCrypt.Verify(login.Password, parent.PasswordHash);
             if (!validPassword)
-                throw new Exception("Số điện thoại hoặc mật khẩu không đúng");
+                return Result<LoginResponseDto>.Failure(LOGIN_FAILURE_MESSAGE);
 
             var accessToken = tokenService.GenerateAccessToken(parent);
             var refreshTokenValue = tokenService.GenerateRefreshToken();
@@ -174,11 +178,11 @@ namespace eBoardAPI.Services
             };
 
             await refreshTokenParentRepository.AddAsync(refreshToken);
-            return new LoginResponseDto
+            return Result<LoginResponseDto>.Success(new LoginResponseDto
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshTokenValue
-            };
+            });
         }
     }
 }
