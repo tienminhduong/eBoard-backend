@@ -164,6 +164,13 @@ namespace eBoardAPI.Services
                     incomeDetailEntity.ContributedAmount += difference;
                     fundIncomeEntity.CollectedAmount += difference;
                     classFundEntity.CurrentBalance += difference;
+                    classFundEntity.TotalContributions += difference;
+                    var updateFundClassResult = await unitOfWork.ClassFundRepository.UpdateAsync(classFundEntity);
+                    if (!updateFundClassResult.IsSuccess)
+                    {
+                        unitOfWork.Dispose();
+                        return Result.Failure("Cập nhật quỹ lớp thất bại");
+                    }
                 }
 
                 incomeDetailEntity.UpdateStatus(incomeDetailEntity.FundIncome.AmountPerStudent);
