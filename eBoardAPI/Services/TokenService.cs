@@ -1,4 +1,5 @@
-﻿using eBoardAPI.Entities;
+﻿using eBoardAPI.Consts;
+using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Services;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
@@ -28,14 +29,14 @@ namespace eBoardAPI.Services
         };
 
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
+                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable(EnvKey.JWT_KEY)!)
             );
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
+                issuer: Environment.GetEnvironmentVariable(EnvKey.JWT_ISSUER)!,
+                audience: Environment.GetEnvironmentVariable(EnvKey.JWT_AUDIENCE)!,
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: creds
@@ -53,12 +54,12 @@ namespace eBoardAPI.Services
                 new Claim(ClaimTypes.Role, ROLE.Parent.ToString())
                 };
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
+                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable(EnvKey.JWT_KEY)!)
             );
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
+                issuer: Environment.GetEnvironmentVariable(EnvKey.JWT_ISSUER)!,
+                audience: Environment.GetEnvironmentVariable(EnvKey.JWT_AUDIENCE)!,
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: creds
@@ -81,14 +82,14 @@ namespace eBoardAPI.Services
     };
 
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
+                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable(EnvKey.JWT_KEY)!)
             );
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
+                issuer: Environment.GetEnvironmentVariable(EnvKey.JWT_ISSUER)!,
+                audience: Environment.GetEnvironmentVariable(EnvKey.JWT_AUDIENCE)!,
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: creds
