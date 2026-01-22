@@ -78,7 +78,8 @@ public static class ServiceCollectionExtension
 
             services.AddScoped<IActivityRepository, ActivityRepository>();
             services.AddScoped<IParentNotificationRepository, ParentNotificationRepository>();
-            
+            services.AddScoped<IRefreshTokenParentRepository, RefreshTokenParentRepository>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

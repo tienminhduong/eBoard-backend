@@ -17,7 +17,9 @@ namespace eBoardAPI.Services
     public class AuthService(ITeacherRepository teacherRepository,
         IEmailService emailService,
         IRefreshTokenRepository refreshTokenRepository,
+        IRefreshTokenParentRepository refreshTokenParentRepository,
         IConfiguration _config,
+        IParentRepository parentRepository,
         ITokenService tokenService) : IAuthService
     {
         public async Task<Result> RegisterTeacherAsync(RegisterTeacherDto dto)
@@ -150,6 +152,33 @@ namespace eBoardAPI.Services
             await teacherRepository.UpdateAsync(teacher);
         }
 
+        public async Task<LoginResponseDto> LoginAsync(ParentLoginDto login)
+        {
+            var parentResult = await parentRepository.GetByPhoneNumberAsync(login.PhoneNumber);
+            if (parentResult == null || !parentResult.IsSuccess)
+                throw new Exception("Số điện thoại hoặc mật khẩu không đúng");
+            var parent = parentResult.Value!;
+            var validPassword = BCrypt.Net.BCrypt.Verify(login.Password, parent.PasswordHash);
+            if (!validPassword)
+                throw new Exception("Số điện thoại hoặc mật khẩu không đúng");
 
+            var accessToken = tokenService.GenerateAccessToken(parent);
+            var refreshTokenValue = tokenService.GenerateRefreshToken();
+
+            var refreshToken = new RefreshTokenParent
+            {
+                Id = Guid.NewGuid(),
+                ParentId = parent.Id,
+                Token = refreshTokenValue,
+                ExpiresAt = DateTime.UtcNow.AddDays(7)
+            };
+
+            await refreshTokenParentRepository.AddAsync(refreshToken);
+            return new LoginResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshTokenValue
+            };
+        }
     }
 }
