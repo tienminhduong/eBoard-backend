@@ -17,7 +17,7 @@ public interface IActivityService
     Task<Result> UpdateParticipantAsync(Guid id, UpdateActivityParticipantDto updateParticipantDto);
     Task<Result> RemoveParticipantAsync(Guid id);
     
-    Task<Result> AddSignInAsync(AddActivitySignInDto addSignInDto);
+    Task<Result<Guid>> AddSignInAsync(AddActivitySignInDto addSignInDto);
     Task<Result> RemoveSignInAsync(Guid id);
     Task<Result> AcceptSignInAsync(Guid id);
     Task<Result> RejectSignInAsync(Guid id);

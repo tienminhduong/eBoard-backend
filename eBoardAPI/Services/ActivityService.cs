@@ -196,33 +196,33 @@ public class ActivityService(
         }
     }
 
-    public async Task<Result> AddSignInAsync(AddActivitySignInDto addSignInDto)
+    public async Task<Result<Guid>> AddSignInAsync(AddActivitySignInDto addSignInDto)
     {
         var existingActivityResult = await unitOfWork.ActivityRepository.GetActivityByIdAsync(addSignInDto.ActivityId);
         if (!existingActivityResult.IsSuccess)
-            return Result.Failure("Hoạt động ngoại khóa không tồn tại.");
+            return Result<Guid>.Failure("Hoạt động ngoại khóa không tồn tại.");
         
         if (existingActivityResult.Value!.Participants.Any(si => si.StudentId == addSignInDto.StudentId))
-            return Result.Failure("Học sinh đã đăng ký tham gia hoạt động này.");
+            return Result<Guid>.Failure("Học sinh đã đăng ký tham gia hoạt động này.");
         
         var existingStudentResult = await unitOfWork.StudentRepository.GetByIdAsync(addSignInDto.StudentId);
         if (!existingStudentResult.IsSuccess)
-            return Result.Failure("Học sinh không tồn tại.");
+            return Result<Guid>.Failure("Học sinh không tồn tại.");
         
         var existingSignIns = await unitOfWork.ActivityRepository.GetSignInsForActivityAsync(addSignInDto.ActivityId, "");
         if (existingSignIns.Any(si => si.StudentId == addSignInDto.StudentId))
-            return Result.Failure("Học sinh đã đăng ký tham gia hoạt động này.");
+            return Result<Guid>.Failure("Học sinh đã đăng ký tham gia hoạt động này.");
         
         var signIn = mapper.Map<ActivitySignIn>(addSignInDto);
         await unitOfWork.ActivityRepository.AddActivitySignInAsync(signIn);
         try
         {
             await unitOfWork.SaveChangesAsync();
-            return Result.Success();
+            return Result<Guid>.Success(signIn.Id);
         }
         catch (Exception ex)
         {
-            return Result.Failure("Đã xảy ra lỗi khi thêm đăng ký tham gia hoạt động.");
+            return Result<Guid>.Failure("Đã xảy ra lỗi khi thêm đăng ký tham gia hoạt động.");
         }
     }
 

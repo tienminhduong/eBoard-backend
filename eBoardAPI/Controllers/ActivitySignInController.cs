@@ -13,7 +13,12 @@ public class ActivitySignInController(IActivityService activityService) : Contro
     public async Task<ActionResult> AddSignIn([FromBody] AddActivitySignInDto addSignInDto)
     {
         var result = await activityService.AddSignInAsync(addSignInDto);
-        return result.IsSuccess ? NoContent() : BadRequest(result.ErrorMessage!);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result.ErrorMessage!);
+        }
+        var res = await activityService.CheckPaidSignInAsync(result.Value);
+        return res.IsSuccess ? NoContent() : BadRequest(res.ErrorMessage);
     }
 
     [HttpDelete("signins/{id}")]
