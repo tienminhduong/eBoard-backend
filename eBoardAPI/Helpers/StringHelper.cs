@@ -1,3 +1,4 @@
+using eBoardAPI.Consts;
 using eBoardAPI.Entities;
 using eBoardAPI.Models.Student;
 
@@ -38,6 +39,29 @@ public static class StringHelper
             >= 7 => "Khá",
             >= 5 => "Trung bình",
             _ => "Yếu"
+        };
+    }
+
+    public static string ConductAndScoreGradeToFinalGrade(string conduct, string grade)
+    {
+        return conduct switch
+        {
+            EConduct.GOOD => grade,
+            EConduct.AVERAGE => grade switch
+            {
+                "Xuất sắc" => "Giỏi",
+                "Giỏi" => "Khá",
+                "Khá" => "Trung bình",
+                "Trung bình" => "Yếu",
+                _ => "Yếu"
+            },
+            _ => grade switch
+            {
+                "Xuất sắc" => "Khá",
+                "Giỏi" => "Trung bình",
+                "Khá" => "Yếu",
+                _ => "Yếu"
+            }
         };
     }
 }

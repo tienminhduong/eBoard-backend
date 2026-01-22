@@ -47,9 +47,8 @@ public static class EActivitySignInStatus
 public static class EConduct
 {
     public const string GOOD = "Tốt";
-    public const string FAIR = "Khá";
-    public const string AVERAGE = "Trung bình";
-    public const string POOR = "Yếu";
+    public const string AVERAGE = "Đạt";
+    public const string NEEDS_IMPROVEMENT = "Cần cố gắng";
 }
 
 public static class EExamFormat
