@@ -60,4 +60,17 @@ public class ParentRepository(AppDbContext dbContext) : IParentRepository
         dbContext.Parents.UpdateRange(parents);
         await dbContext.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<Parent>> GetParentNotCreateAccountByClassId(Guid classId)
+    {
+        var query = await dbContext.InClasses
+            .AsNoTracking()
+            .Where(ic => ic.ClassId == classId)
+            .Include(ic => ic.Student)
+            .ThenInclude(s => s.Parent)
+            .Select(ic => ic.Student.Parent)
+            .Where(pr => pr.GeneratedPassword == "")
+            .ToListAsync();
+        return query;
+    }
 }

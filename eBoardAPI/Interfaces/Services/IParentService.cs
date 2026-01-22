@@ -8,4 +8,5 @@ public interface IParentService
     Task<Result<ParentInfoDto>> GetByIdAsync(Guid id);
     Task<Result<ParentInfoDto>> UpdateAsync(Guid id, UpdateParentInfoDto updateParentInfoDto);
     Task<IEnumerable<ParentInfoDto>> CreateAccountForParent(List<Guid> parentIds);
+    Task<IEnumerable<ParentInfoDto>> GetParentNotCreateAccountByClassId(Guid classId);
 }

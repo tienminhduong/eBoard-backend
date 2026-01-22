@@ -11,4 +11,5 @@ public interface IParentRepository
     Task<Parent> AddNewParentAsync(Parent parent);
     Task<IEnumerable<Parent>> GetParentsByIdsAsync(List<Guid> parentIds);
     Task UpdateRangeParentsAsync(IEnumerable<Parent> parents);
+    Task<IEnumerable<Parent>> GetParentNotCreateAccountByClassId(Guid classId);
 }

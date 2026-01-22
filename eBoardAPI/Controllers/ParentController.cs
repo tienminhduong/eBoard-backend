@@ -42,4 +42,12 @@ public class ParentController(IParentService parentService) : ControllerBase
         var result = await parentService.CreateAccountForParent(parentIds);
         return Ok(result);
     }
+
+    [HttpGet("class/{classId}/accounts/not-created")]
+    public async Task<ActionResult> GetParentNotCreateAccountByClassId(Guid classId)
+    {
+        var result = await parentService.GetParentNotCreateAccountByClassId(classId);
+        return Ok(result);
+    }
+
 }
