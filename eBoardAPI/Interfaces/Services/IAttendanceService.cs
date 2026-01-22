@@ -18,4 +18,5 @@ public interface IAttendanceService
     
     Task SendNotificationForAbsenceWithoutExcuseToParentsAsync(Guid classId, DateOnly date);
     Task<IEnumerable<string>> GetRecentPickUpPersonForStudentAsync(Guid studentId, int limit);
+    Task<IEnumerable<AbsentRequestDto>> GetAbsentRequestsForStudentInClassAsync(Guid studentId, Guid classId);
 }

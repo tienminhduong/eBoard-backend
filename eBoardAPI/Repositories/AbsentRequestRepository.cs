@@ -52,4 +52,16 @@ public class AbsentRequestRepository(AppDbContext dbContext) : IAbsentRequestRep
     {
         dbContext.AbsentRequests.Update(absentRequest);
     }
+
+    public async Task<IEnumerable<AbsentRequest>> GetAbsentRequestsByStudentInClassAsync(Guid studentId, Guid classId)
+    {
+        var query = from request in dbContext.AbsentRequests
+                    where request.StudentId == studentId && request.ClassId == classId
+                    select request;
+
+        return await query
+            .Include(r => r.Class)
+            .Include(r => r.Student)
+            .ToListAsync();
+    }
 }

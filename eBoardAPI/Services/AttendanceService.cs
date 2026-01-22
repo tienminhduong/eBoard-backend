@@ -189,4 +189,10 @@ public class AttendanceService(
     {
         return await attendanceRepository.GetRecentPickUpPersonForStudentAsync(studentId, limit);
     }
+
+    public async Task<IEnumerable<AbsentRequestDto>> GetAbsentRequestsForStudentInClassAsync(Guid studentId, Guid classId)
+    {
+        var absentRequests = await absentRequestRepository.GetAbsentRequestsByStudentInClassAsync(studentId, classId);
+        return mapper.Map<List<AbsentRequestDto>>(absentRequests);
+    }
 }
