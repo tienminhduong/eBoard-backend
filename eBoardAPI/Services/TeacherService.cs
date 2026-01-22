@@ -3,12 +3,37 @@ using eBoardAPI.Common;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
+using eBoardAPI.Models.Auth;
 using eBoardAPI.Models.Teacher;
 
 namespace eBoardAPI.Services;
 
 public class TeacherService(ITeacherRepository teacherRepository, IMapper mapper) : ITeacherService
 {
+    public async Task<Result> ChangePasswordAsync(ChangePasswordDto changePasswordDto)
+    {
+        if(changePasswordDto.NewPassword != changePasswordDto.ConfirmPassword)
+        {
+            return Result.Failure("New password and confirm password do not match.");
+        }
+        var teacherResult = await teacherRepository.GetByIdAsync(changePasswordDto.Id);
+        if(!teacherResult.IsSuccess)
+        {
+            return Result.Failure(teacherResult.ErrorMessage!);
+        }
+        var teacher = teacherResult.Value!;
+        if(!BCrypt.Net.BCrypt.Verify(changePasswordDto.OldPassword, teacher.PasswordHash))
+        {
+            return Result.Failure("Old password is incorrect.");
+        }
+        teacher.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordDto.NewPassword);
+        var updateResult = await teacherRepository.UpdateAsync(teacher);
+        return updateResult.IsSuccess 
+            ? Result.Success() 
+            : Result.Failure(updateResult.ErrorMessage!);
+
+    }
+
     public async Task<Result<TeacherInfoDto>> GetTeacherInfoAsync(Guid id)
     {       
         var teacherResult = await teacherRepository.GetByIdAsync(id);

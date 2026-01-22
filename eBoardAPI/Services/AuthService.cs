@@ -144,7 +144,7 @@ namespace eBoardAPI.Services
                 return Result.Failure("Token không hợp lệ");
 
             var userId = Guid.Parse(
-                principal.FindFirst("id")!.Value
+                principal.FindFirst(CustomClaims.USER_ID)!.Value
             );
 
             var teacherResult = await teacherRepository.GetByIdAsync(userId);

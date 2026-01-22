@@ -1,6 +1,7 @@
 using eBoardAPI.Common;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
+using eBoardAPI.Models.Auth;
 using eBoardAPI.Models.Teacher;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,6 +48,20 @@ public class TeacherController(ITeacherService teacherService) : ControllerBase
         else
         {
             return NotFound(result.ErrorMessage);
+        }
+    }
+
+    [HttpPost("change-password")]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+    {
+        var result = await teacherService.ChangePasswordAsync(changePasswordDto);
+        if (result.IsSuccess)
+        {
+            return Ok();
+        }
+        else
+        {
+            return BadRequest(result.ErrorMessage);
         }
     }
 }
