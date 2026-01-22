@@ -98,7 +98,7 @@ namespace eBoardAPI.Repositories
             }
         }
 
-        public async Task<Result<IEnumerable<StudentFundIncomeSummary>>> GetAllFundIncomeDetailsByIdFundIncomeAsync(Guid fundIncomeId)
+        public async Task<Result<IEnumerable<StudentFundIncomeSummary>>> GetAllFundIncomeDetailsByIdFundIncomeAsync(Guid fundIncomeId, int pageNumber = 1, int pageSize = 20)
         {
             try
             {
@@ -175,6 +175,9 @@ namespace eBoardAPI.Repositories
 
                 var data = await result
                     .AsNoTracking()
+                    .Skip(pageSize * (pageNumber - 1))
+                    .Take(pageSize)
+                    .OrderBy(r => r.FullName)
                     .ToListAsync();
                 return Result<IEnumerable<StudentFundIncomeSummary>>.Success(data);
             }

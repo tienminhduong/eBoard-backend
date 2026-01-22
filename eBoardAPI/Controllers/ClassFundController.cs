@@ -138,9 +138,9 @@ public class ClassFundController(IClassFundService classFundService,
     }
 
     [HttpGet("{fundIncomeId}/summary")]
-    public async Task<ActionResult> GetSummaryFundIncomeByIdAsync(Guid fundIncomeId)
+    public async Task<ActionResult> GetSummaryFundIncomeByIdAsync(Guid fundIncomeId, int pageNumber = 1, int pageSize = 20)
     {
-        var result = await fundIncomeDetailService.GetAllFundIncomeDetailsByIdFundIncomeAsync(fundIncomeId);
+        var result = await fundIncomeDetailService.GetAllFundIncomeDetailsByIdFundIncomeAsync(fundIncomeId, pageNumber, pageSize);
         if(!result.IsSuccess)
         {
             return BadRequest(result.ErrorMessage);
