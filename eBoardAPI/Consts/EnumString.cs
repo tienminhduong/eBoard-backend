@@ -44,15 +44,11 @@ public static class EActivitySignInStatus
     public const string PARTICIPATED = "Đã tham gia";
 }
 
-public static class EDayOfWeek
+public static class EConduct
 {
-    public const string MONDAY = "Thứ Hai";
-    public const string TUESDAY = "Thứ Ba";
-    public const string WEDNESDAY = "Thứ Tư";
-    public const string THURSDAY = "Thứ Năm";
-    public const string FRIDAY = "Thứ Sáu";
-    public const string SATURDAY = "Thứ Bảy";
-    public const string SUNDAY = "Chủ Nhật";
+    public const string GOOD = "Tốt";
+    public const string AVERAGE = "Đạt";
+    public const string NEEDS_IMPROVEMENT = "Cần cố gắng";
 }
 
 public static class EExamFormat

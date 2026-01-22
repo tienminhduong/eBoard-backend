@@ -78,7 +78,8 @@ public static class ServiceCollectionExtension
 
             services.AddScoped<IActivityRepository, ActivityRepository>();
             services.AddScoped<IParentNotificationRepository, ParentNotificationRepository>();
-            
+            services.AddScoped<IRefreshTokenParentRepository, RefreshTokenParentRepository>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
@@ -222,7 +223,9 @@ public static class ServiceCollectionExtension
     {
         cfg.CreateMap<ScoreSheet, StudentScoreSummaryDto>()
             .ForMember(dest => dest.StudentName,
-                opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"));
+                opt => opt.MapFrom(src => $"{src.Student.LastName} {src.Student.FirstName}"))
+            .ForMember(dest => dest.FinalGrade,
+                opt => opt.MapFrom(src => StringHelper.ConductAndScoreGradeToFinalGrade(src.Conduct, src.Grade)));
 
         cfg.CreateMap<ScoreSheet, StudentScoreSheetDto>()
             .ForMember(dest => dest.StudentName,

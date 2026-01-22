@@ -13,13 +13,22 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("parent/login")]
     public async Task<ActionResult<LoginResponseDto>> ParentLogin([FromBody] ParentLoginDto parentLoginDto)
     {
-        return Ok(new LoginResponseDto { AccessToken = "parent_access_token", RefreshToken = "parent_refresh_token" });
+        var result = await authService.LoginAsync(parentLoginDto);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { Message = result.ErrorMessage });
+        }
+        return Ok(result.Value);
     }
 
     [HttpPost("teacher/login")]
     public async Task<ActionResult<LoginResponseDto>> TeacherLogin([FromBody] TeacherLoginDto teacherLoginDto)
     {
         var result = await authService.LoginAsync(teacherLoginDto);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { Message = result.ErrorMessage });
+        }
         return Ok(result);
     }
 
@@ -38,13 +47,13 @@ public class AuthController(IAuthService authService) : ControllerBase
     public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
     {
         await authService.ForgotPasswordAsync(dto);
-        return Ok("Nếu email tồn tại, link reset đã được gửi");
+        return Ok("N?u email t?n t?i, link reset ?� ???c g?i");
     }
 
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
     {
         await authService.ResetPasswordAsync(dto);
-        return Ok("Đổi mật khẩu thành công");
+        return Ok("??i m?t kh?u th�nh c�ng");
     }
 }

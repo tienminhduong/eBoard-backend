@@ -64,4 +64,24 @@ public class ScoreController(IScoreService scoreService) : ControllerBase
             return BadRequest("Cập nhật điểm thất bại");
         return NoContent();
     }
+    
+    [HttpPatch("{classId}/scores/{semester}/conduct")]
+    public async Task<ActionResult> UpdateStudentsConduct(Guid classId, int semester,
+        [FromBody] UpdateConductDto updateConductDto)
+    {
+        var isSuccess = await scoreService.UpdateStudentConductAsync(classId, semester, updateConductDto);
+        if (!isSuccess)
+            return BadRequest("Cập nhật hạnh kiểm thất bại");
+        return NoContent();
+    }
+
+    [HttpPatch("{classId}/scores/{semester}/conduct/batch")]
+    public async Task<ActionResult> UpdateStudentsConductBatch(Guid classId, int semester,
+        IEnumerable<UpdateConductDto> updateConductDtos)
+    {
+        var isSuccess = await scoreService.UpdateStudentsConductAsync(classId, semester, updateConductDtos);
+        if (!isSuccess)
+            return BadRequest("Cập nhật hạnh kiểm thất bại");
+        return NoContent();
+    }
 }

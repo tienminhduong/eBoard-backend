@@ -139,4 +139,9 @@ public class ScoreRepository(AppDbContext dbContext) : IScoreRepository
     {
         await dbContext.ScoreSheetDetails.AddAsync(scoreSheetDetail);
     }
+
+    public void UpdateScoreSheetAsync(ScoreSheet scoreSheet)
+    {
+        dbContext.ScoreSheets.Update(scoreSheet);
+    }
 }

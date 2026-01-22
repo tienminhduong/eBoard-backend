@@ -6,8 +6,9 @@ namespace eBoardAPI.Interfaces.Services
     public interface IAuthService
     {
         Task<Result> RegisterTeacherAsync(RegisterTeacherDto registerTeacherDto);
-        Task<LoginResponseDto> LoginAsync(TeacherLoginDto login);
-        Task ForgotPasswordAsync(ForgotPasswordDto dto);
-        Task ResetPasswordAsync(ResetPasswordDto dto);
+        Task<Result<LoginResponseDto>> LoginAsync(TeacherLoginDto login);
+        Task<Result<LoginResponseDto>> LoginAsync(ParentLoginDto login);
+        Task<Result> ForgotPasswordAsync(ForgotPasswordDto dto);
+        Task<Result> ResetPasswordAsync(ResetPasswordDto dto);
     }
 }
