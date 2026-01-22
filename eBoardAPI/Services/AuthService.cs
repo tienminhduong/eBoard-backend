@@ -1,4 +1,5 @@
 ﻿using eBoardAPI.Common;
+using eBoardAPI.Consts;
 using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
@@ -97,7 +98,7 @@ namespace eBoardAPI.Services
             var token = tokenService.GenerateResetPasswordToken(user);
 
             var resetLink =
-                $"{_config["Frontend:ResetPasswordUrl"]}?token={token}";
+                $"{Environment.GetEnvironmentVariable(EnvKey.FRONTEND_RESET_PASSWORD_URL)!}?token={token}";
 
             await emailService.SendAsync(
                 user.Email,
@@ -125,10 +126,10 @@ namespace eBoardAPI.Services
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = _config["Jwt:Issuer"],
-                        ValidAudience = _config["Jwt:Audience"],
+                        ValidIssuer = Environment.GetEnvironmentVariable(EnvKey.JWT_ISSUER)!,
+                        ValidAudience = Environment.GetEnvironmentVariable(EnvKey.JWT_AUDIENCE)!,
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
+                            Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable(EnvKey.JWT_KEY)!)
                         )
                     },
                     out _

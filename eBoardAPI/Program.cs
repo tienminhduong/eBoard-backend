@@ -33,6 +33,7 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "eBoard API V1");
 });
 
+app.UseAuthentication();
 app.MapControllers();
 
 app.Run();
