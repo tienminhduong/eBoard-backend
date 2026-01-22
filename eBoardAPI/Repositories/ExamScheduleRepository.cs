@@ -90,6 +90,40 @@ namespace eBoardAPI.Repositories
             }
         }
 
+        public async Task<Result<ExamScheduleStats>> GetExamScheduleStats(Guid classId)
+        {
+            try
+            {
+
+                int currentMonth = DateTime.Now.Month;
+                var examSchedules = await dbContext.ExamSchedules
+                    .AsNoTracking()
+                    .Where(es => es.ClassId == classId)
+                    .ToListAsync();
+
+                int examInMonth = 0;
+                int futureExam = 0;
+                foreach (var exam in examSchedules)
+                {
+                    if (exam.StartTime > DateTime.Now)
+                        futureExam++;
+
+                    if (exam.StartTime.Month == currentMonth)
+                        examInMonth++;
+                }
+
+                return Result<ExamScheduleStats>.Success(new ExamScheduleStats
+                {
+                    ExamInMonth = examInMonth,
+                    FutureExam = futureExam
+                });
+            }
+            catch (Exception ex)
+            {
+                return Result<ExamScheduleStats>.Failure(ex.Message);
+            }
+        }
+
         public async Task<Result> UpdateAsync(ExamSchedule examSchedule)
         {
             try

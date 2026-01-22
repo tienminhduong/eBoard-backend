@@ -26,7 +26,7 @@ namespace eBoardAPI.Controllers
             var result = await examScheduleService.GetExamScheduleById(examScheduleId);
             if (result.IsSuccess)
             {
-                if(result.Value == null)
+                if (result.Value == null)
                 {
                     return NotFound();
                 }
@@ -39,8 +39,8 @@ namespace eBoardAPI.Controllers
         public async Task<ActionResult> GetExamSchedules(Guid classId, [FromQuery] ExamScheduleFilter filter)
         {
             var result = await examScheduleService.GetExamSchedules(classId, filter);
-            if (!result.IsSuccess) 
-            { 
+            if (!result.IsSuccess)
+            {
                 return BadRequest(result.ErrorMessage);
             }
             return Ok(result.Value);
@@ -67,5 +67,14 @@ namespace eBoardAPI.Controllers
             }
             return BadRequest(result.ErrorMessage);
         }
+
+        [HttpGet("exams-schedule/classes/{classId}/stats")]
+        public async Task<ActionResult> GetExamScheduleStatsByClassId(Guid classId)
+        {
+            var result = await examScheduleService.GetExamScheduleStats(classId);
+            if(!result.IsSuccess)
+                return BadRequest(result.ErrorMessage);
+            return Ok(result.Value);
+        } 
     }
 }
