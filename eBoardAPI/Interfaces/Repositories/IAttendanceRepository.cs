@@ -12,4 +12,5 @@ public interface IAttendanceRepository
     void UpdateAttendanceAsync(Attendance attendance);
     Task<Tuple<int, int>> GetAttendanceCountsByClassAndDateAsync(Guid classId, DateOnly date);
     Task<IEnumerable<Student>> GetStudentsWithAbsenceWithoutExcuseAsync(Guid classId, DateOnly date);
+    Task<IEnumerable<string>> GetRecentPickUpPersonForStudentAsync(Guid studentId, int limit);
 }

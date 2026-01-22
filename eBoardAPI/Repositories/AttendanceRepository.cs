@@ -68,4 +68,15 @@ public class AttendanceRepository(AppDbContext dbContext) : IAttendanceRepositor
             select attendance.Student;
         return await query.Distinct().ToListAsync();
     }
+
+    public async Task<IEnumerable<string>> GetRecentPickUpPersonForStudentAsync(Guid studentId, int limit)
+    {
+        var query = from attendance in dbContext.Attendances
+            where attendance.StudentId == studentId
+                  && !string.IsNullOrEmpty(attendance.PickupPerson)
+            orderby attendance.Date descending
+            select attendance.PickupPerson!;
+        
+        return await query.Distinct().Take(limit).ToListAsync();
+    }
 }
