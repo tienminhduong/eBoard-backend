@@ -1,4 +1,5 @@
 using eBoardAPI.Common;
+using eBoardAPI.Models.Auth;
 using eBoardAPI.Models.Parent;
 
 namespace eBoardAPI.Interfaces.Services;
@@ -11,4 +12,5 @@ public interface IParentService
     Task<IEnumerable<ParentInfoDto>> GetParentNotCreateAccountByClassId(Guid classId, int pageNumber, int pageSize);
     Task<IEnumerable<ParentInfoDto>> GetParentCreateAccountByClassId(Guid classId, int pageNumber, int pageSize);
     Task<IEnumerable<ChildInClassDto>> GetChildInClassesByClassId(Guid parentId, int pageNumber, int pageSize);
+    Task<Result> ChangePasswordAsync(ChangePasswordDto changePasswordDto);
 }

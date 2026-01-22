@@ -1,8 +1,10 @@
 using AutoMapper;
+using BCrypt.Net;
 using eBoardAPI.Common;
 using eBoardAPI.Helpers;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
+using eBoardAPI.Models.Auth;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.Parent;
 using eBoardAPI.Models.Student;
@@ -113,5 +115,25 @@ public class ParentService(IParentRepository parentRepository, IMapper mapper) :
         });
         
         return dtos;
+    }
+
+    public async Task<Result> ChangePasswordAsync(ChangePasswordDto changePasswordDto)
+    {
+        if (changePasswordDto.NewPassword != changePasswordDto.ConfirmPassword)
+            return Result.Failure("Mật khẩu mới và xác nhận mật khẩu không khớp");
+
+        var parentResult = await parentRepository.GetByIdAsync(changePasswordDto.Id);
+        if (!parentResult.IsSuccess || parentResult.Value == null)
+        {
+            return Result.Failure("Không tồn tại phụ huynh có Id này");
+        }
+
+        var parent = parentResult.Value;
+        var check = BCrypt.Net.BCrypt.Verify(changePasswordDto.OldPassword, parent.PasswordHash);
+        if (!check)
+            return Result.Failure("Sai mật khẩu");
+        parent.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordDto.NewPassword);
+        var result = await parentRepository.Update(parent);
+        return result;
     }
 }

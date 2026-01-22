@@ -1,5 +1,6 @@
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
+using eBoardAPI.Models.Auth;
 using eBoardAPI.Models.Parent;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -56,5 +57,16 @@ public class ParentController(IParentService parentService) : ControllerBase
     {
         var result = await parentService.GetChildInClassesByClassId(parentId, pageNumber, pageSize);
         return Ok(result);
+    }
+
+    [HttpPost("change-password")]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+    {
+        var result = await parentService.ChangePasswordAsync(changePasswordDto);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result);
+        }
+        return Ok();
     }
 }
