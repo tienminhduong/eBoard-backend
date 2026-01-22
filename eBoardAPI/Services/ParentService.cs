@@ -39,18 +39,36 @@ public class ParentService(IParentRepository parentRepository, IMapper mapper) :
 
         if (existingParent == null)
         {
-            return Result<ParentInfoDto>.Failure("Parent not found");
+            return Result<ParentInfoDto>.Failure("Không tìm thấy phụ huynh");
         }
-
-        // Map updated fields to existing parent entity
-        mapper.Map(updateParentInfoDto, existingParent);
+        
+        if (updateParentInfoDto.Address != null)
+            existingParent.Address = updateParentInfoDto.Address;
+        if (updateParentInfoDto.Email != null)
+            existingParent.Email = updateParentInfoDto.Email;
+        if (updateParentInfoDto.FullName != null)
+            existingParent.FullName = updateParentInfoDto.FullName;
+        if (updateParentInfoDto.HealthCondition != null)
+            existingParent.HealthCondition = updateParentInfoDto.HealthCondition;
+        
+        //check phone number
+        if (updateParentInfoDto.PhoneNumber != null && updateParentInfoDto.PhoneNumber != existingParent.PhoneNumber)
+        {
+            var phoneNumberExistsResult = await parentRepository.GetByPhoneNumberAsync(updateParentInfoDto.PhoneNumber);
+            if (phoneNumberExistsResult.IsSuccess)
+            {
+                return Result<ParentInfoDto>.Failure("Số điện thoại đã được sử dụng bởi phụ huynh khác");
+            }
+            existingParent.PhoneNumber = updateParentInfoDto.PhoneNumber;
+        }
+        
 
         // Update parent in repository
         var result = await parentRepository.Update(existingParent);
 
         if (!result.IsSuccess)
         {
-            return Result<ParentInfoDto>.Failure("Failed to update parent");
+            return Result<ParentInfoDto>.Failure("Cập nhật thông tin phụ huynh thất bại");
         }
 
         var updatedParent = mapper.Map<ParentInfoDto>(existingParent);
