@@ -10,5 +10,6 @@ namespace eBoardAPI.Interfaces.Services
         Task<Result<LoginResponseDto>> LoginAsync(ParentLoginDto login);
         Task<Result> ForgotPasswordAsync(ForgotPasswordDto dto);
         Task<Result> ResetPasswordAsync(ResetPasswordDto dto);
+        Task<Result<string>> GetNewTokenByRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto);
     }
 }

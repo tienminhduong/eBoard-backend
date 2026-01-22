@@ -1,7 +1,9 @@
-﻿using eBoardAPI.Interfaces.Services;
+using eBoardAPI.Entities;
+using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Auth;
 using eBoardAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBoardAPI.Controllers;
@@ -55,5 +57,16 @@ public class AuthController(IAuthService authService) : ControllerBase
     {
         await authService.ResetPasswordAsync(dto);
         return Ok("??i m?t kh?u th�nh c�ng");
+    }
+
+    [HttpPost("teacher/refresh-token")]
+    public async Task<ActionResult> RefreshTeacherToken([FromBody] RefreshTokenRequestDto dto)
+    {
+        var result = await authService.GetNewTokenByRefreshToken(dto);
+        if (!result.IsSuccess)
+        {
+            return Unauthorized(result.ErrorMessage);
+        }
+        return Ok(new { accessToken = result.Value });
     }
 }

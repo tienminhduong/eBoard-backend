@@ -19,7 +19,6 @@ namespace eBoardAPI.Services
         IEmailService emailService,
         IRefreshTokenRepository refreshTokenRepository,
         IRefreshTokenParentRepository refreshTokenParentRepository,
-        IConfiguration _config,
         IParentRepository parentRepository,
         ITokenService tokenService) : IAuthService
     {
@@ -184,6 +183,24 @@ namespace eBoardAPI.Services
                 AccessToken = accessToken,
                 RefreshToken = refreshTokenValue
             });
+        }
+
+        public async Task<Result<string>> GetNewTokenByRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto)
+        {
+            var tokenEntity = await refreshTokenRepository.GetRefreshTokenByTokenAsync(refreshTokenRequestDto.RefreshToken);
+            if (tokenEntity == null)
+                return Result<string>.Failure("Không tồn tại refresh token");
+
+            if (tokenEntity.ExpiresAt < DateTime.UtcNow)
+                return Result<string>.Failure("Refresh token đã hết hạn");
+
+            var teacherResult = await teacherRepository.GetByIdAsync(tokenEntity.TeacherId);
+            if (!teacherResult.IsSuccess || teacherResult.Value == null)
+                return Result<string>.Failure("User không tồn tại");
+
+            var teacher = teacherResult.Value;
+            var newAccessToken = tokenService.GenerateAccessToken(teacher);
+            return Result<string>.Success(newAccessToken);
         }
     }
 }

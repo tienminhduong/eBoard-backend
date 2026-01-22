@@ -10,5 +10,7 @@ namespace eBoardAPI.Interfaces.Services
         Task<Result<IEnumerable<ExamScheduleDto>>> GetExamSchedules(Guid classId, ExamScheduleFilter filter);
         Task<Result> UpdateExamSchedule(Guid examScheduleId, UpdateExamScheduleDto updateExamScheduleDto);
         Task<Result> DeleteExamSchedule(Guid id);
+        Task<Result<ExamScheduleStats>> GetExamScheduleStats(Guid classId);
+       
     }
 }

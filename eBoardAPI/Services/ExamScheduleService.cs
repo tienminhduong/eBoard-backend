@@ -76,6 +76,16 @@ namespace eBoardAPI.Services
             return Result<IEnumerable<ExamScheduleDto>>.Success(examScheduleDtos);
         }
 
+        public async Task<Result<ExamScheduleStats>> GetExamScheduleStats(Guid classId)
+        {
+            var result = await examScheduleRepository.GetExamScheduleStats(classId);
+            if (!result.IsSuccess)
+            {
+                return Result<ExamScheduleStats>.Failure(result.ErrorMessage!);
+            }
+            return Result<ExamScheduleStats>.Success(result.Value!);
+        }
+
         public async Task<Result> UpdateExamSchedule(Guid examScheduleId, UpdateExamScheduleDto updateExamScheduleDto)
         {
             if (updateExamScheduleDto.SubjectId == null && updateExamScheduleDto.SubjectName == null)

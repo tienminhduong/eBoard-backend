@@ -15,7 +15,8 @@ builder.Services
     .AddServices()
     .AddAutoMapper()
     .AddCorsPolicy()
-    .AddProvinceApiClient();
+    .AddProvinceApiClient()
+    .AddAuthenticationApp();
 
 var app = builder.Build();
 
@@ -34,6 +35,7 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

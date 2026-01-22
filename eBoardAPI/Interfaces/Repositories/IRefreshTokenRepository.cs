@@ -7,6 +7,8 @@ namespace eBoardAPI.Interfaces.Repositories
         Task AddAsync(RefreshToken token);
         Task<RefreshToken?> GetAsync(string token);
         Task SaveAsync();
+        Task<RefreshToken?> GetRefreshTokenByTokenAsync(string token);
+        Task RevokeToken(RefreshToken token);
     }
 
 }
