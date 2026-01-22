@@ -25,7 +25,7 @@ public class ActivityService(
             await unitOfWork.SaveChangesAsync();
             return Result<ExtracurricularActivityDto>.Success(mapper.Map<ExtracurricularActivityDto>(activity));
         }
-        catch (Exception ex)
+        catch
         {
             return Result<ExtracurricularActivityDto>.Failure("Đã xảy ra lỗi khi tạo hoạt động ngoại khóa.");
         }
@@ -44,7 +44,7 @@ public class ActivityService(
             await unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
-        catch (Exception ex)
+        catch
         {
             return Result.Failure("Đã xảy ra lỗi khi cập nhật hoạt động ngoại khóa.");
         }
@@ -60,7 +60,7 @@ public class ActivityService(
             await unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
-        catch (Exception ex)
+        catch
         {
             return Result.Failure("Đã xảy ra lỗi khi xóa hoạt động ngoại khóa.");
         }
@@ -124,7 +124,7 @@ public class ActivityService(
             await unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
-        catch (Exception ex)
+        catch
         {
             return Result.Failure("Đã xảy ra lỗi khi thêm học sinh tham gia hoạt động.");
         }
@@ -154,7 +154,7 @@ public class ActivityService(
             await unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
-        catch (Exception ex)
+        catch
         {
             return Result.Failure("Đã xảy ra lỗi khi thêm học sinh tham gia hoạt động.");
         }
@@ -174,7 +174,7 @@ public class ActivityService(
             await unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
-        catch (Exception ex)
+        catch
         {
             return Result.Failure("Đã xảy ra lỗi khi cập nhật người tham gia hoạt động.");
         }
@@ -190,7 +190,7 @@ public class ActivityService(
             await unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
-        catch (Exception ex)
+        catch
         {
             return Result.Failure("Đã xảy ra lỗi khi xóa người tham gia hoạt động.");
         }
@@ -220,7 +220,7 @@ public class ActivityService(
             await unitOfWork.SaveChangesAsync();
             return Result<Guid>.Success(signIn.Id);
         }
-        catch (Exception ex)
+        catch
         {
             return Result<Guid>.Failure("Đã xảy ra lỗi khi thêm đăng ký tham gia hoạt động.");
         }
@@ -236,7 +236,7 @@ public class ActivityService(
             await unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
-        catch (Exception ex)
+        catch
         {
             return Result.Failure("Đã xảy ra lỗi khi xóa đăng ký tham gia hoạt động.");
         }
@@ -293,7 +293,7 @@ public class ActivityService(
             await unitOfWork.SaveChangesAsync();
             return Result.Success();
         }
-        catch (Exception ex)
+        catch
         {
             return Result.Failure("Đã xảy ra lỗi khi cập nhật trạng thái đăng ký tham gia hoạt động.");
         }

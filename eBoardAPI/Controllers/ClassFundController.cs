@@ -112,7 +112,7 @@ public class ClassFundController(IClassFundService classFundService,
     }
 
     [HttpPost("{classId}/expenses")]
-    public async Task<ActionResult> AddNewFundExpense(Guid classId, [FromBody] FundExpenseCreateDto expenseRecord)
+    public async Task<ActionResult> AddNewFundExpense(Guid classId, [FromForm] FundExpenseCreateDto expenseRecord)
     {
         var result = await fundExpenseService.CreateNewFundExpenseAsync(classId, expenseRecord);
         if(!result.IsSuccess) {

@@ -10,8 +10,7 @@ using System.Net.WebSockets;
 namespace eBoardAPI.Services
 {
     public class ViolationService(IViolationRepository violationRepository,
-                                  IUnitOfWork unitOfWork,
-                                  IMapper mapper) : IViolationService
+                                  IUnitOfWork unitOfWork) : IViolationService
     {
         public async Task<Result> ConfirmViolation(Guid violationId, Guid studentId)
         {
