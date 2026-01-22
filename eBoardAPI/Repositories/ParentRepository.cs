@@ -75,4 +75,19 @@ public class ParentRepository(AppDbContext dbContext) : IParentRepository
             .ToListAsync();
         return query;
     }
+
+    public async Task<IEnumerable<Parent>> GetParentCreateAccountByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
+    {
+        var query = await dbContext.InClasses
+            .AsNoTracking()
+            .Where(ic => ic.ClassId == classId)
+            .Include(ic => ic.Student)
+            .ThenInclude(s => s.Parent)
+            .Select(ic => ic.Student.Parent)
+            .Where(pr => pr.GeneratedPassword != "")
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return query;
+    }
 }

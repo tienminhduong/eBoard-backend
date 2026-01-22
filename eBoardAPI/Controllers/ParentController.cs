@@ -50,4 +50,11 @@ public class ParentController(IParentService parentService) : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("class/{classId}/accounts/created")]
+    public async Task<ActionResult> GetParentCreateAccountByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
+    {
+        var result = await parentService.GetParentCreateAccountByClassId(classId, pageNumber, pageSize);
+        return Ok(result);
+    }
+
 }
