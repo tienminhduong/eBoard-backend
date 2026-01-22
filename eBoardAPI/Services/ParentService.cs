@@ -3,8 +3,9 @@ using eBoardAPI.Common;
 using eBoardAPI.Helpers;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
+using eBoardAPI.Models.Class;
 using eBoardAPI.Models.Parent;
-using Microsoft.AspNetCore.Identity;
+using eBoardAPI.Models.Student;
 
 namespace eBoardAPI.Services;
 
@@ -25,16 +26,9 @@ public class ParentService(IParentRepository parentRepository, IMapper mapper) :
         }
 
         var parentDto = mapper.Map<ParentInfoDto?>(resultGet.Value);
-        Result<ParentInfoDto> result;
-        if (parentDto == null)
-        {
-            result = Result<ParentInfoDto>.Failure("Parent not found");
-        }
-        else
-        {
-            result = Result<ParentInfoDto>.Success(parentDto);
-        }
-        return result;
+        return parentDto == null
+            ? Result<ParentInfoDto>.Failure("Không tìm thấy phụ huynh")
+            : Result<ParentInfoDto>.Success(parentDto);
     }
 
     public async Task<Result<ParentInfoDto>> UpdateAsync(Guid id, UpdateParentInfoDto updateParentInfoDto)
@@ -88,6 +82,18 @@ public class ParentService(IParentRepository parentRepository, IMapper mapper) :
     {
         var parents = await parentRepository.GetParentCreateAccountByClassId(classId, pageNumber, pageSize);
         var dtos = mapper.Map<List<ParentInfoDto>>(parents);
+        return dtos;
+    }
+
+    public async Task<IEnumerable<ChildInClassDto>> GetChildInClassesByClassId(Guid parentId, int pageNumber, int pageSize)
+    {
+        var studentWithClasses = await parentRepository.GetStudentsWithClassesByParentIdAsync(parentId);
+        var dtos = studentWithClasses.Select(x => new ChildInClassDto
+        {
+            StudentInfo = mapper.Map<StudentInfoDto>(x.Item1),
+            ClassInfo = mapper.Map<ClassInfoDto>(x.Item2)
+        });
+        
         return dtos;
     }
 }

@@ -10,4 +10,5 @@ public interface IParentService
     Task<IEnumerable<ParentInfoDto>> CreateAccountForParent(List<Guid> parentIds);
     Task<IEnumerable<ParentInfoDto>> GetParentNotCreateAccountByClassId(Guid classId, int pageNumber, int pageSize);
     Task<IEnumerable<ParentInfoDto>> GetParentCreateAccountByClassId(Guid classId, int pageNumber, int pageSize);
+    Task<IEnumerable<ChildInClassDto>> GetChildInClassesByClassId(Guid parentId, int pageNumber, int pageSize);
 }

@@ -13,4 +13,5 @@ public interface IParentRepository
     Task UpdateRangeParentsAsync(IEnumerable<Parent> parents);
     Task<IEnumerable<Parent>> GetParentNotCreateAccountByClassId(Guid classId, int pageNumber, int pageSize);
     Task<IEnumerable<Parent>> GetParentCreateAccountByClassId(Guid classId, int pageNumber, int pageSize);
+    Task<IEnumerable<Tuple<Student, Class>>> GetStudentsWithClassesByParentIdAsync(Guid parentId);
 }
