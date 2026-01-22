@@ -13,7 +13,8 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("parent/login")]
     public async Task<ActionResult<LoginResponseDto>> ParentLogin([FromBody] ParentLoginDto parentLoginDto)
     {
-        return Ok(new LoginResponseDto { AccessToken = "parent_access_token", RefreshToken = "parent_refresh_token" });
+        var result = await authService.LoginAsync(parentLoginDto);
+        return Ok(result);
     }
 
     [HttpPost("teacher/login")]

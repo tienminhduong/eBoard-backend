@@ -7,6 +7,7 @@ namespace eBoardAPI.Interfaces.Services
     {
         Task<Result> RegisterTeacherAsync(RegisterTeacherDto registerTeacherDto);
         Task<LoginResponseDto> LoginAsync(TeacherLoginDto login);
+        Task<LoginResponseDto> LoginAsync(ParentLoginDto login);
         Task ForgotPasswordAsync(ForgotPasswordDto dto);
         Task ResetPasswordAsync(ResetPasswordDto dto);
     }

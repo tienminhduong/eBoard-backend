@@ -24,7 +24,6 @@ namespace eBoardAPI.Services
             var claims = new[]
             {
             new Claim(JwtRegisteredClaimNames.Sub, teacher.Id.ToString()),
-            new Claim(ClaimTypes.Email, teacher.Email),
             new Claim(ClaimTypes.Role, ROLE.Teacher.ToString())
         };
 
@@ -42,6 +41,28 @@ namespace eBoardAPI.Services
                 signingCredentials: creds
             );
 
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateAccessToken(Parent parent)
+        {
+            // Implement similarly to GenerateAccessToken for Teacher
+            var claims = new[]
+            {
+                new Claim("id", parent.Id.ToString()),
+                new Claim(ClaimTypes.Role, ROLE.Parent.ToString())
+                };
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
+            );
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(15),
+                signingCredentials: creds
+            );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 

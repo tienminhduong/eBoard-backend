@@ -31,6 +31,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ActivityParticipant> ActivityParticipants { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<ParentNotification> ParentNotifications { get; set; }
+    public DbSet<RefreshTokenParent> RefreshTokenParents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
