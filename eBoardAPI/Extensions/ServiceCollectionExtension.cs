@@ -108,6 +108,7 @@ public static class ServiceCollectionExtension
             services.AddScoped<ITokenService, TokenService>();
             services.AddSingleton<IEmailService, EmailService>();
             services.AddScoped<IParentNotificationService, ParentNotificationService>();
+            services.AddScoped<IPhotoService, PhotoService>();
             return services;
         }
 

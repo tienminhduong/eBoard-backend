@@ -8,6 +8,7 @@ using eBoardAPI.Models.FundExpense;
 namespace eBoardAPI.Services
 {
     public class FundExpenseService(IFundExpenseRepository fundExpenseRepository,
+                                    IPhotoService photoService,
                                     IUnitOfWork unitOfWork,
                                     IMapper mapper) : IFundExpenseService
     {
@@ -51,6 +52,11 @@ namespace eBoardAPI.Services
                 {
                     unitOfWork.Dispose();
                     return Result<FundExpenseDto?>.Failure("Add new fund expense failed");
+                }
+                if(fundExpenseCreateDto.Image != null)
+                {
+                    var res = await photoService.UploadPhotoAsync(fundExpenseCreateDto.Image);
+                    fundExpenseEntity.InvoiceImgUrl = res.SecureUrl.ToString();
                 }
                 await unitOfWork.SaveChangesAsync();
                 var dto = mapper.Map<FundExpenseDto>(result.Value);

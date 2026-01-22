@@ -1,3 +1,5 @@
+using eBoardAPI.Interfaces.Services;
+
 namespace eBoardAPI.Interfaces.Repositories;
 
 public interface IUnitOfWork : IDisposable

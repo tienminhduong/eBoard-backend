@@ -8,6 +8,7 @@
         public DateOnly ExpenseDate { get; set; }
         public string InvoiceImgUrl { get; set; } = string.Empty;
         public string Notes { get; set; } = string.Empty;
+        public IFormFile? Image { get; set; }
 
         public string ValidateData()
         {
