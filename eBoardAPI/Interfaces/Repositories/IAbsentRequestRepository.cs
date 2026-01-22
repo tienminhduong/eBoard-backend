@@ -10,4 +10,6 @@ public interface IAbsentRequestRepository
     Task<IEnumerable<AbsentRequest>> GetAcceptedAbsentRequestsByDateAsync(Guid classId, DateOnly date);
     Task CreateAbsentRequestAsync(AbsentRequest absentRequest);
     void UpdateAbsentRequest(AbsentRequest absentRequest);
+    
+    Task<IEnumerable<AbsentRequest>> GetAbsentRequestsByStudentInClassAsync(Guid studentId, Guid classId);
 }

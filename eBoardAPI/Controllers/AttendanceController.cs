@@ -98,6 +98,13 @@ public class AttendanceController(
                 pageSize);
         return Ok(absentRequests);
     }
+    
+    [HttpGet("absent-requests/student/{studentId}/class/{classId}")]
+    public async Task<ActionResult<IEnumerable<AbsentRequestDto>>> GetAbsentRequestsForStudentInClassAsync(Guid studentId, Guid classId)
+    {
+        var absentRequests = await attendanceService.GetAbsentRequestsForStudentInClassAsync(studentId, classId);
+        return Ok(absentRequests);
+    }
 
     [HttpGet("absent-requests/class/{classId}/all")]
     public async Task<ActionResult<IEnumerable<AbsentRequestDto>>> GetAllAbsentRequestsForClassAsync(Guid classId,
