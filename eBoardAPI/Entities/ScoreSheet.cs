@@ -13,6 +13,7 @@ public class ScoreSheet
     public float AverageScore { get; set; }
     public string Grade { get; set; } = string.Empty;
     public int Semester { get; set; }
+    public string Conduct { get; set; } = string.Empty;
     public int Rank { get; set; }
     
     public ICollection<ScoreSheetDetail> Details { get; set; } = [];
