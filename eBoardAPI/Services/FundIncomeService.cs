@@ -11,6 +11,7 @@ namespace eBoardAPI.Services
     public class FundIncomeService(IFundIncomeRepository fundIncomeRepository,
                                    IClassFundRepository classFundRepository,
                                    IClassRepository classRepository,
+                                   IStudentRepository studentRepository,
                                    IMapper mapper) : IFundIncomeService
     {
         public async Task<Result<FundIncomeDto>> CreateFundIncomeAsync(Guid classId, CreateFundIncomeDto fundIncome)
@@ -84,24 +85,44 @@ namespace eBoardAPI.Services
 
         public async Task<Result<FundIncomeDto>> UpdateFundIncomeAsync(Guid id, UpdateFundIncomeDto updatedFundIncome)
         {
-            var existingFundIncomeResult = await fundIncomeRepository.GetByIdAsync(id);
-            if(!existingFundIncomeResult.IsSuccess)
+            try
             {
-                return Result<FundIncomeDto>.Failure(existingFundIncomeResult.ErrorMessage!);
-            }
-            if(existingFundIncomeResult.Value == null)
+
+
+                var existingFundIncomeResult = await fundIncomeRepository.GetByIdAsync(id);
+                if (!existingFundIncomeResult.IsSuccess)
+                {
+                    return Result<FundIncomeDto>.Failure(existingFundIncomeResult.ErrorMessage!);
+                }
+                if (existingFundIncomeResult.Value == null)
+                {
+                    return Result<FundIncomeDto>.Failure("Không tồn tại quỹ thu này");
+                }
+                var existingFundIncome = existingFundIncomeResult.Value;
+                mapper.Map(updatedFundIncome, existingFundIncome);
+
+                // update expected amount
+                var classFundResult = await classFundRepository.GetClassFundByIdAsync(existingFundIncome.ClassFundId);
+                if (!classFundResult.IsSuccess || classFundResult.Value == null)
+                {
+                    return Result<FundIncomeDto>.Failure("Class Fund not found.");
+                }
+
+                var countStudentResult = await studentRepository.CountStudentByClassIdAsync(classFundResult.Value.ClassId);
+                existingFundIncome.CalculateExpectedAmount(countStudentResult.Value);
+                var updateResult = await fundIncomeRepository.UpdateAsync(existingFundIncome);
+
+                if (!updateResult.IsSuccess)
+                {
+                    return Result<FundIncomeDto>.Failure(updateResult.ErrorMessage!);
+                }
+                var fundIncomeDto = mapper.Map<FundIncomeDto>(existingFundIncome);
+                return Result<FundIncomeDto>.Success(fundIncomeDto);
+            } 
+            catch (Exception ex)
             {
-                return Result<FundIncomeDto>.Failure("Không tồn tại quỹ thu này");
+                return Result<FundIncomeDto>.Failure($"An error occurred while updating Fund Income: {ex.Message}");
             }
-            var existingFundIncome = existingFundIncomeResult.Value;
-            mapper.Map(updatedFundIncome, existingFundIncome);
-            var updateResult = await fundIncomeRepository.UpdateAsync(existingFundIncome);
-            if(!updateResult.IsSuccess)
-            {
-                return Result<FundIncomeDto>.Failure(updateResult.ErrorMessage!);
-            }
-            var fundIncomeDto = mapper.Map<FundIncomeDto>(existingFundIncome);
-            return Result<FundIncomeDto>.Success(fundIncomeDto);
         }
     }
 }

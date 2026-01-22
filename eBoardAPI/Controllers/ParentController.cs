@@ -25,4 +25,30 @@ public class ParentController(IParentService parentService) : ControllerBase
         var result = await parentService.UpdateAsync(id, updateParentInfoDto);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.ErrorMessage);
     }
+
+    [HttpPost("create-accounts")]
+    public async Task<ActionResult> CreateAccountParents([FromBody] List<Guid> parentIds)
+    {
+        if (ModelState.IsValid == false)
+        {
+            return BadRequest(ModelState);
+        }
+        var result = await parentService.CreateAccountForParent(parentIds);
+        return Ok(result);
+    }
+
+    [HttpGet("class/{classId}/accounts/not-created")]
+    public async Task<ActionResult> GetParentNotCreateAccountByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
+    {
+        var result = await parentService.GetParentNotCreateAccountByClassId(classId, pageNumber, pageSize);
+        return Ok(result);
+    }
+
+    [HttpGet("class/{classId}/accounts/created")]
+    public async Task<ActionResult> GetParentCreateAccountByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
+    {
+        var result = await parentService.GetParentCreateAccountByClassId(classId, pageNumber, pageSize);
+        return Ok(result);
+    }
+
 }

@@ -36,8 +36,8 @@ public class StudentService(
                     FullName = createStudentDto.ParentFullName,
                     PhoneNumber = createStudentDto.ParentPhoneNumber,
                     Email = "",
-                    GeneratedPassword = RandomGeneratorHelper.GenerateRandomPassword(),
-                    PasswordHash = "Hello",
+                    GeneratedPassword = "",
+                    PasswordHash = "",
                     Address = StringHelper.ParseFullAddress(createStudentDto),
                     HealthCondition = createStudentDto.ParentHealthCondition
                 };

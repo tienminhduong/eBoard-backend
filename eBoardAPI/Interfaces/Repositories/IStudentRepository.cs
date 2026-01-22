@@ -11,4 +11,5 @@ public interface IStudentRepository
     Task<IEnumerable<Tuple<Guid, string>>> GetStudentsOptionInClassAsync(Guid classId);
     void UpdateStudent(Student student);
     Task<Result<Parent>> GetParentByStudentIdAsync(Guid studentId);
+    Task<Result<int>> CountStudentByClassIdAsync(Guid classId);
 }

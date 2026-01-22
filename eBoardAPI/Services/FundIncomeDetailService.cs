@@ -82,9 +82,9 @@ namespace eBoardAPI.Services
             }
         }
 
-        public async Task<Result<IEnumerable<StudentFundIncomeSummary>>> GetAllFundIncomeDetailsByIdFundIncomeAsync(Guid fundIncomeId)
+        public async Task<Result<IEnumerable<StudentFundIncomeSummary>>> GetAllFundIncomeDetailsByIdFundIncomeAsync(Guid fundIncomeId, int pageNumber = 1, int pageSize = 20)
         {
-            var result = await fundIncomeDetailRepository.GetAllFundIncomeDetailsByIdFundIncomeAsync(fundIncomeId);
+            var result = await fundIncomeDetailRepository.GetAllFundIncomeDetailsByIdFundIncomeAsync(fundIncomeId, pageNumber, pageSize);
             if(result.IsSuccess == false)
             {
                 return Result<IEnumerable<StudentFundIncomeSummary>>.Failure(result.ErrorMessage!);
@@ -164,6 +164,13 @@ namespace eBoardAPI.Services
                     incomeDetailEntity.ContributedAmount += difference;
                     fundIncomeEntity.CollectedAmount += difference;
                     classFundEntity.CurrentBalance += difference;
+                    classFundEntity.TotalContributions += difference;
+                    var updateFundClassResult = await unitOfWork.ClassFundRepository.UpdateAsync(classFundEntity);
+                    if (!updateFundClassResult.IsSuccess)
+                    {
+                        unitOfWork.Dispose();
+                        return Result.Failure("Cập nhật quỹ lớp thất bại");
+                    }
                 }
 
                 incomeDetailEntity.UpdateStatus(incomeDetailEntity.FundIncome.AmountPerStudent);

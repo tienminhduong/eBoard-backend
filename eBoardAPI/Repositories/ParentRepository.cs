@@ -46,4 +46,48 @@ public class ParentRepository(AppDbContext dbContext) : IParentRepository
         await dbContext.Parents.AddAsync(parent);
         return parent;
     }
+
+    public async Task<IEnumerable<Parent>> GetParentsByIdsAsync(List<Guid> parentIds)
+    {
+        return await dbContext.Parents
+            .AsNoTracking()
+            .Where(p => parentIds.Contains(p.Id))
+            .ToListAsync();
+    }
+
+    public async Task UpdateRangeParentsAsync(IEnumerable<Parent> parents)
+    {
+        dbContext.Parents.UpdateRange(parents);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Parent>> GetParentNotCreateAccountByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
+    {
+        var query = await dbContext.InClasses
+            .AsNoTracking()
+            .Where(ic => ic.ClassId == classId)
+            .Include(ic => ic.Student)
+            .ThenInclude(s => s.Parent)
+            .Select(ic => ic.Student.Parent)
+            .Where(pr => pr.GeneratedPassword == "")
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return query;
+    }
+
+    public async Task<IEnumerable<Parent>> GetParentCreateAccountByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
+    {
+        var query = await dbContext.InClasses
+            .AsNoTracking()
+            .Where(ic => ic.ClassId == classId)
+            .Include(ic => ic.Student)
+            .ThenInclude(s => s.Parent)
+            .Select(ic => ic.Student.Parent)
+            .Where(pr => pr.GeneratedPassword != "")
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return query;
+    }
 }

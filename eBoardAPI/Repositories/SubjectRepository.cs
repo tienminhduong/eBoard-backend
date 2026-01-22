@@ -49,6 +49,13 @@ public class SubjectRepository(AppDbContext dbContext) : ISubjectRepository
         return subject;
     }
 
+    public async Task<Subject> AddSubjectAndSaveAsync(Subject subject)
+    {
+        var res = await dbContext.Subjects.AddAsync(subject);
+        await dbContext.SaveChangesAsync();
+        return res.Entity;
+    }
+
     public async Task<IEnumerable<Subject>> GetAllSubjectsAsync() => await dbContext.Subjects.AsNoTracking().ToListAsync();
     public async Task<IEnumerable<Subject>> GetAllSubjectsByClassAsync(Guid classId)
     {

@@ -61,4 +61,18 @@ public class StudentRepository(AppDbContext db) : IStudentRepository
         return (student != null) ? Result<Student>.Success(student)
                                  : Result<Student>.Failure("Học sinh không tồn tại");
     }
+
+    public async Task<Result<int>> CountStudentByClassIdAsync(Guid classId)
+    {
+        try
+        {
+            return Result<int>.Success(await db.InClasses
+                .Where(ic => ic.ClassId == classId)
+                .CountAsync());
+        }
+        catch (Exception ex)
+        {
+            return Result<int>.Failure($"Đếm học sinh thất bại: {ex.Message}");
+        }
+    }
 }

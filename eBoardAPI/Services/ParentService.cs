@@ -1,8 +1,10 @@
 using AutoMapper;
 using eBoardAPI.Common;
+using eBoardAPI.Helpers;
 using eBoardAPI.Interfaces.Repositories;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Parent;
+using Microsoft.AspNetCore.Identity;
 
 namespace eBoardAPI.Services;
 
@@ -59,5 +61,33 @@ public class ParentService(IParentRepository parentRepository, IMapper mapper) :
 
         var updatedParent = mapper.Map<ParentInfoDto>(existingParent);
         return Result<ParentInfoDto>.Success(updatedParent);
+    }
+
+    public async Task<IEnumerable<ParentInfoDto>> CreateAccountForParent(List<Guid> parentIds)
+    {
+        var parents = await parentRepository.GetParentsByIdsAsync(parentIds);
+        var generatePassword = RandomGeneratorHelper.GenerateRandomPassword();
+        foreach (var parent in parents)
+        {
+            parent.GeneratedPassword = generatePassword;
+            parent.PasswordHash = BCrypt.Net.BCrypt.HashPassword(generatePassword);
+        }    
+        await parentRepository.UpdateRangeParentsAsync(parents);
+        var dtos = mapper.Map<List<ParentInfoDto>>(parents);
+        return dtos;
+    }
+
+    public async Task<IEnumerable<ParentInfoDto>> GetParentNotCreateAccountByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
+    {
+        var parents = await parentRepository.GetParentNotCreateAccountByClassId(classId, pageNumber, pageSize);
+        var dtos = mapper.Map<List<ParentInfoDto>>(parents);
+        return dtos;
+    }
+
+    public async Task<IEnumerable<ParentInfoDto>> GetParentCreateAccountByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
+    {
+        var parents = await parentRepository.GetParentCreateAccountByClassId(classId, pageNumber, pageSize);
+        var dtos = mapper.Map<List<ParentInfoDto>>(parents);
+        return dtos;
     }
 }

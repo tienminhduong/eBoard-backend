@@ -103,5 +103,18 @@ namespace eBoardAPI.Repositories
                 return Result.Failure(ex.Message);
             }
         }
+
+        public async Task<Result> UpdateNotSaveAsync(ExamSchedule examSchedule)
+        {
+            try
+            {
+                dbContext.ExamSchedules.Update(examSchedule);
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure(ex.Message);
+            }
+        }
     }
 }
