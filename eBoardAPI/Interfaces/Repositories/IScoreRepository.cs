@@ -24,4 +24,5 @@ public interface IScoreRepository
     
     public Task<IEnumerable<StudentScoreBySubjectDto>> GetScoresBySubjectAsync(Guid classId, Guid subjectId, int semester);
     Task AddScoreSheetDetailAsync(ScoreSheetDetail scoreSheetDetail);
+    void UpdateScoreSheetAsync(ScoreSheet scoreSheet);
 }

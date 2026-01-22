@@ -184,4 +184,9 @@ public class AttendanceService(
                 $"Học sinh {student.LastName} {student.FirstName} đã vắng mặt không lý do trong lớp ngày {date.ToString("dd/MM/yyyy")}.");
         }
     }
+
+    public async Task<IEnumerable<string>> GetRecentPickUpPersonForStudentAsync(Guid studentId, int limit)
+    {
+        return await attendanceRepository.GetRecentPickUpPersonForStudentAsync(studentId, limit);
+    }
 }

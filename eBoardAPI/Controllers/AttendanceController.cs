@@ -115,4 +115,12 @@ public class AttendanceController(
         await attendanceService.SendNotificationForAbsenceWithoutExcuseToParentsAsync(classId, date);
         return Ok();
     }
+
+    [HttpGet("student/{studentId}/recent-pickup-persons")]
+    public async Task<ActionResult<IEnumerable<string>>> GetRecentPickUpPersonForStudentAsync(Guid studentId,
+        [FromQuery] int limit = 5)
+    {
+        var pickUpPersons = await attendanceService.GetRecentPickUpPersonForStudentAsync(studentId, limit);
+        return Ok(pickUpPersons);
+    }
 }

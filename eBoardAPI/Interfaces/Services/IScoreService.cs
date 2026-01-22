@@ -16,4 +16,6 @@ public interface IScoreService
         UpdateIndividualStudentScoreSheetDto updateDto);
     Task<bool> UpdateScoresBySubjectAsync(Guid classId, Guid subjectId, int semester,
         IEnumerable<UpdateStudentScoreBySubjectDto> updateDtos);
+    Task<bool> UpdateStudentConductAsync(Guid classId, int semester, UpdateConductDto updateConductDto);
+    Task<bool> UpdateStudentsConductAsync(Guid classId, int semester, IEnumerable<UpdateConductDto> updateConductDtos);
 }

@@ -10,6 +10,7 @@ using eBoardAPI.Models.Subject;
 
 namespace eBoardAPI.Services;
 
+[SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
 public class ScoreService(
     IScoreRepository scoreRepository,
     IUnitOfWork unitOfWork,
@@ -140,6 +141,52 @@ public class ScoreService(
         
         await unitOfWork.ScoreRepository.EvaluateClassRankAsync(classId, semester);
 
+        try
+        {
+            await unitOfWork.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> UpdateStudentConductAsync(Guid classId, int semester, UpdateConductDto updateConductDto)
+    {
+        var scoreSheet = await unitOfWork.ScoreRepository.GetStudentScoreSheetAsync(classId, updateConductDto.StudentId, semester);
+        if (scoreSheet == null)
+            return false;
+        
+        scoreSheet.Conduct = updateConductDto.Conduct;
+        unitOfWork.ScoreRepository.UpdateScoreSheetAsync(scoreSheet);
+        
+        try
+        {
+            await unitOfWork.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> UpdateStudentsConductAsync(Guid classId, int semester, IEnumerable<UpdateConductDto> updateConductDtos)
+    {
+        var studentIds = updateConductDtos.Select(d => d.StudentId).ToHashSet();
+        var existingSheets = await unitOfWork.ScoreRepository.GetScoreSheetsByClassAndSemesterAsync(classId, semester);
+        var sheetDict = existingSheets.Where(s => studentIds.Contains(s.StudentId))
+            .ToDictionary(s => s.StudentId);
+        
+        foreach (var updateDto in updateConductDtos)
+        {
+            if (!sheetDict.TryGetValue(updateDto.StudentId, out var scoreSheet)) continue;
+            
+            scoreSheet.Conduct = updateDto.Conduct;
+            unitOfWork.ScoreRepository.UpdateScoreSheetAsync(scoreSheet);
+        }
+        
         try
         {
             await unitOfWork.SaveChangesAsync();
