@@ -6,6 +6,7 @@ public class ClassInfoDto
     public required string Name { get; set; }
     public required string Grade { get; set; }
     public required string TeacherName { get; set; }
+    public Guid TeacherId { get; set; }
     public string RoomName { get; set; } = string.Empty;
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }

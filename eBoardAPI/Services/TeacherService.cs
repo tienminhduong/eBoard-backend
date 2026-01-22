@@ -34,6 +34,13 @@ public class TeacherService(ITeacherRepository teacherRepository, IMapper mapper
 
     }
 
+    public async Task<Result<TeacherInfoDto>> GetTeacherByClassIdAsync(Guid classId)
+    {
+        var teacherResult = await teacherRepository.GetTeacherByClassIdAsync(classId);
+        return (teacherResult != null) ? Result<TeacherInfoDto>.Success(mapper.Map<TeacherInfoDto>(teacherResult))
+            : Result<TeacherInfoDto>.Failure("Teacher not found for the given class ID.");
+    }
+
     public async Task<Result<TeacherInfoDto>> GetTeacherInfoAsync(Guid id)
     {       
         var teacherResult = await teacherRepository.GetByIdAsync(id);

@@ -64,4 +64,18 @@ public class TeacherController(ITeacherService teacherService) : ControllerBase
             return BadRequest(result.ErrorMessage);
         }
     }
+
+    [HttpGet("classes/{classId}")]
+    public async Task<ActionResult> GetTeacherByClassId([FromRoute] Guid classId)
+    {
+        var result = await teacherService.GetTeacherByClassIdAsync(classId);
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+        else
+        {
+            return NotFound(result.ErrorMessage);
+        }
+    }
 }

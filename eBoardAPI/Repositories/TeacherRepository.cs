@@ -45,4 +45,13 @@ public class TeacherRepository(AppDbContext db) : ITeacherRepository
 
     public async Task<Teacher?> GetByEmailAsync(string email)
         => await db.Teachers.FirstOrDefaultAsync(x => x.Email == email);
+
+    public async Task<Teacher?> GetTeacherByClassIdAsync(Guid classId)
+    {
+        var res =  await db.Classes.Where(c => c.Id == classId)
+                        .Include(c => c.Teacher)
+                        .Select(c => c.Teacher)
+                        .FirstOrDefaultAsync();
+        return res;
+    }
 }

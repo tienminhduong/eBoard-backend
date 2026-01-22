@@ -10,4 +10,5 @@ public interface ITeacherService
     Task<Result> ChangePasswordAsync(ChangePasswordDto changePasswordDto);
     Task<Result<TeacherInfoDto>> GetTeacherInfoAsync(Guid id);
     Task<Result<TeacherInfoDto>> UpdateTeacherInfoAsync(Guid id, UpdateTeacherInfoDto updateTeacherInfoDto);
+    Task<Result<TeacherInfoDto>> GetTeacherByClassIdAsync(Guid classId);
 }
