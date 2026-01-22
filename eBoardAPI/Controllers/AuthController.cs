@@ -48,22 +48,15 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
     {
-        var result = await authService.ForgotPasswordAsync(dto);
-        if (!result.IsSuccess) {
-            return BadRequest(new { Message = result.ErrorMessage });
-        }
-        return Ok("N?u email t?n t?i, link reset ?ã ???c g?i");
+        await authService.ForgotPasswordAsync(dto);
+        return Ok("N?u email t?n t?i, link reset ?ï¿½ ???c g?i");
     }
 
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
     {
-        var res = await authService.ResetPasswordAsync(dto);
-        if (!res.IsSuccess)
-        {
-            return BadRequest(new { Message = res.ErrorMessage });
-        }
-        return Ok("??i m?t kh?u thành công");
+        await authService.ResetPasswordAsync(dto);
+        return Ok("??i m?t kh?u thï¿½nh cï¿½ng");
     }
 
     [HttpPost("teacher/refresh-token")]

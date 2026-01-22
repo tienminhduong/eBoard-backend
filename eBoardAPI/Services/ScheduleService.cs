@@ -147,7 +147,7 @@ public class ScheduleService(
                 continue;
             
             var existingDetail = scheduleSetting.Details
-                .FirstOrDefault(d => d.PeriodNumber == detail.PeriodNumber);
+                .FirstOrDefault(d => d.PeriodNumber == detail.PeriodNumber && d.IsMorningPeriod == detail.IsMorningPeriod);
             if (existingDetail != null)
             {
                 existingDetail.StartTime = detail.StartTime;
@@ -160,7 +160,8 @@ public class ScheduleService(
                     ScheduleSettingId = scheduleSettingId,
                     PeriodNumber = detail.PeriodNumber,
                     StartTime = detail.StartTime,
-                    EndTime = detail.EndTime
+                    EndTime = detail.EndTime,
+                    IsMorningPeriod = detail.IsMorningPeriod
                 };
                 await unitOfWork.ScheduleRepository.AddNewScheduleSettingDetailAsync(newDetail);
             }
