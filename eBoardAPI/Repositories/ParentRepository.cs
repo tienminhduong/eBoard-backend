@@ -90,4 +90,20 @@ public class ParentRepository(AppDbContext dbContext) : IParentRepository
             .ToListAsync();
         return query;
     }
+
+    public async Task<IEnumerable<Tuple<Student, Class>>> GetStudentsWithClassesByParentIdAsync(Guid parentId)
+    {
+        var query = dbContext.InClasses
+            .Include(ic => ic.Student)
+            .Where(ic => ic.Student.ParentId == parentId)
+            .Include(ic => ic.Class)
+            .ThenInclude(c => c.Grade)
+            .Include(ic => ic.Class)
+            .ThenInclude(c => c.Teacher)
+            .Select(ic => new Tuple<Student, Class>(ic.Student, ic.Class));
+        
+        return await query
+            .AsNoTracking()
+            .ToListAsync();
+    }
 }

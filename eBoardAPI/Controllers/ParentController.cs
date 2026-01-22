@@ -51,4 +51,10 @@ public class ParentController(IParentService parentService) : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("class/{parentId}/children")]
+    public async Task<ActionResult> GetChildInClassByClassId(Guid parentId, int pageNumber = 1, int pageSize = 20)
+    {
+        var result = await parentService.GetChildInClassesByClassId(parentId, pageNumber, pageSize);
+        return Ok(result);
+    }
 }
