@@ -15,5 +15,6 @@ public interface IUnitOfWork : IDisposable
     IFundIncomeDetailRepository FundIncomeDetailRepository { get; }
     IAbsentRequestRepository AbsentRequestRepository { get; }
     IActivityRepository ActivityRepository { get; }
+    IExamScheduleRepository ExamScheduleRepository { get; }
     Task<int> SaveChangesAsync();
 }

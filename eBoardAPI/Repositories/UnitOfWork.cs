@@ -18,6 +18,16 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
     IFundIncomeDetailRepository? _fundIncomeDetailRepository;
     IViolationRepository? _violationRepository;
     IActivityRepository? _activityRepository;
+    IExamScheduleRepository? _examScheduleRepository;   
+
+    public IExamScheduleRepository ExamScheduleRepository
+    {
+        get
+        {
+            _examScheduleRepository ??= new ExamScheduleRepository(dbContext);
+            return _examScheduleRepository;
+        }
+    }
 
     public IViolationRepository ViolationRepository
     {

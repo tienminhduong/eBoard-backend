@@ -10,6 +10,7 @@ namespace eBoardAPI.Services
 {
     public class ExamScheduleService(IExamScheduleRepository examScheduleRepository,
         ISubjectRepository subjectRepository,
+        IUnitOfWork unitOfWork,
         IMapper mapper) : IExamScheduleService
     {
         public async Task<Result<ExamScheduleDto>> CreateNewExamSchedule(CreateExamScheduleDto createExamScheduleDto)
@@ -77,20 +78,47 @@ namespace eBoardAPI.Services
 
         public async Task<Result> UpdateExamSchedule(Guid examScheduleId, UpdateExamScheduleDto updateExamScheduleDto)
         {
+            if (updateExamScheduleDto.SubjectId == null && updateExamScheduleDto.SubjectName == null)
+            {
+                return Result.Failure("SubjectId hoặc SubjectName phải được cung cấp");
+            }
+
             var existingExamScheduleResult = await examScheduleRepository.GetExamScheduleByIdAsync(examScheduleId);
             if (!existingExamScheduleResult.IsSuccess || existingExamScheduleResult.Value == null)
             {
                 return Result.Failure(existingExamScheduleResult.ErrorMessage ?? "Exam schedule not found.");
             }
-
             var examScheduleEntity = existingExamScheduleResult.Value;
-            mapper.Map(updateExamScheduleDto, examScheduleEntity);
-            var updateResult = await examScheduleRepository.UpdateAsync(examScheduleEntity);
-            if (!updateResult.IsSuccess)
+            try
             {
-                return Result.Failure(updateResult.ErrorMessage ?? "Failed to update exam schedule.");
+                if (updateExamScheduleDto.SubjectId != null)
+                {
+                    examScheduleEntity.SubjectId = updateExamScheduleDto.SubjectId.Value;
+                }
+                else
+                {
+                    var subjectEntity = new Subject
+                    {
+                        Name = updateExamScheduleDto.SubjectName!,
+                        ClassId = examScheduleEntity.ClassId
+                    };
+                    var subjectResult = await unitOfWork.SubjectRepository.AddSubjectAsync(subjectEntity);
+                    examScheduleEntity.SubjectId = subjectResult.Id;
+                }
+
+
+                var updateResult = await unitOfWork.ExamScheduleRepository.UpdateNotSaveAsync(examScheduleEntity);
+                if (!updateResult.IsSuccess)
+                {
+                    return Result.Failure(updateResult.ErrorMessage ?? "Failed to update exam schedule.");
+                }
+                await unitOfWork.SaveChangesAsync();
+                return Result.Success();
             }
-            return Result.Success();
+            catch (Exception ex)
+            {
+                return Result.Failure($"An error occurred while updating the exam schedule: {ex.Message}");
+            }
         }
     }
 }
