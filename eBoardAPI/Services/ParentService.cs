@@ -77,9 +77,9 @@ public class ParentService(IParentRepository parentRepository, IMapper mapper) :
         return dtos;
     }
 
-    public async Task<IEnumerable<ParentInfoDto>> GetParentNotCreateAccountByClassId(Guid classId)
+    public async Task<IEnumerable<ParentInfoDto>> GetParentNotCreateAccountByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
     {
-        var parents = await parentRepository.GetParentNotCreateAccountByClassId(classId);
+        var parents = await parentRepository.GetParentNotCreateAccountByClassId(classId, pageNumber, pageSize);
         var dtos = mapper.Map<List<ParentInfoDto>>(parents);
         return dtos;
     }

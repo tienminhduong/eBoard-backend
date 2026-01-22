@@ -61,7 +61,7 @@ public class ParentRepository(AppDbContext dbContext) : IParentRepository
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Parent>> GetParentNotCreateAccountByClassId(Guid classId)
+    public async Task<IEnumerable<Parent>> GetParentNotCreateAccountByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
     {
         var query = await dbContext.InClasses
             .AsNoTracking()
@@ -70,6 +70,8 @@ public class ParentRepository(AppDbContext dbContext) : IParentRepository
             .ThenInclude(s => s.Parent)
             .Select(ic => ic.Student.Parent)
             .Where(pr => pr.GeneratedPassword == "")
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
         return query;
     }

@@ -44,9 +44,9 @@ public class ParentController(IParentService parentService) : ControllerBase
     }
 
     [HttpGet("class/{classId}/accounts/not-created")]
-    public async Task<ActionResult> GetParentNotCreateAccountByClassId(Guid classId)
+    public async Task<ActionResult> GetParentNotCreateAccountByClassId(Guid classId, int pageNumber = 1, int pageSize = 20)
     {
-        var result = await parentService.GetParentNotCreateAccountByClassId(classId);
+        var result = await parentService.GetParentNotCreateAccountByClassId(classId, pageNumber, pageSize);
         return Ok(result);
     }
 
