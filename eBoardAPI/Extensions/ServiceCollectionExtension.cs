@@ -272,7 +272,9 @@ public static class ServiceCollectionExtension
                 opt => opt.MapFrom(src => $"{src.Class.StartDate.Year}-{src.Class.EndDate.Year}"))
             .ForMember(dest => dest.SubjectScores, opt => opt.MapFrom(src => src.Details))
             .ForMember(dest => dest.RankInClass,
-                opt => opt.MapFrom(src => $"{src.Rank}/{src.Class.CurrentStudentCount}"));
+                opt => opt.MapFrom(src => $"{src.Rank}/{src.Class.CurrentStudentCount}"))
+            .ForMember(dest => dest.FinalGrade,
+                opt => opt.MapFrom(src => StringHelper.ConductAndScoreGradeToFinalGrade(src.Conduct, src.Grade)));
 
         cfg.CreateMap<ScoreSheetDetail, SubjectScoreDto>()
             .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.Subject.Name));
