@@ -1,7 +1,9 @@
+using eBoardAPI.Entities;
 using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models;
 using eBoardAPI.Models.Auth;
 using eBoardAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBoardAPI.Controllers;

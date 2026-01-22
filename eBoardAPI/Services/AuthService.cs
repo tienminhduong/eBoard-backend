@@ -19,7 +19,6 @@ namespace eBoardAPI.Services
         IEmailService emailService,
         IRefreshTokenRepository refreshTokenRepository,
         IRefreshTokenParentRepository refreshTokenParentRepository,
-        IConfiguration _config,
         IParentRepository parentRepository,
         ITokenService tokenService) : IAuthService
     {

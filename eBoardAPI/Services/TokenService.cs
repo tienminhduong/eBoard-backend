@@ -24,8 +24,8 @@ namespace eBoardAPI.Services
         {
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, teacher.Id.ToString()),
-            new Claim(ClaimTypes.Role, ROLE.Teacher.ToString())
+            new Claim(CustomClaims.USER_ID, teacher.Id.ToString()),
+            new Claim(ClaimTypes.Role, nameof(ROLE.Teacher))
         };
 
             var key = new SymmetricSecurityKey(
@@ -38,7 +38,7 @@ namespace eBoardAPI.Services
                 issuer: Environment.GetEnvironmentVariable(EnvKey.JWT_ISSUER)!,
                 audience: Environment.GetEnvironmentVariable(EnvKey.JWT_AUDIENCE)!,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
+                expires: DateTime.UtcNow.AddDays(3),
                 signingCredentials: creds
             );
 
@@ -50,7 +50,7 @@ namespace eBoardAPI.Services
             // Implement similarly to GenerateAccessToken for Teacher
             var claims = new[]
             {
-                new Claim("id", parent.Id.ToString()),
+                new Claim(CustomClaims.USER_ID, parent.Id.ToString()),
                 new Claim(ClaimTypes.Role, ROLE.Parent.ToString())
                 };
             var key = new SymmetricSecurityKey(
@@ -61,7 +61,7 @@ namespace eBoardAPI.Services
                 issuer: Environment.GetEnvironmentVariable(EnvKey.JWT_ISSUER)!,
                 audience: Environment.GetEnvironmentVariable(EnvKey.JWT_AUDIENCE)!,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
+                expires: DateTime.UtcNow.AddDays(3),
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -76,10 +76,10 @@ namespace eBoardAPI.Services
         {
             var claims = new[]
             {
-        new Claim("id", teacher.Id.ToString()),
-        new Claim(ClaimTypes.Email, teacher.Email),
-        new Claim("type", "reset-password")
-    };
+                new Claim(CustomClaims.USER_ID, teacher.Id.ToString()),
+                new Claim(ClaimTypes.Role, ROLE.Teacher.ToString()),
+                new Claim(CustomClaims.TYPE, "reset-password")
+            };
 
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable(EnvKey.JWT_KEY)!)

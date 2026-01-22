@@ -3,12 +3,14 @@ using eBoardAPI.Interfaces.Services;
 using eBoardAPI.Models.Class;
 using eBoardAPI.Models.Student;
 using eBoardAPI.Models.Subject;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBoardAPI.Controllers;
 
 [ApiController]
 [Route("api/classes")]
+[Authorize(Roles = nameof(ROLE.Teacher))]
 public class ClassController(IClassService classService) : ControllerBase
 {
     [HttpGet("/api/grades")]
@@ -17,7 +19,7 @@ public class ClassController(IClassService classService) : ControllerBase
         var grades = await classService.GetAllGradesAsync();
         return Ok(grades);
     }
-    
+
     [HttpGet]
     public async Task<ActionResult<ClassInfoDto>> GetClassesByTeacher(
         Guid teacherId,

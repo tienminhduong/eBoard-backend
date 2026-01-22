@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using eBoardAPI.Consts;
 using eBoardAPI.Context;
 using eBoardAPI.Entities;
@@ -25,9 +25,13 @@ using eBoardAPI.Models.Violation;
 using eBoardAPI.Repositories;
 using eBoardAPI.Services;
 using EntityFramework.Exceptions.PostgreSQL;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Refit;
+using System.Security.Claims;
+using System.Text;
 
 namespace eBoardAPI.Extensions;
 
@@ -56,7 +60,7 @@ public static class ServiceCollectionExtension
             });
             return services;
         }
-        
+
         public IServiceCollection AddRepositories()
         {
             services.AddScoped<IStudentRepository, StudentRepository>();
@@ -106,23 +110,23 @@ public static class ServiceCollectionExtension
             services.AddScoped<IParentNotificationService, ParentNotificationService>();
             return services;
         }
-        
+
         public IServiceCollection AddAutoMapper()
         {
             var licenseKey = Environment.GetEnvironmentVariable(EnvKey.AUTOMAPPER_LICENSE_KEY);
             services.AddAutoMapper(cfg =>
             {
                 cfg.LicenseKey = licenseKey;
-                
+
                 cfg.CreateMap<Subject, SubjectDto>();
                 cfg.CreateMap<Parent, ParentInfoDto>();
                 cfg.CreateMap<UpdateTeacherInfoDto, Teacher>();
                 cfg.CreateMap<Teacher, TeacherInfoDto>();
-                
+
                 cfg.CreateMap<ScheduleSetting, ScheduleSettingDto>();
                 cfg.CreateMap<ScheduleSettingDetail, ScheduleSettingDetailDto>();
                 cfg.CreateMap<ParentNotification, ParentNotificationDto>();
-                
+
                 AddStudentDtoMappings(cfg);
                 AddClassDtoMappings(cfg);
                 AddFundDtoMappings(cfg);
@@ -130,7 +134,7 @@ public static class ServiceCollectionExtension
                 AddScoreSheetDtoMappings(cfg);
                 AddAttendanceDtoMappings(cfg);
                 AddActivityDtoMapping(cfg);
-                
+
                 AddViolationDtoMapping(cfg);
                 AddExamScheduleDtoMappings(cfg);
             }, AppDomain.CurrentDomain.GetAssemblies());
@@ -160,6 +164,38 @@ public static class ServiceCollectionExtension
                 {
                     c.BaseAddress = new Uri(baseUrl ?? "");
                 });
+            return services;
+        }
+
+        public IServiceCollection AddAuthenticationApp()
+        {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+
+                        ValidIssuer = Environment.GetEnvironmentVariable(EnvKey.JWT_ISSUER),
+                        ValidAudience = Environment.GetEnvironmentVariable(EnvKey.JWT_AUDIENCE),
+
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(
+                                Environment.GetEnvironmentVariable(EnvKey.JWT_KEY)!
+                            )
+                        ),
+
+                        // ⚠️ QUAN TRỌNG
+                        RoleClaimType = ClaimTypes.Role
+                };
+            });
             return services;
         }
     }
