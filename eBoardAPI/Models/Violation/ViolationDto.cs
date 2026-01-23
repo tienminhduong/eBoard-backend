@@ -18,5 +18,6 @@ namespace eBoardAPI.Models.Violation
     {
         public Guid StudentId { get; set; }
         public string StudentName { get; set; } = string.Empty;
+        public bool SeenByStudent { get; set; } = false;
     }
 }
