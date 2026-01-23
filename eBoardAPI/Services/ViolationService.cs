@@ -115,7 +115,8 @@ namespace eBoardAPI.Services
                 InvolvedStudents = violationEntity.Students.Select(s => new IdStudentPair
                 {
                     StudentId = s.Student.Id,
-                    StudentName = s.Student.FirstName + " " + s.Student.LastName
+                    StudentName = s.Student.FirstName + " " + s.Student.LastName,
+                    SeenByStudent = s.SeenByParent
                 }).ToList()
             };
             return Result<ViolationDto>.Success(violationDto);
@@ -141,7 +142,8 @@ namespace eBoardAPI.Services
                 InvolvedStudents = violationEntity.Students.Select(s => new IdStudentPair
                 {
                     StudentId = s.Student.Id,
-                    StudentName = s.Student.FirstName + " " + s.Student.LastName
+                    StudentName = s.Student.FirstName + " " + s.Student.LastName,
+                    SeenByStudent = s.SeenByParent
                 }).ToList()
             });
             return Result<IEnumerable<ViolationDto>>.Success(dtos);
